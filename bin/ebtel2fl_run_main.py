@@ -7,7 +7,7 @@
 import argparse
 import numpy as np
 import sys
-sys.path.append('/home/wtb2/Documents/EBTEL-2fluid_repo/bin/')
+sys.path.append('../src/')
 from ebtel2fl_run import Runner
 
 #Declare parser object
@@ -26,6 +26,7 @@ args = parser.parse_args()
 
 #set executable directory
 exec_dir = '/home/wtb2/Documents/EBTEL-2fluid_repo/bin/'
+
 #set top level directory
 top_dir = '/data/datadrive2/EBTEL-2fluid_runs/'
 top_dir = top_dir + args.species+'_heating_runs/alpha'+str(args.alpha)+'/config/'

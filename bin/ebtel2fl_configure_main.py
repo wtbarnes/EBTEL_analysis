@@ -6,7 +6,7 @@
 #Import needed modules
 import argparse
 import sys
-sys.path.append('../../../bin/')
+sys.path.append('../src/')
 from ebtel2fl_configure import Configurer
 
 #Declare parser object

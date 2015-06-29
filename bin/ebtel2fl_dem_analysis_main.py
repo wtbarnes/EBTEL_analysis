@@ -8,7 +8,7 @@ import sys
 import os
 import argparse
 import numpy as np
-sys.path.append('../../../bin/')
+sys.path.append('../src/')
 import ebtel2fl_dem as ebd
 import ebtel2fl_plot_em as ebpe
 import ebtel2fl_plot as ebp
