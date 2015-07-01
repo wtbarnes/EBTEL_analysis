@@ -110,14 +110,14 @@ class DEMAnalyzer(object):
             
         #Check if inside interpolated array and calculate slope
         #cool
-        if not bound_arrays['temp_cool']:
+        if bound_arrays['temp_cool'] is False:
             print "Cool bound out of range."
             a_coolward = False
         else:
             pars_cool,covar = curve_fit(linear_fit,bound_arrays['temp_cool'],bound_arrays['dem_cool'])
             a_coolward = pars_cool[0]
         #hot
-        if not bound_arrays['temp_hot']:
+        if bound_arrays['temp_hot'] is False:
             print "Hot bound out of range."
             a_hotward = False
         else:
