@@ -160,7 +160,7 @@ class DEMAnalyzer(object):
         inf_index = np.where(dem > self.em_cutoff)
         #Interpolate DEM and temperature arrays
         temp_new = np.linspace(temp[inf_index[0][0]],temp[inf_index[0][-1]],2000)
-        dem_new = np.interp(temp_new,temp[inf_index[0][0]:inf_index[0][-1]],dem_cool[inf_index[0][0]:inf_index[0][-1]])
+        dem_new = np.interp(temp_new,temp[inf_index[0][0]:inf_index[0][-1]],dem[inf_index[0][0]:inf_index[0][-1]])
         #Select hot and cool upper and lower bounds
         if not self.slope_limits:
             self.slope_limits['cool_upper'],self.slope_limits['hot_lower'] = temp[np.argmax(dem)],temp[np.argmax(dem)]
