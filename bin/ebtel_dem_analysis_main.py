@@ -1,4 +1,4 @@
-#ebtel2fl_dem_analysis_main.py
+#ebtel_dem_analysis_main.py
 
 #Will Barnes
 #15 May 2015
