@@ -27,16 +27,12 @@ class DEMAnalyzer(object):
             self.Tn = kwargs['Tn']
         else:
             self.Tn = np.arange(250,5250,250)
-        if 'delta_cool' in kwargs:
-            self.delta_cool = kwargs['delta_cool']
+        if 'slope_limits' in kwargs:
+            self.slope_limits = kwargs['slope_limits']
         else:
-            self.delta_cool = -0.6
-        if 'delta_hot' in kwargs:
-            self.delta_hot = kwargs['delta_hot']
-        else:
-            self.delta_hot = -2.0
+            self.slope_limits = {}
         #set static variables
-        self.em_cutoff = 23.0
+        self.em_cutoff = 25.0
         self.em_max_eps_percent = 0.999
             
             
@@ -106,7 +102,7 @@ class DEMAnalyzer(object):
 
     def slope(self,temp,dem,**kwargs):
         #Calculate bounds
-        dict_bounds = self.bounds(temp,dem)
+        bound_arrays = self.bounds(temp,dem)
         
         #Function for linear fit
         def linear_fit(x,a,b):
@@ -114,20 +110,18 @@ class DEMAnalyzer(object):
             
         #Check if inside interpolated array and calculate slope
         #cool
-        if np.size(dict_bounds['bound_cool']) == 0:
-            print "Cool bound out of range. T_cool_bound = ",temp[np.argmax(dem)] + self.delta_cool," < T_cool(0) = ",dict_bounds['temp_cool'][0]
+        if not bound_arrays['temp_cool']:
+            print "Cool bound out of range."
             a_coolward = False
         else:
-            bound_cool = dict_bounds['bound_cool'][0][-1] + 1
-            pars_cool,covar = curve_fit(linear_fit,dict_bounds['temp_cool'][bound_cool:-1],dict_bounds['dem_cool'][bound_cool:-1])
+            pars_cool,covar = curve_fit(linear_fit,bound_arrays['temp_cool'],bound_arrays['dem_cool'])
             a_coolward = pars_cool[0]
         #hot
         if np.size(dict_bounds['bound_hot']) == 0:
-            print "Hot bound out of range. DEM_hot_bound = ",dem[np.argmax(dem)] + self.delta_hot," < DEM_hot(end) = ",dict_bounds['dem_hot'][-1]
+            print "Hot bound out of range."
             a_hotward = False
         else:
-            bound_hot = dict_bounds['bound_hot'][0][0] - 1
-            pars_hot,covar = curve_fit(linear_fit,dict_bounds['temp_hot'][0:bound_hot],dict_bounds['dem_hot'][0:bound_hot])
+            pars_hot,covar = curve_fit(linear_fit,bound_arrays['temp_hot'],bound_arrays['dem_hot'])
             a_hotward = pars_hot[0]
             
         return a_coolward,a_hotward
@@ -161,33 +155,70 @@ class DEMAnalyzer(object):
         
         
     def bounds(self,temp,dem,**kwargs):
-        #Find peak parameters
-        dem_max = np.max(dem)
-        i_dem_max = np.argmax(dem)
-        temp_dem_max = temp[i_dem_max]
-
-        #Create cool and hot DEM and temperature arrays
-        dem_hot = dem[i_dem_max:-1]
-        temp_hot = temp[i_dem_max:-1]
-        dem_cool = dem[0:i_dem_max]
-        temp_cool = temp[0:i_dem_max]
-
+        #Filter inf and unrealistically low values
         #Find the dem index where dem->inf (or less than the cutoff)
-        inf_index_hot = np.where(dem_hot > self.em_cutoff)[0][-1]
-        inf_index_cool = np.where(dem_cool > self.em_cutoff)[0][0]
-
-        #Calculate the cool and hot bounds (in DEM and temperature)
-        temp_cool_bound = temp_dem_max + self.delta_cool
-        dem_hot_bound = dem_max + self.delta_hot
-
-        #Interpolate and find accurate bound index
-        temp_cool_new = np.linspace(temp_cool[inf_index_cool],temp_cool[-1],1000)
-        dem_cool_new = np.interp(temp_cool_new,temp_cool[inf_index_cool:-1],dem_cool[inf_index_cool:-1])
-        i_bound_cool = np.where(temp_cool_new < temp_cool_bound)
-        temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
-        dem_hot_new = np.interp(temp_hot_new,temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot])
-        i_bound_hot = np.where(dem_hot_new < dem_hot_bound)
-
-        #Return the list of indices and interpolated DEM and temperature arrays
-        return {'bound_cool':i_bound_cool,'bound_hot':i_bound_hot,'temp_cool':temp_cool_new,'temp_hot':temp_hot_new,'dem_cool':dem_cool_new,'dem_hot':dem_hot_new}
+        inf_index = np.where(dem > self.em_cutoff)
+        #Interpolate DEM and temperature arrays
+        temp_new = np.linspace(temp[inf_index[0][0]],temp[inf_index[0][-1]],2000)
+        dem_new = np.interp(temp_new,temp[inf_index[0][0]:inf_index[0][-1]],dem_cool[inf_index[0][0]:inf_index[0][-1]])
+        #Select hot and cool upper and lower bounds
+        if not self.slope_limits:
+            self.slope_limits['cool_upper'],self.slope_limits['hot_lower'] = temp[np.argmax(dem)],temp[np.argmax(dem)]
+            self.slope_limits['cool_lower'] = self.slope_limits['cool_upper'] - 0.6
+            self.slope_limits['hot_upper'] = self.slope_limits['hot_lower'] + 0.4
+        
+        #Construct hot and cool dem and temp arrays for given bounds
+        try:
+            i_cool_lower = np.where(temp_new<self.slope_limits['cool_lower'])[0][-1] + 1
+            i_cool_upper = np.where(temp_new>self.slope_limits['cool_upper'])[0][0] - 1
+            temp_new_cool = temp_new[i_cool_lower:i_cool_upper]
+            dem_new_cool = dem_new[i_cool_lower:i_cool_upper]
+        except:
+            temp_new_cool = False
+            dem_new_cool = False
+            
+        try:
+            i_hot_lower = np.where(temp_new<self.slope_limits['hot_lower'])[0][-1] + 1
+            i_hot_upper = np.where(temp_new>self.slope_limits['hot_upper'])[0][0] - 1
+            temp_new_hot = temp_new[i_hot_lower:i_hot_upper]
+            dem_new_hot = dem_new[i_hot_lower:i_hot_upper]
+        except:
+            temp_new_hot = False
+            dem_new_hot = False
+        
+        #Return interpolated arrays and indices
+        return {'temp_cool':temp_new_cool,'dem_cool':dem_new_cool,'temp_hot':temp_new_hot,'dem_hot':dem_new_hot}
+        
+    #def bounds(self,temp,dem,**kwargs):
+    #    #Find peak parameters
+    #    dem_max = np.max(dem)
+    #    i_dem_max = np.argmax(dem)
+    #    temp_dem_max = temp[i_dem_max]
+    #
+    #    #Create cool and hot DEM and temperature arrays
+    #    dem_hot = dem[i_dem_max:-1]
+    #    temp_hot = temp[i_dem_max:-1]
+    #    dem_cool = dem[0:i_dem_max]
+    #    temp_cool = temp[0:i_dem_max]
+    #
+    #    #Find the dem index where dem->inf (or less than the cutoff)
+    #    inf_index_hot = np.where(dem_hot > self.em_cutoff)[0][-1]
+    #    inf_index_cool = np.where(dem_cool > self.em_cutoff)[0][0]
+    #
+    #    #Interpolate DEM and temperature arrays
+    #    temp_cool_new = np.linspace(temp_cool[inf_index_cool],temp_cool[-1],1000)
+    #    dem_cool_new = np.interp(temp_cool_new,temp_cool[inf_index_cool:-1],dem_cool[inf_index_cool:-1])
+    #    temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
+    #    dem_hot_new = np.interp(temp_hot_new,temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot])
+    #    
+    #    #Specify lower and upper bounds for hot and cool branches
+    #    cool_lower_bound = temp_dem_max + self.delta_cool
+    #    hot_upper_bound = dem_max + self.delta_hot
+    #    
+    #    
+    #    i_bound_cool = np.where(temp_cool_new < cool_lower_bound)
+    #    i_bound_hot = np.where(dem_hot_new < hot_upper_bound)
+    #    
+    #    #Return the list of indices and interpolated DEM and temperature arrays
+    #    return {'bound_cool':i_bound_cool,'bound_hot':i_bound_hot,'temp_cool':temp_cool_new,'temp_hot':temp_hot_new,'dem_cool':dem_cool_new,'dem_hot':dem_hot_new}
         

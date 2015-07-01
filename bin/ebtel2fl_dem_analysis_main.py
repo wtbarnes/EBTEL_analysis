@@ -26,6 +26,9 @@ alpha = ['uniform',1.5,2.0,2.5]
 #make waiting time vector
 Tn = np.arange(250,5250,250)
 
+#set limits on hot/cool slope calculation
+slope_limits = {'cool_lower':6.0,'cool_upper':6.6,'hot_lower':6.6,'hot_upper':7.25}
+
 #set static parameters
 tpulse = 100.0
 solver = 'rka4'
@@ -53,7 +56,7 @@ for i in range(len(alpha)):
         else:
             solver = 'rka4'
             
-        dema = ebd.DEMAnalyzer(root_dir,args.species,alpha[i],loop_length[j],tpulse,solver,Tn=Tn)
+        dema = ebd.DEMAnalyzer(root_dir,args.species,alpha[i],loop_length[j],tpulse,solver,Tn=Tn,slope_limits=slope_limits)
         dema.process_raw()
         dema.many_slopes()
         dema.em_max()
