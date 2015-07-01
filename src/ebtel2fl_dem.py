@@ -117,7 +117,7 @@ class DEMAnalyzer(object):
             pars_cool,covar = curve_fit(linear_fit,bound_arrays['temp_cool'],bound_arrays['dem_cool'])
             a_coolward = pars_cool[0]
         #hot
-        if np.size(dict_bounds['bound_hot']) == 0:
+        if not bound_arrays['temp_hot']:
             print "Hot bound out of range."
             a_hotward = False
         else:
