@@ -63,7 +63,7 @@ for i in range(len(alpha)):
         temp_max_save.append([np.mean(tmax) for tmax in dema.temp_max])
         em_max_save.append([np.mean(emmax) for emmax in dema.em_max])
         #build figure names and make sure directories exist
-        if no os.path.exists(root_dir_figs + figdir%(args.species,str(alpha[i]))):
+        if not os.path.exists(root_dir_figs + figdir%(args.species,str(alpha[i]))):
             os.makedirs(figdir%(root_dir_figs + args.species,str(alpha[i])))
             
         figname_temp = figdir%(args.species,str(alpha[i]))+figname%(loop_length[j],tpulse,str(alpha[i]),args.species)
