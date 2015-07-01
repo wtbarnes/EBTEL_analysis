@@ -9,9 +9,9 @@ import os
 import argparse
 import numpy as np
 sys.path.append('../src/')
-import ebtel2fl_dem as ebd
-import ebtel2fl_plot_em as ebpe
-import ebtel2fl_plot as ebp
+import ebtel_dem as ebd
+import ebtel_plot_em as ebpe
+import ebtel_plot as ebp
 
 #set root directory
 root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'

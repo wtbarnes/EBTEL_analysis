@@ -1,4 +1,4 @@
-#ebtel2fl_configure.py
+#ebtel_configure.py
 
 #Will Barnes
 #7 May 2015

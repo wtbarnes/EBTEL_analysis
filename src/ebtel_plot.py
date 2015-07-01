@@ -1,4 +1,4 @@
-#ebtel2fl_plot.py
+#ebtel_plot.py
 
 #Will Barnes
 #7 May 2015

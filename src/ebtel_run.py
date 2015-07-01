@@ -1,4 +1,4 @@
-#ebtel2fl_run.py
+#ebtel_run.py
 
 #Will Barnes
 #7 May 2015

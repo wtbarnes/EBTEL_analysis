@@ -8,7 +8,7 @@ import argparse
 import numpy as np
 import sys
 sys.path.append('../src/')
-from ebtel2fl_run import Runner
+from ebtel_run import Runner
 
 #Declare parser object
 parser = argparse.ArgumentParser(description='Script to perform Monte Carlo-like EBTEL simulations by running over same parameter set multiple times')

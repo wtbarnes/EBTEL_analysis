@@ -1,4 +1,4 @@
-#ebtel2fl_plot_em.py
+#ebtel_plot_em.py
 
 #Will Barnes
 #14 May 2015
@@ -53,7 +53,7 @@ class DEMPlotter(object):
                 ax.plot(np.array(self.temp_list[i]),np.array(self.em_list[i])+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
 
         #set labels
-        ax.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
+        ax.set_title(r'EBTEL EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
         ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
@@ -85,7 +85,7 @@ class DEMPlotter(object):
         ax.fill_between(mean_temp,mean_em-std_em,mean_em+std_em,facecolor='red',edgecolor='red',alpha=0.25)
 
         #set labels
-        ax.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(self.alpha)+", $T_n$ = "+str(self.Tn[tn_index]),fontsize=self.fs)
+        ax.set_title(r'EBTEL EM, $\alpha$ = '+str(self.alpha)+", $T_n$ = "+str(self.Tn[tn_index]),fontsize=self.fs)
         ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
@@ -116,7 +116,7 @@ class DEMPlotter(object):
             ax_twin.errorbar(self.Tn[i],mean_em_max,yerr=std_em_max,fmt='*',color='black')
 
         #set labels
-        ax.set_title(r'EBTEL Two-fluid $T(\max(EM))$, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
+        ax.set_title(r'EBTEL $T(\max(EM))$, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
         ax.set_ylabel(r'$\log(T_{max})$',fontsize=self.fs)
         ax.set_ylim([5.5,7.0])
@@ -152,7 +152,7 @@ class DEMPlotter(object):
                 pass
 
         #set labels
-        ax.set_title(r'EBTEL Two-fluid Hot Shoulder Strength Comparison',fontsize=self.fs)
+        ax.set_title(r'EBTEL Hot Shoulder Strength Comparison',fontsize=self.fs)
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
         ax.set_ylabel(r'$a_{hot,cool}$',fontsize=self.fs)
         ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[2,2],'--k')

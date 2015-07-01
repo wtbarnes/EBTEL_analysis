@@ -7,7 +7,7 @@
 import argparse
 import sys
 sys.path.append('../src/')
-from ebtel2fl_configure import Configurer
+from ebtel_configure import Configurer
 
 #Declare parser object
 parser = argparse.ArgumentParser(description='Script that prints configuration files for EBTEL-2fluid runs.')
