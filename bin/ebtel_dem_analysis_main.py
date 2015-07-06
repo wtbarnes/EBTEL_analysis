@@ -14,8 +14,8 @@ import ebtel_plot_em as ebpe
 import ebtel_plot as ebp
 
 #set root directory
-root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'
-root_dir_figs = '/data/datadrive1/EBTEL-2fluid_figs/'
+root_dir = '/data/datadrive2/EBTEL_C_runs/'
+root_dir_figs = '/data/datadrive1/EBTEL_C_figs/'
 #set figure file format
 figdir = '%s_heating_runs/alpha%s/'
 figname = 'ebtel_L%.1f_tpulse%.1f_alpha%s_%s_heating'
@@ -68,7 +68,7 @@ for i in range(len(alpha)):
             
         figname_temp = figdir%(args.species,str(alpha[i]))+figname%(loop_length[j],tpulse,str(alpha[i]),args.species)
         #plot data
-        demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn)
+        demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn,format='pdf')
         demp.plot_em_max(dema.temp_max,dema.em_max,print_fig_filename=root_dir_figs + figname_temp + '_TmaxVTn')
         demp.plot_em_slopes(dema.a_cool,dema.a_hot,print_fig_filename=root_dir_figs + figname_temp + '_hs_compare')
         demp.plot_em_curves(print_fig_filename=root_dir_figs+figname_temp+'_dem')

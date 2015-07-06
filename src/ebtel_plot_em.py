@@ -18,7 +18,6 @@ class DEMPlotter(object):
         self.fs = 18.0
         self.figsize = (10,10)
         self.linestyles = ('-','--','-.',':')
-        self.format = 'eps'
         self.dpi = 1000
         #arguments
         self.temp_list = temp_list
@@ -30,6 +29,10 @@ class DEMPlotter(object):
         else:
             self.Tn = np.arange(250,5250,250)
         self.Tndelta = self.Tn[1] - self.Tn[0]
+        if 'format' in kwargs:
+            self.format = kwargs['format']
+        else:
+            self.format = 'eps'
 
 
     def plot_em_curves(self,**kwargs):
@@ -85,7 +88,7 @@ class DEMPlotter(object):
         ax.fill_between(mean_temp,mean_em-std_em,mean_em+std_em,facecolor='red',edgecolor='red',alpha=0.25)
 
         #set labels
-        ax.set_title(r'EBTEL EM, $\alpha$ = '+str(self.alpha)+", $T_n$ = "+str(self.Tn[tn_index]),fontsize=self.fs)
+        ax.set_title(r'EBTEL EM, $\alpha$ = '+str(self.alpha)+", $T_n$ = "+str(self.Tn[tn_index])+" s",fontsize=self.fs)
         ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
