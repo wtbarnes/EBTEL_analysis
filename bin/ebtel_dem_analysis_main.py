@@ -13,9 +13,26 @@ import ebtel_dem as ebd
 import ebtel_plot_em as ebpe
 import ebtel_plot as ebp
 
+#Declare parser object
+parser = argparse.ArgumentParser(description='Script that performs DEM analysis for EBTEL-2fluid runs.')
+#Add arguments to parser
+parser.add_argument("-s","--species",help="Species to which the heating was applied for particular run.")
+parser.add_argument("--root_dir",help="Root directory from which EBTEL output will be read.")
+parser.add_argument("--root_dir_figs",help="Root directory to which figures will be output.")
+#Declare the parser dictionary
+args = parser.parse_args()
+
 #set root directory
-root_dir = '/data/datadrive2/EBTEL_C_runs/'
-root_dir_figs = '/data/datadrive1/EBTEL_C_figs/'
+if args.root_dir:
+    root_dir = args.root_dir
+else:
+    root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'
+
+if args.root_dir_figs:
+    root_dir_figs = args.root_dir_figs
+else:
+    root_dir_figs = '/data/datadrive1/EBTEL-2fluid_figs/'
+    
 #set figure file format
 figdir = '%s_heating_runs/alpha%s/'
 figname = 'ebtel_L%.1f_tpulse%.1f_alpha%s_%s_heating'
@@ -34,13 +51,6 @@ t_hot = np.linspace(slope_limits['hot_lower'],slope_limits['hot_upper'],1000)
 #set static parameters
 tpulse = 100.0
 solver = 'rka4'
-
-#parse species argument
-parser = argparse.ArgumentParser(description='Script that performs DEM analysis for EBTEL-2fluid runs.')
-#Add arguments to parser
-parser.add_argument("-s","--species",help="Species to which the heating was applied for particular run.")
-#Declare the parser dictionary
-args = parser.parse_args()
 
 #declare instance of Plotter class
 surf_plot = ebp.Plotter()
