@@ -20,11 +20,24 @@ class Plotter(object):
         if 'child' in kwargs:
             self.child = kwargs['child']
         #configure static parameters
-        self.fs = 18.0
-        self.figsize = (10,10)
         self.linestyles = ('-','--','-.',':')
-        self.format = 'eps'
-        self.dpi = 1000
+        #check for custom parameters
+        if 'dpi' in kwargs:
+            self.dpi = kwargs['dpi']
+        else:
+            self.dpi = 1000
+        if 'fs' in kwargs:
+            self.fs = kwargs['fs']
+        else:
+            self.fs = 18.0
+        if 'figsize' in kwargs:
+            self.figsize = kwargs['figsize']
+        else:
+            self.figsize = (12,12)
+        if 'format' in kwargs:
+            self.format = kwargs['format']
+        else:
+            self.format = 'eps'
         #load variables
         if 'parent_dir' in kwargs and 'child' in kwargs:
             self.load_variables()
@@ -175,13 +188,14 @@ class Plotter(object):
 
         #plot fit
         ax.plot(10**bin_centers,10**pl_fit,'--r',label=r'Fit',linewidth=2.0)
-        ax.set_xlabel(r'Event Amplitude (erg cm$^{-3}$ s$^{-1}$)',fontsize=self.fs)
+        ax.set_xlabel(r'$E_H$ (erg cm$^{-3}$ s$^{-1}$)',fontsize=self.fs)
         ax.set_ylabel(r'Number of Events',fontsize=self.fs)
         ax.set_title(r'$P(x)=Cx^{\alpha}$, C = %.2e, $\alpha$ = %.2f $\pm$ %.2e' % (pars[0],pars[1],sigma[1]),fontsize=self.fs)
         ax.set_yscale('log',nonposy='clip')
         ax.set_xscale('log')
         ax.set_xlim([np.min(self.events),np.max(self.events)])
-        ax.legend(loc=1)
+        ax.tick_params(axis='both',labelsize=0.75*self.fs)
+        ax.legend(fontsize=0.75*self.fs,loc=1)
 
         #Check if output filename is specified
         if 'print_fig_filename' in kwargs:

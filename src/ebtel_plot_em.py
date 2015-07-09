@@ -15,10 +15,24 @@ class DEMPlotter(object):
 
     def __init__(self,temp_list,em_list,alpha,**kwargs):
         #static parameters
-        self.fs = 18.0
-        self.figsize = (10,10)
         self.linestyles = ('-','--','-.',':')
-        self.dpi = 1000
+        #check for custom parameters
+        if 'dpi' in kwargs:
+            self.dpi = kwargs['dpi']
+        else:
+            self.dpi = 1000
+        if 'format' in kwargs:
+            self.format = kwargs['format']
+        else:
+            self.format = 'eps'
+        if 'fs' in kwargs:
+            self.fs = kwargs['fs']
+        else:
+            self.fs = 18.0
+        if 'figsize' in kwargs:
+            self.figsize = kwargs['figsize']
+        else:
+            self.figsize = (12,12)
         #arguments
         self.temp_list = temp_list
         self.em_list = em_list
@@ -29,10 +43,6 @@ class DEMPlotter(object):
         else:
             self.Tn = np.arange(250,5250,250)
         self.Tndelta = self.Tn[1] - self.Tn[0]
-        if 'format' in kwargs:
-            self.format = kwargs['format']
-        else:
-            self.format = 'eps'
 
 
     def plot_em_curves(self,**kwargs):
@@ -82,10 +92,10 @@ class DEMPlotter(object):
         mean_em = np.mean(em_list,axis=0)
         std_em = np.std(em_list,axis=0)
         mean_temp = np.mean(temp_list,axis=0)
+        ax.fill_between(mean_temp,mean_em-std_em,mean_em+std_em,facecolor='red',edgecolor='red',alpha=0.35)
         for i in range(len(temp_list)):
             ax.plot(temp_list[i],em_list[i],color='blue',linestyle=self.linestyles[-1])
         ax.plot(mean_temp,mean_em,color='black')
-        ax.fill_between(mean_temp,mean_em-std_em,mean_em+std_em,facecolor='red',edgecolor='red',alpha=0.25)
 
         #set labels
         ax.set_title(r'EBTEL EM, $\alpha$ = '+str(self.alpha)+", $T_n$ = "+str(self.Tn[tn_index])+" s",fontsize=self.fs)
