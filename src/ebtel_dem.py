@@ -114,6 +114,7 @@ class DEMAnalyzer(object):
         if bound_arrays['temp_cool'] is False:
             print "Cool bound out of range."
             a_coolward = False
+            b_coolward = False
         else:
             pars_cool,covar = curve_fit(linear_fit,bound_arrays['temp_cool'],bound_arrays['dem_cool'])
             a_coolward,b_coolward = pars_cool[0],pars_cool[1]
@@ -121,6 +122,7 @@ class DEMAnalyzer(object):
         if bound_arrays['temp_hot'] is False:
             print "Hot bound out of range."
             a_hotward = False
+            b_hotward = False
         else:
             pars_hot,covar = curve_fit(linear_fit,bound_arrays['temp_hot'],bound_arrays['dem_hot'])
             a_hotward,b_hotward = pars_hot[0],pars_hot[1]
