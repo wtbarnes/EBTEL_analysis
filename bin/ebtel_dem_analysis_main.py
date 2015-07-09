@@ -29,7 +29,7 @@ Tn = np.arange(250,5250,250)
 #set limits on hot/cool slope calculation
 slope_limits = {'cool_lower':6.0,'cool_upper':6.6,'hot_lower':6.6,'hot_upper':7.25}
 t_cool = np.linspace(slope_limits['cool_lower'],slope_limits['cool_upper'],1000)
-t_hot = np.linspace(slope_limits['hot_lower'],slope_limit['hot_upper'],1000)
+t_hot = np.linspace(slope_limits['hot_lower'],slope_limits['hot_upper'],1000)
 
 #set static parameters
 tpulse = 100.0
