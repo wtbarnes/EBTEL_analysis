@@ -34,11 +34,16 @@ class DEMAnalyzer(object):
         #set static variables
         self.em_cutoff = 25.0
         self.em_max_eps_percent = 0.999
-            
-            
-    def process_raw(self,**kwargs):
+        #define variables to be used later
         self.em = []
         self.temp_em = []
+        self.temp_max = []
+        self.em_max = []
+        self.a_cool,self.a_cool_mean,self.a_cool_std = [],[],[]
+        self.a_hot,self.a_hot_mean,self.a_hot_std = [],[],[]
+        self.b_cool_mean,self.b_hot_mean = [],[]
+            
+    def process_raw(self,**kwargs):
         for i in range(len(self.Tn)):
             tn_path = self.root_path%self.Tn[i]
             #initialize lists
@@ -68,8 +73,6 @@ class DEMAnalyzer(object):
                 
                 
     def em_max(self,**kwargs):
-        self.temp_max = []
-        self.em_max = []
         for i in range(len(self.Tn)):
             temp_max_temp = []
             em_max_temp = []
@@ -89,14 +92,12 @@ class DEMAnalyzer(object):
                 
                 
     def many_slopes(self,**kwargs):
-        self.a_cool = []
-        self.a_hot = []
         for i in range(len(self.Tn)):
             acl = []
             ahl = []
             for j in range(len(self.temp_em[i])):
-                ac,ah = self.slope(self.temp_em[i][j],self.em[i][j])
-                acl.append(ac),ahl.append(ah)
+                ac,bc,ah,bh = self.slope(self.temp_em[i][j],self.em[i][j])
+                acl.append([ac,bc]),ahl.append([ah,bh])
             self.a_cool.append(acl),self.a_hot.append(ahl)
 
 
@@ -115,16 +116,38 @@ class DEMAnalyzer(object):
             a_coolward = False
         else:
             pars_cool,covar = curve_fit(linear_fit,bound_arrays['temp_cool'],bound_arrays['dem_cool'])
-            a_coolward = pars_cool[0]
+            a_coolward,b_coolward = pars_cool[0],pars_cool[1]
         #hot
         if bound_arrays['temp_hot'] is False:
             print "Hot bound out of range."
             a_hotward = False
         else:
             pars_hot,covar = curve_fit(linear_fit,bound_arrays['temp_hot'],bound_arrays['dem_hot'])
-            a_hotward = pars_hot[0]
+            a_hotward,b_hotward = pars_hot[0],pars_hot[1]
             
-        return a_coolward,a_hotward
+        return a_coolward,b_coolward,a_hotward,b_hotward
+        
+        
+    def slope_statistics(self,**kwargs):
+        if not self.a_cool or not self.a_hot:
+            raise ValueError("Before computing statistics of slopes, first calculate slopes using self.many_slopes()")
+        
+        for i in range(len(self.a_cool)):
+            try:
+                self.a_cool_mean.append(np.mean([self.a_cool[i][j][0] for j in np.where(np.array(self.a_cool[i]) != False)[0]]))
+                self.a_cool_std.append(np.std([self.a_cool[i][j][0] for j in np.where(np.array(self.a_cool[i]) != False)[0]]))
+                self.b_cool_mean.append(np.mean([self.a_cool[i][j][1] for j in np.where(np.array(self.a_cool[i]) != False)[0]]))
+            except:
+                self.a_cool_mean,self.a_cool_std,self.b_cool_mean = False,False,False
+                pass
+            try:
+                self.a_hot_mean = np.mean([self.a_hot[i][j][0] for j in np.where(np.array(self.a_hot[i]) != False)[0]])
+                self.a_hot_std = np.std([self.a_hot[i][j][0] for j in np.where(np.array(self.a_hot[i]) != False)[0]])
+                self.b_hot_mean.append(np.mean([self.a_hot[i][j][1] for j in np.where(np.array(self.a_hot[i]) != False)[0]]))
+            except:
+                self.a_hot_mean,self.a_hot_std,self.b_hot_mean = False,False,False
+                pass
+            
         
         
     def integrate(self,temp,dem,**kwargs):

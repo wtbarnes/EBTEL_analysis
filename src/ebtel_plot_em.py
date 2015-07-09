@@ -61,9 +61,19 @@ class DEMPlotter(object):
                 temp_mean_em[np.where(temp_mean_em==0.0)]=-np.float('Inf')
                 mean_em = temp_mean_em
                 mean_temp = np.mean(self.temp_list[i],axis=0)
-                ax.plot(mean_temp,mean_em+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
+                ax.plot(mean_temp,mean_em+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')
             else:
-                ax.plot(np.array(self.temp_list[i]),np.array(self.em_list[i])+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
+                ax.plot(np.array(self.temp_list[i]),np.array(self.em_list[i])+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')
+                
+            if 'fit_lines' in kwargs:
+                try:
+                    ax.plot(kwargs['t_cool'],(kwargs['a_cool']*kwargs['t_cool'] + kwargs['b_cool']) + i*delta_em,linewidth=2.0,color='blue')
+                except:
+                    pass
+                try:
+                    ax.plot(kwargs['t_hot'],(kwargs['a_hot']*kwargs['t_hot'] + kwargs['b_hot']) + i*delta_em,linewidth=2.0,color='red')
+                except:
+                    pass
 
         #set labels
         ax.set_title(r'EBTEL EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
@@ -102,7 +112,7 @@ class DEMPlotter(object):
         ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
-        ax.set_ylim([25,30])
+        ax.set_ylim([27,30])
 
         #save or show figure
         if 'print_fig_filename' in kwargs:
@@ -135,7 +145,7 @@ class DEMPlotter(object):
         ax.set_ylim([5.5,7.0])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
         ax_twin.set_ylabel(r'$\log$EM($T_{max}$) (cm$^{-5}$)',fontsize=self.fs)
-        ax_twin.set_ylim([26,30])
+        ax_twin.set_ylim([28,30])
 
         #save or show figure
         if 'print_fig_filename' in kwargs:
@@ -145,24 +155,17 @@ class DEMPlotter(object):
             plt.show()
 
 
-    def plot_em_slopes(self,a_cool,a_hot,**kwargs):
+    def plot_em_slopes(self,a_cool_mean,a_cool_std,a_hot_mean,a_hot_std,**kwargs):
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
 
         for i in range(len(self.Tn)):
-            try:
-                a_cool_mean = np.mean([a_cool[i][j] for j in np.where(np.array(a_cool[i]) != False)[0]])
-                a_cool_std = np.std([a_cool[i][j] for j in np.where(np.array(a_cool[i]) != False)[0]])
-                ax.errorbar(self.Tn[i],a_cool_mean,yerr=a_cool_std,fmt='o',color='blue')
-            except:
-                pass
-            try:
-                a_hot_mean = np.mean([a_hot[i][j] for j in np.where(np.array(a_hot[i]) != False)[0]])
-                a_hot_std = np.std([a_hot[i][j] for j in np.where(np.array(a_hot[i]) != False)[0]])
-                ax.errorbar(self.Tn[i],np.fabs(a_hot_mean),yerr=a_hot_std,fmt='o',color='red')
-            except:
-                pass
+            if a_cool_mean[i] is not False and a_cool_std[i] is not False:
+                ax.errorbar(self.Tn[i],a_cool_mean[i],yerr=a_cool_std[i],fmt='o',color='blue')
+
+            if a_hot_mean[i] is not False and a_hot_std[i] is not False:
+                ax.errorbar(self.Tn[i],np.fabs(a_hot_mean[i]),yerr=a_hot_std[i],fmt='o',color='red')
 
         #set labels
         ax.set_title(r'EBTEL Hot Shoulder Strength Comparison',fontsize=self.fs)
