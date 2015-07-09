@@ -72,7 +72,7 @@ class DEMAnalyzer(object):
             self.em.append(em)
                 
                 
-    def em_max(self,**kwargs):
+    def find_em_max(self,**kwargs):
         for i in range(len(self.Tn)):
             temp_max_temp = []
             em_max_temp = []
@@ -213,37 +213,4 @@ class DEMAnalyzer(object):
         
         #Return interpolated arrays and indices
         return {'temp_cool':temp_new_cool,'dem_cool':dem_new_cool,'temp_hot':temp_new_hot,'dem_hot':dem_new_hot}
-        
-    #def bounds(self,temp,dem,**kwargs):
-    #    #Find peak parameters
-    #    dem_max = np.max(dem)
-    #    i_dem_max = np.argmax(dem)
-    #    temp_dem_max = temp[i_dem_max]
-    #
-    #    #Create cool and hot DEM and temperature arrays
-    #    dem_hot = dem[i_dem_max:-1]
-    #    temp_hot = temp[i_dem_max:-1]
-    #    dem_cool = dem[0:i_dem_max]
-    #    temp_cool = temp[0:i_dem_max]
-    #
-    #    #Find the dem index where dem->inf (or less than the cutoff)
-    #    inf_index_hot = np.where(dem_hot > self.em_cutoff)[0][-1]
-    #    inf_index_cool = np.where(dem_cool > self.em_cutoff)[0][0]
-    #
-    #    #Interpolate DEM and temperature arrays
-    #    temp_cool_new = np.linspace(temp_cool[inf_index_cool],temp_cool[-1],1000)
-    #    dem_cool_new = np.interp(temp_cool_new,temp_cool[inf_index_cool:-1],dem_cool[inf_index_cool:-1])
-    #    temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
-    #    dem_hot_new = np.interp(temp_hot_new,temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot])
-    #    
-    #    #Specify lower and upper bounds for hot and cool branches
-    #    cool_lower_bound = temp_dem_max + self.delta_cool
-    #    hot_upper_bound = dem_max + self.delta_hot
-    #    
-    #    
-    #    i_bound_cool = np.where(temp_cool_new < cool_lower_bound)
-    #    i_bound_hot = np.where(dem_hot_new < hot_upper_bound)
-    #    
-    #    #Return the list of indices and interpolated DEM and temperature arrays
-    #    return {'bound_cool':i_bound_cool,'bound_hot':i_bound_hot,'temp_cool':temp_cool_new,'temp_hot':temp_hot_new,'dem_cool':dem_cool_new,'dem_hot':dem_hot_new}
         
