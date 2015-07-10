@@ -66,14 +66,14 @@ class DEMPlotter(object):
                 ax.plot(np.array(self.temp_list[i]),np.array(self.em_list[i])+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')
                 
             if 'fit_lines' in kwargs:
-                try:
-                    ax.plot(kwargs['t_cool'],(kwargs['a_cool']*kwargs['t_cool'] + kwargs['b_cool']) + i*delta_em,linewidth=2.0,color='blue')
-                except:
-                    pass
-                try:
-                    ax.plot(kwargs['t_hot'],(kwargs['a_hot']*kwargs['t_hot'] + kwargs['b_hot']) + i*delta_em,linewidth=2.0,color='red')
-                except:
-                    pass
+                #try:
+                ax.plot(kwargs['t_cool'],(kwargs['a_cool']*kwargs['t_cool'] + kwargs['b_cool']) + i*delta_em,linewidth=2.0,color='blue')
+                #except:
+                #    pass
+                #try:
+                ax.plot(kwargs['t_hot'],(kwargs['a_hot']*kwargs['t_hot'] + kwargs['b_hot']) + i*delta_em,linewidth=2.0,color='red')
+                #except:
+                #    pass
 
         #set labels
         ax.set_title(r'EBTEL EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
