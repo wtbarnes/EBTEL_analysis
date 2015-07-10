@@ -66,14 +66,14 @@ class DEMPlotter(object):
                 ax.plot(np.array(self.temp_list[i]),np.array(self.em_list[i])+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')
                 
             if 'fit_lines' in kwargs:
-                #try:
-                ax.plot(kwargs['fit_lines']['t_cool'],(kwargs['fit_lines']['a_cool']*kwargs['fit_lines']['t_cool'] + kwargs['fit_lines']['b_cool']) + i*delta_em,linewidth=2.0,color='blue')
-                #except:
-                #    pass
-                #try:
-                ax.plot(kwargs['fit_lines']['t_hot'],(kwargs['fit_lines']['a_hot']*kwargs['fit_lines']['t_hot'] + kwargs['fit_lines']['b_hot']) + i*delta_em,linewidth=2.0,color='red')
-                #except:
-                #    pass
+                try:
+                    ax.plot(kwargs['fit_lines']['t_cool'],(kwargs['fit_lines']['a_cool'][i]*kwargs['fit_lines']['t_cool'] + kwargs['fit_lines']['b_cool'][i]) + i*delta_em,linewidth=2.0,color='blue')
+                except:
+                    pass
+                try:
+                    ax.plot(kwargs['fit_lines']['t_hot'],(kwargs['fit_lines']['a_hot'][i]*kwargs['fit_lines']['t_hot'] + kwargs['fit_lines']['b_hot'][i]) + i*delta_em,linewidth=2.0,color='red')
+                except:
+                    pass
 
         #set labels
         ax.set_title(r'EBTEL EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
