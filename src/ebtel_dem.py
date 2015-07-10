@@ -136,7 +136,7 @@ class DEMAnalyzer(object):
         #compute mean and standard deviation for fit parameters for each T_n value
         for i in range(len(self.a_cool)):
             true_indices_cool = np.where(np.array(self.a_cool[i]) != False)[0]
-            if float(len(true_indices_cool))/len(self.a_cool[i]) < 0.75:
+            if float(len(true_indices_cool))/len(self.a_cool[i]) < 0.9:
                 self.a_cool_mean.append(False)
                 self.a_cool_std.append(False)
                 self.b_cool_mean.append(False)
@@ -146,7 +146,7 @@ class DEMAnalyzer(object):
                 self.b_cool_mean.append(np.mean(np.array(self.a_cool[i])[true_indices_cool,1]))
                 
             true_indices_hot = np.where(np.array(self.a_hot[i]) != False)[0]
-            if float(len(true_indices_hot))/len(self.a_hot[i]) < 0.75:
+            if float(len(true_indices_hot))/len(self.a_hot[i]) < 0.9:
                 self.a_hot_mean.append(False)
                 self.a_hot_std.append(False)
                 self.b_hot_mean.append(False)
@@ -155,25 +155,6 @@ class DEMAnalyzer(object):
                 self.a_hot_std.append(np.std(np.array(self.a_hot[i])[true_indices_hot,0]))
                 self.b_hot_mean.append(np.mean(np.array(self.a_hot[i])[true_indices_hot,1]))
             
-            #try:
-            #    self.a_cool_mean.append(np.mean([self.a_cool[i][j][0] for j in np.where(np.array(self.a_cool[i]) != False)[0]]))
-            #    self.a_cool_std.append(np.std([self.a_cool[i][j][0] for j in np.where(np.array(self.a_cool[i]) != False)[0]]))
-            #    self.b_cool_mean.append(np.mean([self.a_cool[i][j][1] for j in np.where(np.array(self.a_cool[i]) != False)[0]]))
-            #except:
-            #    self.a_cool_mean.append(False)
-            #    self.a_cool_std.append(False)
-            #    self.b_cool_mean.append(False)
-            #    pass
-            #    
-            #try:
-            #    self.a_hot_mean.append(np.mean([self.a_hot[i][j][0] for j in np.where(np.array(self.a_hot[i]) != False)[0]]))
-            #    self.a_hot_std.append(np.std([self.a_hot[i][j][0] for j in np.where(np.array(self.a_hot[i]) != False)[0]]))
-            #    self.b_hot_mean.append(np.mean([self.a_hot[i][j][1] for j in np.where(np.array(self.a_hot[i]) != False)[0]]))
-            #except:
-            #    self.a_hot_mean.append(False)
-            #    self.a_hot_std.append(False)
-            #    self.b_hot_mean.append(False)
-            #    pass
         
         
     def integrate(self,temp,dem,**kwargs):
