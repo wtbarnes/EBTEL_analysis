@@ -112,15 +112,14 @@ class DEMAnalyzer(object):
         #Check if inside interpolated array and calculate slope
         #cool
         if bound_arrays['temp_cool'] is False:
-            print "Cool bound out of range."
             a_coolward = False
             b_coolward = False
         else:
             pars_cool,covar = curve_fit(linear_fit,bound_arrays['temp_cool'],bound_arrays['dem_cool'])
             a_coolward,b_coolward = pars_cool[0],pars_cool[1]
+            
         #hot
         if bound_arrays['temp_hot'] is False:
-            print "Hot bound out of range."
             a_hotward = False
             b_hotward = False
         else:
@@ -203,6 +202,7 @@ class DEMAnalyzer(object):
             temp_new_cool = temp_new[i_cool_lower:i_cool_upper]
             dem_new_cool = dem_new[i_cool_lower:i_cool_upper]
         except:
+            print "Cool bound out of range, T = %.2f > T_limit = %.2f"%(temp_new[0],self.slope_limits['cool_lower'])
             temp_new_cool = False
             dem_new_cool = False
             
@@ -212,6 +212,7 @@ class DEMAnalyzer(object):
             temp_new_hot = temp_new[i_hot_lower:i_hot_upper]
             dem_new_hot = dem_new[i_hot_lower:i_hot_upper]
         except:
+            print "Hot bound out of range, T = %.2f < T_limit = %.2f"%(temp_new[-1],self.slope_limits['hot_upper'])
             temp_new_hot = False
             dem_new_hot = False
         
