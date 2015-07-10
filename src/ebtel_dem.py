@@ -140,14 +140,18 @@ class DEMAnalyzer(object):
                 self.a_cool_std.append(np.std([self.a_cool[i][j][0] for j in np.where(np.array(self.a_cool[i]) != False)[0]]))
                 self.b_cool_mean.append(np.mean([self.a_cool[i][j][1] for j in np.where(np.array(self.a_cool[i]) != False)[0]]))
             except:
-                self.a_cool_mean,self.a_cool_std,self.b_cool_mean = False,False,False
+                self.a_cool_mean.append(False)
+                self.a_cool_std.append(False)
+                self.b_cool_mean.append(False)
                 pass
             try:
-                self.a_hot_mean = np.mean([self.a_hot[i][j][0] for j in np.where(np.array(self.a_hot[i]) != False)[0]])
-                self.a_hot_std = np.std([self.a_hot[i][j][0] for j in np.where(np.array(self.a_hot[i]) != False)[0]])
+                self.a_hot_mean.append(np.mean([self.a_hot[i][j][0] for j in np.where(np.array(self.a_hot[i]) != False)[0]]))
+                self.a_hot_std.append(np.std([self.a_hot[i][j][0] for j in np.where(np.array(self.a_hot[i]) != False)[0]]))
                 self.b_hot_mean.append(np.mean([self.a_hot[i][j][1] for j in np.where(np.array(self.a_hot[i]) != False)[0]]))
             except:
-                self.a_hot_mean,self.a_hot_std,self.b_hot_mean = False,False,False
+                self.a_hot_mean.append(False)
+                self.a_hot_std.append(False)
+                self.b_hot_mean.append(False)
                 pass
             
         
