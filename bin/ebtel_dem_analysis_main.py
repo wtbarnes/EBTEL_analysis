@@ -84,7 +84,8 @@ for i in range(len(alpha)):
         demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn,format='pdf')
         demp.plot_em_max(dema.temp_max,dema.em_max,print_fig_filename=root_dir_figs + figname_temp + '_TmaxVTn')
         demp.plot_em_slopes(dema.a_cool_mean,dema.a_cool_std,dema.a_hot_mean,dema.a_hot_std,print_fig_filename=root_dir_figs + figname_temp + '_hs_compare')
-        demp.plot_em_curves(fit_lines={'t_cool':t_cool,'a_cool':dema.a_cool_mean,'b_cool':dema.b_cool_mean,'t_hot':t_hot,'a_hot':dema.a_hot_mean,'b_hot':dema.b_hot_mean},print_fig_filename=root_dir_figs+figname_temp+'_dem')
+        fit_lines = {'t_cool':t_cool,'a_cool':dema.a_cool_mean,'b_cool':dema.b_cool_mean,'t_hot':t_hot,'a_hot':dema.a_hot_mean,'b_hot':dema.b_hot_mean}
+        demp.plot_em_curves(fit_lines=fit_lines,print_fig_filename=root_dir_figs+figname_temp+'_dem')
         #plot all em curves for given tn
         if alpha[i] is not 'uniform':
             if not os.path.exists(root_dir_figs+figname_temp+'_dem_mc/'):
