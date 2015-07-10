@@ -72,6 +72,11 @@ for i in range(len(alpha)):
         dema.process_raw()
         dema.many_slopes()
         dema.slope_statistics()
+        
+        #DEBUG
+        print "Length of cool slopes ",len(dema.a_cool_mean)
+        print "Length of hot slopes ",len(dema.a_hot_mean)
+        
         dema.find_em_max()
         temp_max_save.append([np.mean(tmax) for tmax in dema.temp_max])
         em_max_save.append([np.mean(emmax) for emmax in dema.em_max])
