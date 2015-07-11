@@ -79,7 +79,7 @@ class DEMAnalyzer(object):
             for j in range(len(self.em[i])):
                 i_max = np.argmax(self.em[i][j])
                 indices_em_max = np.where(np.array(self.em[i][j]) > self.em_max_eps_percent*self.em[i][j][i_max])[0]
-                if indices_em_max <= 1:
+                if len(indices_em_max) <= 1:
                     temp_max_temp.append(self.temp_em[i][j][i_max])
                     em_max_temp.append(self.em[i][j][i_max])
                 else:
