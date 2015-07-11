@@ -185,7 +185,7 @@ class DEMPlotter(object):
         
         #legend
         if marker_cool and marker_hot:
-            ax.legend(loc=1,fontsize=0.75*self.fs,numpoints=1s)
+            ax.legend(loc=1,fontsize=0.75*self.fs,numpoints=1)
 
         #save or show figure
         if 'print_fig_filename' in kwargs:
