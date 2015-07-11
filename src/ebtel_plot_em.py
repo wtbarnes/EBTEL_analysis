@@ -163,7 +163,8 @@ class DEMPlotter(object):
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
-
+        
+        marker_cool,marker_hot = [],[]
         for i in range(len(self.Tn)):
             if a_cool_mean[i] is not False and a_cool_std[i] is not False:
                 marker_cool = ax.errorbar(self.Tn[i],a_cool_mean[i],yerr=a_cool_std[i],fmt='o',color='blue',label=r'cool')
@@ -184,9 +185,7 @@ class DEMPlotter(object):
         
         #legend
         if marker_cool and marker_hot:
-            lines = marker_cool + marker_hot
-            labels = [l.get_label() for l in lines]
-            ax.legend(lines,labels,loc=1,fontsize=0.75*self.fs)
+            ax.legend(loc=1,fontsize=0.75*self.fs,numpoints=1s)
 
         #save or show figure
         if 'print_fig_filename' in kwargs:
