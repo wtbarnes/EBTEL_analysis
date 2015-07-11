@@ -8,7 +8,7 @@ import sys
 import os
 import argparse
 import numpy as np
-sys.path.append('../src/')
+sys.path.append('/home/wtb2/Documents/EBTEL_analysis/src/')
 import ebtel_dem as ebd
 import ebtel_plot_em as ebpe
 import ebtel_plot as ebp
