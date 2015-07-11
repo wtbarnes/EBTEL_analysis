@@ -81,7 +81,7 @@ for i in range(len(alpha)):
             
         figname_temp = figdir%(args.species,str(alpha[i]))+figname%(loop_length[j],tpulse,str(alpha[i]),args.species)
         #plot data
-        demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn,format='pdf')
+        demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn,format='png',fs=22.0,figsize=(12,12),dpi=300)
         demp.plot_em_max(dema.temp_max,dema.em_max,print_fig_filename=root_dir_figs + figname_temp + '_TmaxVTn')
         demp.plot_em_slopes(dema.a_cool_mean,dema.a_cool_std,dema.a_hot_mean,dema.a_hot_std,print_fig_filename=root_dir_figs + figname_temp + '_hs_compare')
         fit_lines = {'t_cool':t_cool,'a_cool':dema.a_cool_mean,'b_cool':dema.b_cool_mean,'t_hot':t_hot,'a_hot':dema.a_hot_mean,'b_hot':dema.b_hot_mean}
