@@ -78,13 +78,13 @@ class DEMAnalyzer(object):
             em_max_temp = []
             for j in range(len(self.em[i])):
                 i_max = np.argmax(self.em[i][j])
-                indices_em_max = np.where(np.array(self.em[i][j]) > self.em_max_eps_percent*self.em[i][j][i_max])
+                indices_em_max = np.where(np.array(self.em[i][j]) > self.em_max_eps_percent*self.em[i][j][i_max])[0]
                 if indices_em_max <= 1:
                     temp_max_temp.append(self.temp_em[i][j][i_max])
                     em_max_temp.append(self.em[i][j][i_max])
                 else:
-                    em_interp = np.linspace(self.em[i][j][indices_em_max[0][0]],self.em[i][j][indices_em_max[0][-1]],100)
-                    temp_interp = np.interp(em_interp,np.array(self.em[i][j][indices_em_max[0][0]:indices_em_max[0][-1]]),np.array(self.temp_em[i][j][indices_em_max[0][0]:indices_em_max[0][-1]]))
+                    em_interp = np.linspace(self.em[i][j][indices_em_max[0]],self.em[i][j][indices_em_max[-1]],100)
+                    temp_interp = np.interp(em_interp,np.array(self.em[i][j][indices_em_max[0]:indices_em_max[-1]]),np.array(self.temp_em[i][j][indices_em_max[0]:indices_em_max[-1]]))
                     temp_max_temp.append(np.mean(temp_interp))
                     em_max_temp.append(np.mean(em_interp))
             self.temp_max.append(temp_max_temp)
