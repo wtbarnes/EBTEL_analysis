@@ -81,6 +81,7 @@ class DEMPlotter(object):
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,33])
+        ax.tick_params(axis='both',labelsize=0.75*self.fs)
 
         #save or show the figure
         if 'print_fig_filename' in kwargs:
@@ -113,6 +114,7 @@ class DEMPlotter(object):
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,30])
+        ax.tick_params(axis='both',labelsize=0.75*self.fs)
 
         #save or show figure
         if 'print_fig_filename' in kwargs:
@@ -124,7 +126,7 @@ class DEMPlotter(object):
 
     def plot_em_max(self,temp_max,em_max,**kwargs):
         #set up figure
-        fig = plt.figure(figsize=(self.figsize[0],0.7*self.figsize[1]))
+        fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         ax_twin = ax.twinx()
 
@@ -139,13 +141,15 @@ class DEMPlotter(object):
             ax_twin.errorbar(self.Tn[i],mean_em_max,yerr=std_em_max,fmt='*',color='black')
 
         #set labels
-        ax.set_title(r'EBTEL $T(\max(EM))$, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
+        ax.set_title(r'EBTEL $T(\mathrm{EM}_{\mathrm{max}})$, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
         ax.set_ylabel(r'$\log(T_{max})$',fontsize=self.fs)
         ax.set_ylim([5.5,7.0])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
+        ax.tick_params(axis='both',labelsize=0.75*self.fs)
         ax_twin.set_ylabel(r'$\log$EM($T_{max}$) (cm$^{-5}$)',fontsize=self.fs)
         ax_twin.set_ylim([28,30])
+        ax_twin.tick_params(axis='both',labelsize=0.75*self.fs)
 
         #save or show figure
         if 'print_fig_filename' in kwargs:
@@ -162,20 +166,27 @@ class DEMPlotter(object):
 
         for i in range(len(self.Tn)):
             if a_cool_mean[i] is not False and a_cool_std[i] is not False:
-                ax.errorbar(self.Tn[i],a_cool_mean[i],yerr=a_cool_std[i],fmt='o',color='blue')
+                marker_cool = ax.errorbar(self.Tn[i],a_cool_mean[i],yerr=a_cool_std[i],fmt='o',color='blue',label=r'cool')
 
             if a_hot_mean[i] is not False and a_hot_std[i] is not False:
-                ax.errorbar(self.Tn[i],np.fabs(a_hot_mean[i]),yerr=a_hot_std[i],fmt='o',color='red')
+                marker_hot = ax.errorbar(self.Tn[i],np.fabs(a_hot_mean[i]),yerr=a_hot_std[i],fmt='o',color='red',label=r'hot')
 
         #set labels
-        ax.set_title(r'EBTEL Hot Shoulder Strength Comparison',fontsize=self.fs)
+        ax.set_title(r'EBTEL EM Slope',fontsize=self.fs)
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
-        ax.set_ylabel(r'$a_{hot,cool}$',fontsize=self.fs)
+        ax.set_ylabel(r'$a$',fontsize=self.fs)
         ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[2,2],'--k')
         ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[3,3],'-k')
         ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[5,5],'-.k')
-        ax.set_ylim([0,10])
+        ax.set_ylim([0,7])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
+        ax.tick_params(axis='both',labelsize=0.75*self.fs)
+        
+        #legend
+        if marker_cool and marker_hot:
+            lines = marker_cool + marker_hot
+            labels = [l.get_label() for l in lines]
+            ax.legend(lines,labels,loc=1,fontsize=0.75*self.fs)
 
         #save or show figure
         if 'print_fig_filename' in kwargs:
