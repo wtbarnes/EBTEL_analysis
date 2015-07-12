@@ -31,6 +31,10 @@ class DEMAnalyzer(object):
             self.slope_limits = kwargs['slope_limits']
         else:
             self.slope_limits = {}
+        if 'verbose' in kwargs:
+            self.verbose = kwargs['verbose']
+        else:
+            self.verbose = True
         #set static variables
         self.em_cutoff = 26.0
         self.em_max_eps_percent = 0.999
@@ -64,8 +68,10 @@ class DEMAnalyzer(object):
                     #increment counter
                     counter += 1
                 except:
-                    print("Unable to process file for Tn = "+str(self.Tn[i])+", run = "+str(counter))
-                    print("Reached end of list or there was an error reading the file.")
+                    if self.verbose:
+                        print("Unable to process file for Tn = "+str(self.Tn[i])+", run = "+str(counter))
+                        print("Reached end of list or there was an error reading the file.")
+                    
                     eol_flag=True
                     pass
             self.temp_em.append(temp_em)
@@ -204,7 +210,9 @@ class DEMAnalyzer(object):
             temp_new_cool = temp_new[i_cool_lower:i_cool_upper]
             dem_new_cool = dem_new[i_cool_lower:i_cool_upper]
         except:
-            print("Cool bound out of range, T = %.2f > T_limit = %.2f"%(temp_new[0],self.slope_limits['cool_lower']))
+            if self.verbose:
+                print("Cool bound out of range, T = %.2f > T_limit = %.2f"%(temp_new[0],self.slope_limits['cool_lower']))
+            
             temp_new_cool = False
             dem_new_cool = False
             
@@ -214,7 +222,9 @@ class DEMAnalyzer(object):
             temp_new_hot = temp_new[i_hot_lower:i_hot_upper]
             dem_new_hot = dem_new[i_hot_lower:i_hot_upper]
         except:
-            print("Hot bound out of range, T = %.2f < T_limit = %.2f"%(temp_new[-1],self.slope_limits['hot_upper']))
+            if self.verbose:
+                print("Hot bound out of range, T = %.2f < T_limit = %.2f"%(temp_new[-1],self.slope_limits['hot_upper']))
+            
             temp_new_hot = False
             dem_new_hot = False
         
