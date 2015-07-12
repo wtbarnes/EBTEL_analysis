@@ -39,10 +39,8 @@ class DEMAnalyzer(object):
         self.em_cutoff = 26.0
         self.em_max_eps_percent = 0.999
         #define variables to be used later
-        self.em = []
-        self.temp_em = []
-        self.temp_max = []
-        self.em_max = []
+        self.em,self.em_max,self.em_mean = [],[],[]
+        self.temp_em,self.temp_max,self.temp_mean = [],[],[]
         self.a_cool,self.a_cool_mean,self.a_cool_std = [],[],[]
         self.a_hot,self.a_hot_mean,self.a_hot_std = [],[],[]
         self.b_cool_mean,self.b_hot_mean = [],[]
@@ -76,9 +74,27 @@ class DEMAnalyzer(object):
                     pass
             self.temp_em.append(temp_em)
             self.em.append(em)
+            
+            
+    def em_statistics(self,**kwargs):
+        if not self.temp_em or not self.em:
+            raise ValueError("Before computing EM statistics, run self.process_raw() to process EM,T data.")
+            
+        for i in range(len(self.em)):
+            if len(np.shape(np.array(self.em_list[i]))) > 1:
+                temporary_mean_em = np.array(np.mean(self.inf_filter(self.em[i]),axis=0))
+                temporary_mean_em[np.where(temp_mean_em==0.0)]=-np.float('Inf')
+                self.em_mean.append(temporary_mean_em)
+                self.temp_mean.append(np.mean(self.temp_em[i],axis=0))
+            else:
+                self.em_mean.append(np.array(self.em[i]))
+                self.temp_mean.append(np.array(self.temp_em[i]))
                 
                 
     def find_em_max(self,**kwargs):
+        if not self.temp_em or not self.em:
+            raise ValueError("Before computing EM statistics, run self.process_raw() to process EM,T data.")
+            
         for i in range(len(self.Tn)):
             temp_max_temp = []
             em_max_temp = []
@@ -230,4 +246,16 @@ class DEMAnalyzer(object):
         
         #Return interpolated arrays and indices
         return {'temp_cool':temp_new_cool,'dem_cool':dem_new_cool,'temp_hot':temp_new_hot,'dem_hot':dem_new_hot}
+        
+        
+    def inf_filter(self,nested_list,**kwargs):
+        #preallocate space
+        filtered_list = []
+        #filter out infs in list and set to zero for averaging
+        for i in nested_list:
+            temp_array = np.array(i)
+            temp_array[np.where(np.isinf(temp_array)==True)]=0.0
+            filtered_list.append(temp_array)
+        return filtered_list
+        
         

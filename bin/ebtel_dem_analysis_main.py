@@ -70,6 +70,7 @@ for i in range(len(alpha)):
             
         dema = ebd.DEMAnalyzer(root_dir,args.species,alpha[i],loop_length[j],tpulse,solver,Tn=Tn,slope_limits=slope_limits)
         dema.process_raw()
+        dema.em_statistics()
         dema.many_slopes()
         dema.slope_statistics()
         dema.find_em_max()
@@ -85,7 +86,7 @@ for i in range(len(alpha)):
         demp.plot_em_max(dema.temp_max,dema.em_max,print_fig_filename=root_dir_figs + figname_temp + '_TmaxVTn')
         demp.plot_em_slopes(dema.a_cool_mean,dema.a_cool_std,dema.a_hot_mean,dema.a_hot_std,print_fig_filename=root_dir_figs + figname_temp + '_hs_compare')
         fit_lines = {'t_cool':t_cool,'a_cool':dema.a_cool_mean,'b_cool':dema.b_cool_mean,'t_hot':t_hot,'a_hot':dema.a_hot_mean,'b_hot':dema.b_hot_mean}
-        demp.plot_em_curves(fit_lines=fit_lines,print_fig_filename=root_dir_figs+figname_temp+'_dem')
+        demp.plot_em_curves(dema.temp_mean,dema.em_mean,fit_lines=fit_lines,print_fig_filename=root_dir_figs+figname_temp+'_dem')
         #plot all em curves for given tn
         if alpha[i] is not 'uniform':
             if not os.path.exists(root_dir_figs+figname_temp+'_dem_mc/'):

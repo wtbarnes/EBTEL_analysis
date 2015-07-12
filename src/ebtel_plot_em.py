@@ -45,7 +45,7 @@ class DEMPlotter(object):
         self.Tndelta = self.Tn[1] - self.Tn[0]
 
 
-    def plot_em_curves(self,**kwargs):
+    def plot_em_curves(self,temp_mean,em_mean,**kwargs):
         #spacing between tn curves (artificial)
         delta_em = 0.2
 
@@ -55,16 +55,7 @@ class DEMPlotter(object):
 
         #print lines
         for i in range(len(self.em_list)):
-            if len(np.shape(np.array(self.em_list[i]))) > 1:
-                mean_em = np.mean(self.inf_filter(self.em_list[i]),axis=0)
-                temp_mean_em = np.array(mean_em)
-                temp_mean_em[np.where(temp_mean_em==0.0)]=-np.float('Inf')
-                mean_em = temp_mean_em
-                mean_temp = np.mean(self.temp_list[i],axis=0)
-                ax.plot(mean_temp,mean_em+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')
-            else:
-                ax.plot(np.array(self.temp_list[i]),np.array(self.em_list[i])+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')
-                
+            ax.plot(temp_mean,em_mean+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')    
             if 'fit_lines' in kwargs:
                 try:
                     ax.plot(kwargs['fit_lines']['t_cool'],(kwargs['fit_lines']['a_cool'][i]*kwargs['fit_lines']['t_cool'] + kwargs['fit_lines']['b_cool'][i]) + i*delta_em,linewidth=2.0,color='blue')
@@ -195,13 +186,3 @@ class DEMPlotter(object):
             plt.show()
             
             
-    def inf_filter(self,nested_list,**kwargs):
-        #preallocate space
-        filtered_list = []
-        #filter out infs in list and set to zero for averaging
-        for i in nested_list:
-            temp_array = np.array(i)
-            temp_array[np.where(np.isinf(temp_array)==True)]=0.0
-            filtered_list.append(temp_array)
-        return filtered_list
-
