@@ -42,7 +42,7 @@ class Plotter(object):
         if 'parent_dir' in kwargs and 'child' in kwargs:
             self.load_variables()
         else:
-            print "No file specified. Variable namespace will not be populated."
+            print("No file specified. Variable namespace will not be populated.")
 
     def load_variables(self,**kwargs):
         #load plasma parameters
@@ -57,7 +57,7 @@ class Plotter(object):
             self.dens_apex = data[:,9]
             self.heat = data[:,15]
         except:
-            print "Unable to load plasma parameters."
+            print("Unable to load plasma parameters.")
             pass
 
         #load dem parameters
@@ -69,13 +69,13 @@ class Plotter(object):
             self.dem_tot = data[:,3]
             self.em_cor = data[:,4]
         except:
-            print "Unable to load DEM parameters."
+            print("Unable to load DEM parameters.")
             pass
         #load heat parameters
         try:
             self.events = np.loadtxt(self.parent_dir+self.child+'_heat_amp.txt')
         except:
-            print "Unable to load heating event amplitudes."
+            print("Unable to load heating event amplitudes.")
             pass
 
 
@@ -183,7 +183,7 @@ class Plotter(object):
             sigma = np.sqrt(np.diag(covar))
         except:
             sigma = [0.0,0.0]
-            print "Uncertainty calculation failed. Resulting value is a placeholder."
+            print("Uncertainty calculation failed. Resulting value is a placeholder.")
             pass
 
         #plot fit

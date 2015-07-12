@@ -24,7 +24,7 @@ class Runner(object):
             quiet_option = ''
             
         output = commands.getoutput(self.exec_directory+'ebtel-2fl '+self.config_directory+config_file+quiet_option)
-        print output
+        print(output)
         
         
     def run_ebtel_multi_serial(self,**kwargs):
@@ -33,7 +33,7 @@ class Runner(object):
         for name in os.listdir(self.config_directory+kwargs['sub_dir']):
             if os.path.isfile(self.config_directory+kwargs['sub_dir']+name):
                 output = commands.getoutput(self.exec_directory+'ebtel-2fl '+self.config_directory+kwargs['sub_dir']+name+' quiet')
-                print output
+                print(output)
                 
                 
     #This function deprecated--use not recommended            

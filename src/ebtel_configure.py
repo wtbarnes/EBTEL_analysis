@@ -17,7 +17,7 @@ class Configurer(object):
         if 'build_paths' in kwargs and kwargs['build_paths'] is True:
             self.path_builder()
         else:
-            print "Warning: Build paths not constructed! You will not be able to build config files for variable Tn until you run self.path_builder()."
+            print("Warning: Build paths not constructed! You will not be able to build config files for variable Tn until you run self.path_builder().")
         
         if 'Hn' in kwargs:
             self.Hn = kwargs['Hn']

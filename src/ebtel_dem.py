@@ -64,8 +64,8 @@ class DEMAnalyzer(object):
                     #increment counter
                     counter += 1
                 except:
-                    print "Unable to process file for Tn = "+str(self.Tn[i])+", run = "+str(counter)
-                    print "Reached end of list or there was an error reading the file."
+                    print("Unable to process file for Tn = "+str(self.Tn[i])+", run = "+str(counter))
+                    print("Reached end of list or there was an error reading the file.")
                     eol_flag=True
                     pass
             self.temp_em.append(temp_em)
@@ -163,7 +163,7 @@ class DEMAnalyzer(object):
 
         #First check if the bounds are inside of our interpolated array
         if np.size(dict_bounds['bound_cool']) == 0 or np.size(dict_bounds['bound_hot']) == 0:
-            print "Cool and/or hot bound(s) out of range. Skipping integration for these bounds."
+            print("Cool and/or hot bound(s) out of range. Skipping integration for these bounds.")
             hot_shoulder_strength = False
         else:
             #Refine the arrays we will integrate over
@@ -204,7 +204,7 @@ class DEMAnalyzer(object):
             temp_new_cool = temp_new[i_cool_lower:i_cool_upper]
             dem_new_cool = dem_new[i_cool_lower:i_cool_upper]
         except:
-            print "Cool bound out of range, T = %.2f > T_limit = %.2f"%(temp_new[0],self.slope_limits['cool_lower'])
+            print("Cool bound out of range, T = %.2f > T_limit = %.2f"%(temp_new[0],self.slope_limits['cool_lower']))
             temp_new_cool = False
             dem_new_cool = False
             
@@ -214,7 +214,7 @@ class DEMAnalyzer(object):
             temp_new_hot = temp_new[i_hot_lower:i_hot_upper]
             dem_new_hot = dem_new[i_hot_lower:i_hot_upper]
         except:
-            print "Hot bound out of range, T = %.2f < T_limit = %.2f"%(temp_new[-1],self.slope_limits['hot_upper'])
+            print("Hot bound out of range, T = %.2f < T_limit = %.2f"%(temp_new[-1],self.slope_limits['hot_upper']))
             temp_new_hot = False
             dem_new_hot = False
         

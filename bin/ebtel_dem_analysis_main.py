@@ -61,7 +61,7 @@ for i in range(len(alpha)):
     em_max_save = []
     for j in  range(len(loop_length)):
         #print status
-        print "Processing L = %.1f, alpha = %s"%(loop_length[j],str(alpha[i]))
+        print("Processing L = %.1f, alpha = %s"%(loop_length[j],str(alpha[i])))
         #get data
         if loop_length[j] == 20.0 or alpha[i] == 'uniform':
             solver = 'euler'
