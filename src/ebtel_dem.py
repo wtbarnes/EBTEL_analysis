@@ -81,7 +81,7 @@ class DEMAnalyzer(object):
             raise ValueError("Before computing EM statistics, run self.process_raw() to process EM,T data.")
             
         for i in range(len(self.em)):
-            if len(np.shape(np.array(self.em_list[i]))) > 1:
+            if len(np.shape(np.array(self.em[i]))) > 1:
                 temporary_mean_em = np.array(np.mean(self.inf_filter(self.em[i]),axis=0))
                 temporary_mean_em[np.where(temp_mean_em==0.0)]=-np.float('Inf')
                 self.em_mean.append(temporary_mean_em)
