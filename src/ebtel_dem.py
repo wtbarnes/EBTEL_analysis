@@ -119,6 +119,8 @@ class DEMAnalyzer(object):
             ahl = []
             #redefine slope limits if kwargs
             if 'slope_limits' in kwargs:
+                self.slope_limits['cool_lower'] = kwargs['slope_limits']['cool_lower'][i]
+                self.slope_limits['cool_upper'] = kwargs['slope_limits']['cool_upper'][i]
                 self.slope_limits['hot_lower'] = kwargs['slope_limits']['hot_lower'][i]
                 self.slope_limits['hot_upper'] = kwargs['slope_limits']['hot_upper'][i]
                 

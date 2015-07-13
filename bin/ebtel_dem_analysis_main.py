@@ -45,8 +45,22 @@ Tn = np.arange(250,5250,250)
 
 #set limits on hot/cool slope calculation
 slope_limits = {'cool_lower':6.0,'cool_upper':6.6,'hot_lower':6.8,'hot_upper':7.25}
-t_cool = np.linspace(slope_limits['cool_lower'],slope_limits['cool_upper'],1000)
-t_hot = np.linspace(slope_limits['hot_lower'],slope_limits['hot_upper'],1000)
+t_cool_static = np.linspace(slope_limits['cool_lower'],slope_limits['cool_upper'],1000)
+t_hot_static = np.linspace(slope_limits['hot_lower'],slope_limits['hot_upper'],1000)
+
+#function to calculate variable hot slopes
+def calc_upper_hot_lim(mean_temp,mean_em):
+    delta = 0.4 #spacing between upper and lower limits
+    ninf_i = np.where(np.isinf(mean_em) == False) #find non-inf indices
+    max_i = np.argmax(mean_em) #find index corresponding to max value
+    hot_i = ninf_i[0][np.where(ninf_i[0]>max_i)] #indices for hot branch
+    em_hot = mean_em[hot_i] #hot branch em
+    delta_em_hot = np.fabs(np.diff(em_hot)) #delta(em) of hot branch
+    delta_i = np.where(delta_em_hot>0.5)[0][0]
+    lim_i = hot_i[delta_i - 2]
+    t_upper = mean_temp[lim_i]
+    t_lower = t_upper - delta
+    return t_lower,t_upper
 
 #set static parameters
 tpulse = 100.0
@@ -71,7 +85,16 @@ for i in range(len(alpha)):
         dema = ebd.DEMAnalyzer(root_dir,args.species,alpha[i],loop_length[j],tpulse,solver,Tn=Tn,slope_limits=slope_limits)
         dema.process_raw()
         dema.em_statistics()
-        dema.many_slopes()
+        #variable limit configuration and temperature fit array
+        hot_lower,hot_upper = [],[]
+        t_cool,t_hot = [],[]
+        for i in range(len(dema.temp_mean)):
+            l,u = calc_upper_hot_lim(dema.temp_mean[i],dema.em_mean[i])
+            hot_lower.append(l),hot_upper.append(u)
+            t_cool.append(t_cool_static)
+            t_hot.append(np.linspace(l,u,len(t_cool_static)))
+            
+        dema.many_slopes(slope_limits={'hot_lower':hot_lower,'hot_upper':hot_upper})
         dema.slope_statistics()
         dema.find_em_max()
         temp_max_save.append([np.mean(tmax) for tmax in dema.temp_max])
