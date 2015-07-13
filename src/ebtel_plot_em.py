@@ -58,11 +58,12 @@ class DEMPlotter(object):
             ax.plot(temp_mean[i],em_mean[i]+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')    
             if 'fit_lines' in kwargs:
                 try:
-                    ax.plot(kwargs['fit_lines']['t_cool'],(kwargs['fit_lines']['a_cool'][i]*kwargs['fit_lines']['t_cool'] + kwargs['fit_lines']['b_cool'][i]) + i*delta_em,linewidth=2.0,color='blue')
+                    ax.plot(kwargs['fit_lines']['t_cool'][i],(kwargs['fit_lines']['a_cool'][i]*kwargs['fit_lines']['t_cool'][i] + kwargs['fit_lines']['b_cool'][i]) + i*delta_em,linewidth=2.0,color='blue')
                 except:
                     pass
+                    
                 try:
-                    ax.plot(kwargs['fit_lines']['t_hot'],(kwargs['fit_lines']['a_hot'][i]*kwargs['fit_lines']['t_hot'] + kwargs['fit_lines']['b_hot'][i]) + i*delta_em,linewidth=2.0,color='red')
+                    ax.plot(kwargs['fit_lines']['t_hot'][i],(kwargs['fit_lines']['a_hot'][i]*kwargs['fit_lines']['t_hot'][i] + kwargs['fit_lines']['b_hot'][i]) + i*delta_em,linewidth=2.0,color='red')
                 except:
                     pass
 

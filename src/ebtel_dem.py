@@ -117,9 +117,15 @@ class DEMAnalyzer(object):
         for i in range(len(self.Tn)):
             acl = []
             ahl = []
+            #redefine slope limits if kwargs
+            if 'slope_limits' in kwargs:
+                self.slope_limits['hot_lower'] = kwargs['slope_limits']['hot_lower'][i]
+                self.slope_limits['hot_upper'] = kwargs['slope_limits']['hot_upper'][i]
+                
             for j in range(len(self.temp_em[i])):
                 ac,bc,ah,bh = self.slope(self.temp_em[i][j],self.em[i][j])
                 acl.append([ac,bc]),ahl.append([ah,bh])
+                
             self.a_cool.append(acl),self.a_hot.append(ahl)
 
 
@@ -176,34 +182,6 @@ class DEMAnalyzer(object):
                 self.a_hot_mean.append(np.mean(np.array(self.a_hot[i])[true_indices_hot,0]))
                 self.a_hot_std.append(np.std(np.array(self.a_hot[i])[true_indices_hot,0]))
                 self.b_hot_mean.append(np.mean(np.array(self.a_hot[i])[true_indices_hot,1]))
-            
-        
-        
-    def integrate(self,temp,dem,**kwargs):
-        #Find the corresponding temperature bounds
-        dict_bounds = self.bounds(temp,dem)
-
-        #First check if the bounds are inside of our interpolated array
-        if np.size(dict_bounds['bound_cool']) == 0 or np.size(dict_bounds['bound_hot']) == 0:
-            print("Cool and/or hot bound(s) out of range. Skipping integration for these bounds.")
-            hot_shoulder_strength = False
-        else:
-            #Refine the arrays we will integrate over
-            #Temprature
-            temp_hot = dict_bounds['temp_hot'][0:(dict_bounds['bound_hot'][0][0] - 1)]
-            temp_cool = dict_bounds['temp_cool'][(dict_bounds['bound_cool'][0][-1] + 1):-1]
-            #DEM (EM)
-            dem_hot = dict_bounds['dem_hot'][0:(dict_bounds['bound_hot'][0][0] - 1)]
-            dem_cool = dict_bounds['dem_cool'][(dict_bounds['bound_cool'][0][-1] + 1):-1]
-            #Do the integration
-            #Hot shoulder
-            hot_shoulder = np.trapz(dem_hot,x=temp_hot)
-            #Total
-            total_shoulder = np.trapz(np.concatenate([dem_cool[0:-1],dem_hot]),x=np.concatenate([temp_cool[0:-1],temp_hot]))
-            #Compute the ratio
-            hot_shoulder_strength = hot_shoulder/total_shoulder
-
-        return hot_shoulder_strength
         
         
     def bounds(self,temp,dem,**kwargs):
@@ -257,5 +235,33 @@ class DEMAnalyzer(object):
             temp_array[np.where(np.isinf(temp_array)==True)]=0.0
             filtered_list.append(temp_array)
         return filtered_list
+        
+        
+    #DEPRECATED
+    def integrate(self,temp,dem,**kwargs):
+        #Find the corresponding temperature bounds
+        dict_bounds = self.bounds(temp,dem)
+
+        #First check if the bounds are inside of our interpolated array
+        if np.size(dict_bounds['bound_cool']) == 0 or np.size(dict_bounds['bound_hot']) == 0:
+            print("Cool and/or hot bound(s) out of range. Skipping integration for these bounds.")
+            hot_shoulder_strength = False
+        else:
+            #Refine the arrays we will integrate over
+            #Temprature
+            temp_hot = dict_bounds['temp_hot'][0:(dict_bounds['bound_hot'][0][0] - 1)]
+            temp_cool = dict_bounds['temp_cool'][(dict_bounds['bound_cool'][0][-1] + 1):-1]
+            #DEM (EM)
+            dem_hot = dict_bounds['dem_hot'][0:(dict_bounds['bound_hot'][0][0] - 1)]
+            dem_cool = dict_bounds['dem_cool'][(dict_bounds['bound_cool'][0][-1] + 1):-1]
+            #Do the integration
+            #Hot shoulder
+            hot_shoulder = np.trapz(dem_hot,x=temp_hot)
+            #Total
+            total_shoulder = np.trapz(np.concatenate([dem_cool[0:-1],dem_hot]),x=np.concatenate([temp_cool[0:-1],temp_hot]))
+            #Compute the ratio
+            hot_shoulder_strength = hot_shoulder/total_shoulder
+
+        return hot_shoulder_strength
         
         
