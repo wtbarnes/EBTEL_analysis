@@ -49,8 +49,7 @@ t_cool_static = np.linspace(slope_limits['cool_lower'],slope_limits['cool_upper'
 t_hot_static = np.linspace(slope_limits['hot_lower'],slope_limits['hot_upper'],1000)
 
 #function to calculate variable hot slopes
-def calc_upper_hot_lim(mean_temp,mean_em):
-    delta = 0.4 #spacing between upper and lower limits
+def calc_upper_hot_lim(mean_temp,mean_em,delta_lim):
     ninf_i = np.where(np.isinf(mean_em) == False) #find non-inf indices
     max_i = np.argmax(mean_em) #find index corresponding to max value
     hot_i = ninf_i[0][np.where(ninf_i[0]>max_i)] #indices for hot branch
@@ -59,12 +58,16 @@ def calc_upper_hot_lim(mean_temp,mean_em):
     delta_i = np.where(delta_em_hot>0.5)[0][0]
     lim_i = hot_i[delta_i - 2]
     t_upper = mean_temp[lim_i]
-    t_lower = t_upper - delta
+    t_lower = t_upper - delta_lim
     return t_lower,t_upper
 
 #set static parameters
 tpulse = 100.0
 solver = 'rka4'
+if args.species == 'ion':
+    delta_lim = 0.2
+else:
+    delta_lim = 0.4
 
 #declare instance of Plotter class
 surf_plot = ebp.Plotter()
@@ -89,12 +92,12 @@ for i in range(len(alpha)):
         hot_lower,hot_upper = [],[]
         t_cool,t_hot = [],[]
         for i in range(len(dema.temp_mean)):
-            l,u = calc_upper_hot_lim(dema.temp_mean[i],dema.em_mean[i])
+            l,u = calc_upper_hot_lim(dema.temp_mean[i],dema.em_mean[i],delta_lim)
             hot_lower.append(l),hot_upper.append(u)
             t_cool.append(t_cool_static)
             t_hot.append(np.linspace(l,u,len(t_cool_static)))
             
-        dema.many_slopes(slope_limits={'hot_lower':hot_lower,'hot_upper':hot_upper})
+        dema.many_slopes(slope_limits={'cool_lower':6.0,'cool_upper':6.6,'hot_lower':hot_lower,'hot_upper':hot_upper})
         dema.slope_statistics()
         dema.find_em_max()
         temp_max_save.append([np.mean(tmax) for tmax in dema.temp_max])
@@ -105,7 +108,7 @@ for i in range(len(alpha)):
             
         figname_temp = figdir%(args.species,str(alpha[i]))+figname%(loop_length[j],tpulse,str(alpha[i]),args.species)
         #plot data
-        demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn,format='png',fs=22.0,figsize=(12,12),dpi=300)
+        demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn,format='eps',fs=22.0,figsize=(12,12),dpi=1000)
         demp.plot_em_max(dema.temp_max,dema.em_max,print_fig_filename=root_dir_figs + figname_temp + '_TmaxVTn')
         demp.plot_em_slopes(dema.a_cool_mean,dema.a_cool_std,dema.a_hot_mean,dema.a_hot_std,print_fig_filename=root_dir_figs + figname_temp + '_hs_compare')
         fit_lines = {'t_cool':t_cool,'a_cool':dema.a_cool_mean,'b_cool':dema.b_cool_mean,'t_hot':t_hot,'a_hot':dema.a_hot_mean,'b_hot':dema.b_hot_mean}
