@@ -88,6 +88,9 @@ for i in range(len(alpha)):
         dema = ebd.DEMAnalyzer(root_dir,args.species,alpha[i],loop_length[j],tpulse,solver,Tn=Tn,slope_limits=slope_limits)
         dema.process_raw()
         dema.em_statistics()
+        #DEBUG--print shape of mean arrays
+        print(np.shape(np.array(dema.em_mean)))
+        print(np.shape(np.array(dema.temp_mean)))
         #variable limit configuration and temperature fit array
         hot_lower,hot_upper = [],[]
         t_cool,t_hot = [],[]
