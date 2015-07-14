@@ -87,7 +87,7 @@ for i in range(len(alpha)):
         dema.em_statistics()
         #variable limit configuration and temperature fit array
         t_cool,t_hot = [],[]
-        if alpha[i] is not 'uniform' and args.species is not 'ion':
+        if alpha[i] is not 'uniform' or args.species is not 'ion':
             hot_lower,hot_upper = [],[]
             cool_lower,cool_upper = [],[]
             for k in range(len(dema.temp_mean)):
