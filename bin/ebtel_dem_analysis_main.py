@@ -116,7 +116,9 @@ for i in range(len(alpha)):
         #plot data
         demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn,format='eps',fs=22.0,figsize=(12,12),dpi=1000)
         demp.plot_em_max(dema.temp_max,dema.em_max,print_fig_filename=root_dir_figs + figname_temp + '_TmaxVTn')
+        demp.figsize = (3/2*demp.figsize[0],3/4*demp.figsize[1])
         demp.plot_em_slopes(dema.a_cool_mean,dema.a_cool_std,dema.a_hot_mean,dema.a_hot_std,print_fig_filename=root_dir_figs + figname_temp + '_hs_compare')
+        demp.figsize = (2/3*demp.figsize[0],4/3*demp.figsize[1])
         fit_lines = {'t_cool':t_cool,'a_cool':dema.a_cool_mean,'b_cool':dema.b_cool_mean,'t_hot':t_hot,'a_hot':dema.a_hot_mean,'b_hot':dema.b_hot_mean}
         demp.plot_em_curves(dema.temp_mean,dema.em_mean,fit_lines=fit_lines,print_fig_filename=root_dir_figs+figname_temp+'_dem')
         #plot all em curves for given tn
