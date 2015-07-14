@@ -173,6 +173,7 @@ class DEMPlotter(object):
         ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[5,5],'-.k')
         ax.set_ylim([0,8])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
+        ax.set_yticks(self.tick_maker(ax.get_yticks,5))
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
         
         #legend
@@ -185,5 +186,20 @@ class DEMPlotter(object):
             plt.close('all')
         else:
             plt.show()
+            
+            
+    def tick_maker(self,old_ticks,n,**kwargs):
+        if n < 2:
+            raise ValueError('n must be greater than 1')
+        
+        n = n-1
+        delta = (old_ticks[-1] - old_ticks[0])/n
+        new_ticks = []
+        for i in range(n):
+            new_ticks.append(old_ticks[0] + i*delta)
+        
+        new_ticks.append(old_ticks[0] + n*delta)
+        return new_ticks
+    
             
             
