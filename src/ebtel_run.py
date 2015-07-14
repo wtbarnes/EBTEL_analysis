@@ -5,7 +5,7 @@
 
 #Import needed modules
 import os
-import commands
+import subprocess
 import multiprocessing
 
 def worker(func,*args):
@@ -23,8 +23,8 @@ class Runner(object):
         else:
             quiet_option = ''
             
-        output = commands.getoutput(self.exec_directory+'ebtel-2fl '+self.config_directory+config_file+quiet_option)
-        print(output)
+        output = subprocess.Popen([(self.exec_directory+'ebtel-2fl'),self.config_directory+config_file+quiet_option],stdout=subprocess.PIPE)
+        print(output.communicate()[0].decode('ascii'))
         
         
     def run_ebtel_multi_serial(self,**kwargs):
@@ -32,8 +32,8 @@ class Runner(object):
             kwargs['sub_dir'] = ''
         for name in os.listdir(self.config_directory+kwargs['sub_dir']):
             if os.path.isfile(self.config_directory+kwargs['sub_dir']+name):
-                output = commands.getoutput(self.exec_directory+'ebtel-2fl '+self.config_directory+kwargs['sub_dir']+name+' quiet')
-                print(output)
+                output = subprocess.Popen([(self.exec_directory+'ebtel-2fl'),(self.config_directory+kwargs['sub_dir']+name+' quiet')],stdout=subprocess.PIPE)
+                print(output.communicate()[0].decode('ascii'))
                 
                 
     #This function deprecated--use not recommended            
