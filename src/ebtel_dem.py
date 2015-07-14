@@ -202,7 +202,7 @@ class DEMAnalyzer(object):
         #Construct hot and cool dem and temp arrays for given bounds
         i_cool_lower = np.where(temp_new<self.slope_limits['cool_lower'])
         i_cool_upper = np.where(temp_new>self.slope_limits['cool_upper'])
-        if i_cool_lower and i_cool_upper and temp_new[i_cool_upper[0][0] - 1] <= np.max(temp_new):
+        if i_cool_lower[0] and i_cool_upper[0] and temp_new[i_cool_upper[0][0] - 1] <= np.max(temp_new):
             temp_new_cool = temp_new[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
             dem_new_cool = dem_new[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
         else:
@@ -214,7 +214,7 @@ class DEMAnalyzer(object):
 
         i_hot_lower = np.where(temp_new<self.slope_limits['hot_lower'])
         i_hot_upper = np.where(temp_new>self.slope_limits['hot_upper'])
-        if i_hot_lower and i_hot_upper and temp_new[i_hot_lower[0][-1] + 1] >= np.max(temp_new):
+        if i_hot_lower[0] and i_hot_upper[0] and temp_new[i_hot_lower[0][-1] + 1] >= np.max(temp_new):
             temp_new_hot = temp_new[(i_hot_lower[0][-1] + 1):(i_hot_upper[0][0] - 1)]
             dem_new_hot = dem_new[(i_hot_lower[0][-1] + 1):(i_hot_upper[0][0] - 1)]
         else:
