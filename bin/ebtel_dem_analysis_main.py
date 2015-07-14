@@ -70,7 +70,7 @@ else:
     delta_lim = 0.4
 
 #declare instance of Plotter class
-surf_plot = ebp.Plotter()
+surf_plot = ebp.Plotter(format='pdf')
 
 #iterate over variable parameters
 for i in range(len(alpha)):
@@ -116,7 +116,7 @@ for i in range(len(alpha)):
             
         figname_temp = figdir%(args.species,str(alpha[i]))+figname%(loop_length[j],tpulse,str(alpha[i]),args.species)
         #plot data
-        demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn,format='eps',fs=22.0,figsize=(12,12),dpi=1000)
+        demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn,format='pdf',fs=22.0,figsize=(12,12),dpi=1000)
         demp.plot_em_max(dema.temp_max,dema.em_max,print_fig_filename=root_dir_figs + figname_temp + '_TmaxVTn')
         demp.figsize = (3/2*demp.figsize[0],3/4*demp.figsize[1])
         demp.plot_em_slopes(dema.a_cool_mean,dema.a_cool_std,dema.a_hot_mean,dema.a_hot_std,print_fig_filename=root_dir_figs + figname_temp + '_hs_compare')
