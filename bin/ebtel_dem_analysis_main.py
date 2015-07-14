@@ -56,7 +56,7 @@ def calc_upper_hot_lim(mean_temp,mean_em,delta_lim):
     em_hot = mean_em[hot_i] #hot branch em
     delta_em_hot = np.fabs(np.diff(em_hot)) #delta(em) of hot branch
     delta_i = np.where(delta_em_hot>0.5)[0][0]
-    lim_i = hot_i[delta_i - 2]
+    lim_i = hot_i[delta_i - 1] -1
     t_upper = mean_temp[lim_i]
     t_lower = t_upper - delta_lim
     return t_lower,t_upper
