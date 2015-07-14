@@ -44,7 +44,7 @@ alpha = ['uniform',1.5,2.0,2.5]
 Tn = np.arange(250,5250,250)
 
 #set limits on hot/cool slope calculation
-slope_limits = {'cool_lower':6.0,'cool_upper':6.6,'hot_lower':6.7,'hot_upper':7.4}
+slope_limits = {'cool_lower':6.0,'cool_upper':6.6,'hot_lower':6.7,'hot_upper':7.3}
 t_cool_static = np.linspace(slope_limits['cool_lower'],slope_limits['cool_upper'],1000)
 t_hot_static = np.linspace(slope_limits['hot_lower'],slope_limits['hot_upper'],1000)
 
