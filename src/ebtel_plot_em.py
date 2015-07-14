@@ -173,7 +173,7 @@ class DEMPlotter(object):
         ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[5,5],'-.k')
         ax.set_ylim([0,8])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
-        ax.set_yticks(self.tick_maker(ax.get_yticks,5))
+        ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
         
         #legend
