@@ -99,7 +99,7 @@ for i in range(len(alpha)):
                 t_cool.append(t_cool_static)
                 t_hot.append(np.linspace(l,u,len(t_cool_static)))
             
-            dema.many_slopes(slope_limits={'cool_lower':slope_limits['cool_lower'],'cool_upper':slope_limits['cool_upper'],'hot_lower':hot_lower,'hot_upper':hot_upper})
+            dema.many_slopes(slope_limits={'cool_lower':(len(dema.temp_mean))*slope_limits['cool_lower'],'cool_upper':(len(dema.temp_mean))*slope_limits['cool_upper'],'hot_lower':hot_lower,'hot_upper':hot_upper})
         else:
             [(t_cool.append(t_cool_static),t_hot.append(t_hot_static)) for i in range(len(dema.temp_mean))]
             dema.many_slopes()
