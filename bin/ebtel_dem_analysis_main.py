@@ -94,8 +94,8 @@ for i in range(len(alpha)):
             hot_lower,hot_upper = [],[]
             cool_lower,cool_upper = [],[]
             t_cool,t_hot = [],[]
-            for i in range(len(dema.temp_mean)):
-                l,u = calc_upper_hot_lim(dema.temp_mean[i],dema.em_mean[i],delta_lim)
+            for k in range(len(dema.temp_mean)):
+                l,u = calc_upper_hot_lim(dema.temp_mean[k],dema.em_mean[k],delta_lim)
                 hot_lower.append(l),hot_upper.append(u)
                 cool_lower.append(slope_limits['cool_lower']),cool_upper.append(slope_limits['cool_upper'])
                 t_cool.append(t_cool_static)
@@ -103,7 +103,7 @@ for i in range(len(alpha)):
             
             dema.many_slopes(slope_limits={'cool_lower':cool_lower,'cool_upper':cool_upper,'hot_lower':hot_lower,'hot_upper':hot_upper})
         else:
-            [(t_cool.append(t_cool_static),t_hot.append(t_hot_static)) for i in range(len(dema.temp_mean))]
+            [(t_cool.append(t_cool_static),t_hot.append(t_hot_static)) for k in range(len(dema.temp_mean))]
             dema.many_slopes()
             
         dema.slope_statistics()

@@ -36,7 +36,7 @@ class DEMAnalyzer(object):
         else:
             self.verbose = True
         #set static variables
-        self.em_cutoff = 26.0
+        self.em_cutoff = 25.0
         self.em_max_eps_percent = 0.999
         #define variables to be used later
         self.em,self.em_max,self.em_mean = [],[],[]
