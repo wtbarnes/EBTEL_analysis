@@ -49,22 +49,22 @@ t_cool_static = np.linspace(slope_limits['cool_lower'],slope_limits['cool_upper'
 t_hot_static = np.linspace(slope_limits['hot_lower'],slope_limits['hot_upper'],1000)
 
 #function to calculate variable hot slopes
-def calc_upper_hot_lim(mean_temp,mean_em,delta_lim):
+def calc_upper_hot_lim(mean_temp,mean_em,delta_t):
     ninf_i = np.where(np.isinf(mean_em) == False) #find non-inf indices
     max_i = np.argmax(mean_em) #find index corresponding to max value
     hot_i = ninf_i[0][np.where(ninf_i[0]>max_i)] #indices for hot branch
     em_hot = mean_em[hot_i] #hot branch em
     delta_em_hot = np.fabs(np.diff(em_hot)) #delta(em) of hot branch
     delta_i = np.where(delta_em_hot>0.5)[0][0]
-    lim_i = hot_i[delta_i - 1] -1
+    lim_i = hot_i[delta_i - 1]-1
     t_upper = mean_temp[lim_i]
-    t_lower = t_upper - delta_lim
+    t_lower = t_upper - delta_t
     return t_lower,t_upper
 
 #set static parameters
 tpulse = 100.0
 solver = 'rka4'
-if args.species == 'ion':
+if args.species is 'ion':
     delta_lim = 0.2
 else:
     delta_lim = 0.4
@@ -90,10 +90,9 @@ for i in range(len(alpha)):
         dema.em_statistics()
         #variable limit configuration and temperature fit array
         t_cool,t_hot = [],[]
-        if alpha[i] != 'uniform':
+        if alpha[i] is not 'uniform':
             hot_lower,hot_upper = [],[]
             cool_lower,cool_upper = [],[]
-            t_cool,t_hot = [],[]
             for k in range(len(dema.temp_mean)):
                 l,u = calc_upper_hot_lim(dema.temp_mean[k],dema.em_mean[k],delta_lim)
                 hot_lower.append(l),hot_upper.append(u)

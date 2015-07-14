@@ -200,27 +200,27 @@ class DEMAnalyzer(object):
             self.slope_limits['hot_upper'] = self.slope_limits['hot_lower'] + 0.4
         
         #Construct hot and cool dem and temp arrays for given bounds
-        try:
-            i_cool_lower = np.where(temp_new<self.slope_limits['cool_lower'])[0][-1] + 1
-            i_cool_upper = np.where(temp_new>self.slope_limits['cool_upper'])[0][0] - 1
-            temp_new_cool = temp_new[i_cool_lower:i_cool_upper]
-            dem_new_cool = dem_new[i_cool_lower:i_cool_upper]
-        except:
+        i_cool_lower = np.where(temp_new<self.slope_limits['cool_lower'])
+        i_cool_upper = np.where(temp_new>self.slope_limits['cool_upper'])
+        if i_cool_lower and i_cool_upper and temp_new[i_cool_upper[0][0] - 1] <= np.max(temp_new):
+            temp_new_cool = temp_new[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
+            dem_new_cool = dem_new[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
+        else:
             if self.verbose:
                 print("Cool bound out of range, T = %.2f > T_limit = %.2f"%(temp_new[0],self.slope_limits['cool_lower']))
-            
+                print("or T_upper_limit = %.2f > T_max = %.2f"%(self.slope_limits['cool_upper'],np.max(temp_new)))
             temp_new_cool = False
             dem_new_cool = False
-            
-        try:
-            i_hot_lower = np.where(temp_new<self.slope_limits['hot_lower'])[0][-1] + 1
-            i_hot_upper = np.where(temp_new>self.slope_limits['hot_upper'])[0][0] - 1
-            temp_new_hot = temp_new[i_hot_lower:i_hot_upper]
-            dem_new_hot = dem_new[i_hot_lower:i_hot_upper]
-        except:
+
+        i_hot_lower = np.where(temp_new<self.slope_limits['hot_lower'])
+        i_hot_upper = np.where(temp_new>self.slope_limits['hot_upper'])
+        if i_hot_lower and i_hot_upper and temp_new[i_hot_lower[0][-1] + 1] >= np.max(temp_new):
+            temp_new_hot = temp_new[(i_hot_lower[0][-1] + 1):(i_hot_upper[0][0] - 1)]
+            dem_new_hot = dem_new[(i_hot_lower[0][-1] + 1):(i_hot_upper[0][0] - 1)]
+        else:
             if self.verbose:
                 print("Hot bound out of range, T = %.2f < T_limit = %.2f"%(temp_new[-1],self.slope_limits['hot_upper']))
-            
+                print("or T_lower_limit = %.2f < T_max = %.2f"%(self.slope_limits['hot_lower'],np.max(temp_new)))
             temp_new_hot = False
             dem_new_hot = False
         
