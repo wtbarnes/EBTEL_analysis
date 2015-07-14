@@ -64,10 +64,7 @@ def calc_upper_hot_lim(mean_temp,mean_em,delta_t):
 #set static parameters
 tpulse = 100.0
 solver = 'rka4'
-if args.species is 'ion':
-    delta_lim = 0.2
-else:
-    delta_lim = 0.4
+delta_lim = 0.4
 
 #declare instance of Plotter class
 surf_plot = ebp.Plotter(format='pdf',fs=20.0,figsize=(8,8),dpi=1000)
@@ -90,7 +87,7 @@ for i in range(len(alpha)):
         dema.em_statistics()
         #variable limit configuration and temperature fit array
         t_cool,t_hot = [],[]
-        if alpha[i] is not 'uniform':
+        if alpha[i] is not 'uniform' and args.species is not 'ion':
             hot_lower,hot_upper = [],[]
             cool_lower,cool_upper = [],[]
             for k in range(len(dema.temp_mean)):

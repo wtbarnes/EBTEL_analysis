@@ -68,7 +68,7 @@ class DEMPlotter(object):
                     pass
 
         #set labels
-        ax.set_title(r'EBTEL EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
+        #ax.set_title(r'EBTEL EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
         ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
@@ -133,7 +133,7 @@ class DEMPlotter(object):
             ax_twin.errorbar(self.Tn[i],mean_em_max,yerr=std_em_max,fmt='*',color='black')
 
         #set labels
-        ax.set_title(r'EBTEL $T(\mathrm{EM}_{\mathrm{max}})$, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
+        #ax.set_title(r'EBTEL $T(\mathrm{EM}_{\mathrm{max}})$, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
         ax.set_ylabel(r'$\log(T_{max})$',fontsize=self.fs)
         ax.set_ylim([5.5,7.0])
@@ -165,7 +165,7 @@ class DEMPlotter(object):
                 marker_hot = ax.errorbar(self.Tn[i],np.fabs(a_hot_mean[i]),yerr=a_hot_std[i],fmt='o',color='red',label=r'hot')
 
         #set labels
-        ax.set_title(r'EBTEL EM Slope',fontsize=self.fs)
+        #ax.set_title(r'EBTEL EM Slope',fontsize=self.fs)
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
         ax.set_ylabel(r'$a$',fontsize=self.fs)
         ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[2,2],'--k')
