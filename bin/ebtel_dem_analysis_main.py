@@ -87,7 +87,10 @@ for i in range(len(alpha)):
         dema.em_statistics()
         #variable limit configuration and temperature fit array
         t_cool,t_hot = [],[]
-        if alpha[i] is not 'uniform' or args.species is not 'ion':
+        if alpha[i] is 'uniform' or args.species is 'ion':
+            [(t_cool.append(t_cool_static),t_hot.append(t_hot_static)) for k in range(len(dema.temp_mean))]
+            dema.many_slopes()
+        else:
             hot_lower,hot_upper = [],[]
             cool_lower,cool_upper = [],[]
             for k in range(len(dema.temp_mean)):
@@ -98,9 +101,6 @@ for i in range(len(alpha)):
                 t_hot.append(np.linspace(l,u,len(t_cool_static)))
             
             dema.many_slopes(slope_limits={'cool_lower':cool_lower,'cool_upper':cool_upper,'hot_lower':hot_lower,'hot_upper':hot_upper})
-        else:
-            [(t_cool.append(t_cool_static),t_hot.append(t_hot_static)) for k in range(len(dema.temp_mean))]
-            dema.many_slopes()
             
         dema.slope_statistics()
         dema.find_em_max()
