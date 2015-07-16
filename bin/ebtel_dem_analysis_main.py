@@ -87,7 +87,7 @@ for i in range(len(alpha)):
         dema.em_statistics()
         #variable limit configuration and temperature fit array
         t_cool,t_hot = [],[]
-        if alpha[i] is 'uniform' or args.species is 'ion':
+        if alpha[i] == 'uniform' or args.species == 'ion':
             [(t_cool.append(t_cool_static),t_hot.append(t_hot_static)) for k in range(len(dema.temp_mean))]
             dema.many_slopes()
         else:
