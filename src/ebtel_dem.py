@@ -16,7 +16,7 @@ class DEMProcess(object):
         #set up paths
         child_path = root_dir+species+'_heating_runs/alpha'+str(alpha)+'/data/'
         self.file_path = 'ebtel_L'+str(loop_length)+'_tn%d_tpulse'+str(tpulse)+'_'+solver
-        self.root_path = child_path + file_path
+        self.root_path = child_path + self.file_path
         #configure keyword arguments
         if 'verbose' in kwargs:
             self.verbose = kwargs['verbose']
