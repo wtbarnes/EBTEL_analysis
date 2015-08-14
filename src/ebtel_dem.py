@@ -33,7 +33,7 @@ class DEMProcess(object):
         for i in range(len(Tn)):
             #initialize lists
             em = []
-            temp_em []
+            temp_em = []
             #initialize counter and flag
             eol_flag=False
             counter=0
