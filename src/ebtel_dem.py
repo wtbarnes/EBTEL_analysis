@@ -164,7 +164,7 @@ class DEMAnalyze(object):
                 
             for j in range(len(self.em[i])):
                 bound_arrays = self.bounds(self.temp_em[i][j],self.em[i][j],slope_limits)
-                ac,bc,ah,bh = self.slope(self.temp_em[i][j],self.em[i][j],bound_arrays)
+                ac,bc,ah,bh = self.branch_fit(self.temp_em[i][j],self.em[i][j],bound_arrays)
                 acl.append([ac,bc]),ahl.append([ah,bh])
                 
             self.a_cool.append(acl),self.a_hot.append(ahl)
@@ -214,7 +214,7 @@ class DEMAnalyze(object):
         return {'temp_cool':temp_new_cool,'dem_cool':dem_new_cool,'temp_hot':temp_new_hot,'dem_hot':dem_new_hot}
         
         
-    def slope(self,temp,dem,**kwargs):
+    def branch_fit(self,temp,dem,**kwargs):
         """Linear fit to hot and cool branches of EM curve using hot and cool branches constructed according to hot and cool limits."""
         
         #Function for linear fit
