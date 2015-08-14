@@ -127,10 +127,10 @@ class DEMAnalyze(object):
     cool_diff = -0.6
     hot_diff = 0.4
     
-    def __init__(self,em,temp,**kwargs):
+    def __init__(self,em,temp_em,**kwargs):
         #get nested lists with EM and T values
         self.em = em
-        self.temp = temp
+        self.temp_em = temp_em
         #keyword arguments
         if 'verbose' in kwargs:
             self.verbose = kwargs['verbose']
