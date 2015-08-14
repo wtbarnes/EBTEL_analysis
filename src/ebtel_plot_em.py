@@ -13,7 +13,7 @@ from scipy.optimize import curve_fit
 
 class DEMPlotter(object):
 
-    def __init__(self,temp_list,em_list,alpha,**kwargs):
+    def __init__(self,temp_list,em_list,**kwargs):
         #static parameters
         self.linestyles = ('-','--','-.',':')
         #check for custom parameters
