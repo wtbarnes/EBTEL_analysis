@@ -12,7 +12,7 @@ class DEMProcess(object):
     em_cutoff = 26.0
     em_max_eps_percent = 0.999
     
-    def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs)):
+    def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs):
         #set up paths
         child_path = root_dir+species+'_heating_runs/alpha'+str(alpha)+'/data/'
         self.file_path = 'ebtel_L'+str(loop_length)+'_tn%d_tpulse'+str(tpulse)+'_'+solver
