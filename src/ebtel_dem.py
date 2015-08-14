@@ -149,7 +149,7 @@ class DEMAnalyze(object):
     def many_slopes(self,**kwargs):
         """Calculate fits to hot and cool branches for all EM and T data sets"""
         
-        for i in range(len(self.Tn)):
+        for i in range(len(self.em)):
             acl = []
             ahl = []
             #redefine slope limits if kwargs
@@ -162,7 +162,7 @@ class DEMAnalyze(object):
             else:
                 slope_limits = []
                 
-            for j in range(len(self.temp_em[i])):
+            for j in range(len(self.em[i])):
                 bound_arrays = self.bounds(self.temp_em[i][j],self.em[i][j],slope_limits)
                 ac,bc,ah,bh = self.slope(self.temp_em[i][j],self.em[i][j],bound_arrays)
                 acl.append([ac,bc]),ahl.append([ah,bh])
