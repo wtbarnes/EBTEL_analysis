@@ -214,7 +214,7 @@ class DEMAnalyze(object):
         return {'temp_cool':temp_cool,'dem_cool':dem_cool,'temp_hot':temp_hot,'dem_hot':dem_hot}
         
         
-    def branch_fit(self,temp,dem,**kwargs):
+    def branch_fit(self,temp,dem,bound_arrays,**kwargs):
         """Linear fit to hot and cool branches of EM curve using hot and cool branches constructed according to hot and cool limits."""
         
         #Function for linear fit
