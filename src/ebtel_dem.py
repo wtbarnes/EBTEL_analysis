@@ -61,8 +61,8 @@ class DEMProcess(object):
     def interp_and_filter(self,**kwargs):
         """Interpolate and filter EM and T arrays and return to same nested lists; this step is mandatory for later slope calculations."""
         
-        for i in range(self.em):
-            for j in range(self.em[i]):
+        for i in range(len(self.em)):
+            for j in range(len(self.em[i])):
                 #find cutoff index
                 inf_index = np.where(self.em[i][j] > self.em_cutoff)
                 #reshape temperature and interpolate emission measure
