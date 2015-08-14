@@ -239,6 +239,35 @@ class DEMAnalyze(object):
             a_hotward,b_hotward = pars_hot[0],pars_hot[1]
             
         return a_coolward,b_coolward,a_hotward,b_hotward
+        
+        
+    def branch_fit_statistics(self,**kwargs):
+        """Compute mean and standard deviation for fit parameters to hot and cool branches"""
+        
+        if not self.a_cool or not self.a_hot:
+            raise ValueError("Before computing statistics of slopes, first calculate slopes using self.many_slopes()")
+            
+        #compute mean and standard deviation for fit parameters for each T_n value
+        for i in range(len(self.a_cool)):
+            true_indices_cool = np.where(np.array(self.a_cool[i]) != False)[0]
+            if float(len(true_indices_cool))/len(self.a_cool[i]) < 0.9:
+                self.a_cool_mean.append(False)
+                self.a_cool_std.append(False)
+                self.b_cool_mean.append(False)
+            else:
+                self.a_cool_mean.append(np.mean(np.array(self.a_cool[i])[true_indices_cool,0]))
+                self.a_cool_std.append(np.std(np.array(self.a_cool[i])[true_indices_cool,0]))
+                self.b_cool_mean.append(np.mean(np.array(self.a_cool[i])[true_indices_cool,1]))
+                    
+            true_indices_hot = np.where(np.array(self.a_hot[i]) != False)[0]
+            if float(len(true_indices_hot))/len(self.a_hot[i]) < 0.9:
+                self.a_hot_mean.append(False)
+                self.a_hot_std.append(False)
+                self.b_hot_mean.append(False)
+            else:
+                self.a_hot_mean.append(np.mean(np.array(self.a_hot[i])[true_indices_hot,0]))
+                self.a_hot_std.append(np.std(np.array(self.a_hot[i])[true_indices_hot,0]))
+                self.b_hot_mean.append(np.mean(np.array(self.a_hot[i])[true_indices_hot,1]))
     
         ##############################
 
