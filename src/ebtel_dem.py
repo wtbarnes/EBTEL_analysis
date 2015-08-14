@@ -186,32 +186,32 @@ class DEMAnalyze(object):
                 print("    T_hot_lower = "+str(slope_limits['hot_lower'])+" K")
         
         #Construct hot and cool dem and temp arrays for given bounds
-        i_cool_lower = np.where(temp_new<slope_limits['cool_lower'])
-        i_cool_upper = np.where(temp_new>slope_limits['cool_upper'])
-        if len(i_cool_lower[0]) > 0 and len(i_cool_upper[0]) > 0 and temp_new[i_cool_upper[0][0] - 1] <= slope_limits['hot_lower']:
-            temp_new_cool = temp_new[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
-            dem_new_cool = dem_new[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
+        i_cool_lower = np.where(temp<slope_limits['cool_lower'])
+        i_cool_upper = np.where(temp>slope_limits['cool_upper'])
+        if len(i_cool_lower[0]) > 0 and len(i_cool_upper[0]) > 0 and temp[i_cool_upper[0][0] - 1] <= slope_limits['hot_lower']:
+            temp_cool = temp[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
+            dem_cool = dem[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
         else:
             if self.verbose:
-                print("Cool bound out of range, T = %.2f > T_limit = %.2f"%(temp_new[0],slope_limits['cool_lower']))
+                print("Cool bound out of range, T = %.2f > T_limit = %.2f"%(temp[0],slope_limits['cool_lower']))
                 print("or T_upper_limit = %.2f > T_max = %.2f"%(slope_limits['cool_upper'],slope_limits['hot_lower']))
-            temp_new_cool = False
-            dem_new_cool = False
+            temp_cool = False
+            dem_cool = False
 
-        i_hot_lower = np.where(temp_new<slope_limits['hot_lower'])
-        i_hot_upper = np.where(temp_new>slope_limits['hot_upper'])
-        if len(i_hot_lower[0]) > 0 and len(i_hot_upper[0]) > 0 and temp_new[i_hot_lower[0][-1] + 1] >= slope_limits['cool_upper']:
-            temp_new_hot = temp_new[(i_hot_lower[0][-1] + 1):(i_hot_upper[0][0] - 1)]
-            dem_new_hot = dem_new[(i_hot_lower[0][-1] + 1):(i_hot_upper[0][0] - 1)]
+        i_hot_lower = np.where(temp<slope_limits['hot_lower'])
+        i_hot_upper = np.where(temp>slope_limits['hot_upper'])
+        if len(i_hot_lower[0]) > 0 and len(i_hot_upper[0]) > 0 and temp[i_hot_lower[0][-1] + 1] >= slope_limits['cool_upper']:
+            temp_hot = temp[(i_hot_lower[0][-1] + 1):(i_hot_upper[0][0] - 1)]
+            dem_hot = dem[(i_hot_lower[0][-1] + 1):(i_hot_upper[0][0] - 1)]
         else:
             if self.verbose:
-                print("Hot bound out of range, T = %.2f < T_limit = %.2f"%(temp_new[-1],slope_limits['hot_upper']))
+                print("Hot bound out of range, T = %.2f < T_limit = %.2f"%(temp[-1],slope_limits['hot_upper']))
                 print("or T_lower_limit = %.2f < T_max = %.2f"%(slope_limits['hot_lower'],slope_limits['cool_upper']))
-            temp_new_hot = False
-            dem_new_hot = False
+            temp_hot = False
+            dem_hot = False
         
         #Return interpolated arrays and indices
-        return {'temp_cool':temp_new_cool,'dem_cool':dem_new_cool,'temp_hot':temp_new_hot,'dem_hot':dem_new_hot}
+        return {'temp_cool':temp_cool,'dem_cool':dem_cool,'temp_hot':temp_hot,'dem_hot':dem_hot}
         
         
     def branch_fit(self,temp,dem,**kwargs):
