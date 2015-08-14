@@ -79,7 +79,7 @@ class DEMProcess(object):
         if not self.temp_em or not self.em:
             raise ValueError("Before computing EM statistics, run self.import_raw() to process EM,T data.")
         
-        for i in range(self.em):
+        for i in range(len(self.em)):
             #first calculate mean
             if len(np.shape(np.array(self.em[i]))) > 1:
                 temporary_mean_em = np.array(np.mean(self.inf_filter(self.em[i]),axis=0))
@@ -93,7 +93,7 @@ class DEMProcess(object):
             #declare temp lists for max quantities
             temp_max_temp = []
             em_max_temp = []    
-            for j in range(self.em[i]):
+            for j in range(len(self.em[i])):
                 i_max = np.argmax(self.em[i][j])
                 indices_em_max = np.where(np.array(self.em[i][j]) > self.em_max_eps_percent*self.em[i][j][i_max])[0]
                 if len(indices_em_max) <= 1:
