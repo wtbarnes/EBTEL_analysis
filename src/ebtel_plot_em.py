@@ -36,7 +36,6 @@ class DEMPlotter(object):
         #arguments
         self.temp_list = temp_list
         self.em_list = em_list
-        self.alpha = alpha
         #keyword arguments
         if 'Tn' in kwargs:
             self.Tn = kwargs['Tn']
