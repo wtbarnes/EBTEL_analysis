@@ -170,7 +170,7 @@ class DEMAnalyze(object):
             else:
                 slope_limits = []
                 
-            bound_arrays = self.bounds(self.temp_em[i],self.em[i],self.sigma_em,slope_limits)
+            bound_arrays = self.bounds(self.temp_em[i],self.em[i],self.sigma_em[i],slope_limits)
             ac,bc,sc,ah,bh,sh = self.branch_fit(self.temp_em[i],self.em[i],bound_arrays)
             self.cool_fits.append([ac,bc,sc]),self.hot_fits.append([ah,bh,sh])
                             
