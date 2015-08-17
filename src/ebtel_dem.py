@@ -9,7 +9,7 @@ from scipy.optimize import curve_fit
 
 class DEMProcess(object):
     
-    em_cutoff = 25.0
+    em_cutoff = 23.0
     em_max_eps_percent = 0.999
     
     def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs):
