@@ -13,7 +13,7 @@ from scipy.optimize import curve_fit
 
 class DEMPlotter(object):
 
-    def __init__(self,temp_list,em_list,**kwargs):
+    def __init__(self,temp_list,em_list,temp_mean,em_mean,em_sigma,cool_fits,hot_fits,**kwargs):
         #static parameters
         self.linestyles = ('-','--','-.',':')
         #check for custom parameters
@@ -36,6 +36,11 @@ class DEMPlotter(object):
         #arguments
         self.temp_list = temp_list
         self.em_list = em_list
+        self.temp_mean = temp_mean
+        self.em_mean = em_mean
+        self.em_sigma = em_sigma
+        self.cool_fits = cool_fits
+        self.hot_fits = hot_fits
         #keyword arguments
         if 'Tn' in kwargs:
             self.Tn = kwargs['Tn']
@@ -44,7 +49,7 @@ class DEMPlotter(object):
         self.Tndelta = self.Tn[1] - self.Tn[0]
 
 
-    def plot_em_curves(self,temp_mean,em_mean,**kwargs):
+    def plot_em_curves(self,**kwargs):
         #spacing between tn curves (artificial)
         delta_em = 0.2
 
@@ -53,16 +58,16 @@ class DEMPlotter(object):
         ax = fig.gca()
 
         #print lines
-        for i in range(len(self.em_list)):
-            ax.plot(temp_mean[i],em_mean[i]+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')    
+        for i in range(len(self.em_mean)):
+            ax.plot(self.temp_mean[i],self.em_mean[i]+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')    
             if 'fit_lines' in kwargs:
                 try:
-                    ax.plot(kwargs['fit_lines']['t_cool'][i],(kwargs['fit_lines']['a_cool'][i]*kwargs['fit_lines']['t_cool'][i] + kwargs['fit_lines']['b_cool'][i]) + i*delta_em,linewidth=2.0,color='blue')
+                    ax.plot(kwargs['fit_lines']['t_cool'][i],(self.cool_fits[i][0]*kwargs['fit_lines']['t_cool'][i] + self.cool_fits[i][1]) + i*delta_em,linewidth=2.0,color='blue')
                 except:
                     pass
                     
                 try:
-                    ax.plot(kwargs['fit_lines']['t_hot'][i],(kwargs['fit_lines']['a_hot'][i]*kwargs['fit_lines']['t_hot'][i] + kwargs['fit_lines']['b_hot'][i]) + i*delta_em,linewidth=2.0,color='red')
+                    ax.plot(kwargs['fit_lines']['t_hot'][i],(self.hot_fits[i][0]*kwargs['fit_lines']['t_hot'][i] + self.hot_fits[i][1]) + i*delta_em,linewidth=2.0,color='red')
                 except:
                     pass
 
@@ -90,13 +95,10 @@ class DEMPlotter(object):
         ax = fig.gca()
 
         #print lines
-        mean_em = np.mean(em_list,axis=0)
-        std_em = np.std(em_list,axis=0)
-        mean_temp = np.mean(temp_list,axis=0)
-        ax.fill_between(mean_temp,mean_em-std_em,mean_em+std_em,facecolor='red',edgecolor='red',alpha=0.35)
+        ax.fill_between(self.temp_mean,self.em_mean-self.em_sigma,self.em_mean+self.em_sigma,facecolor='red',edgecolor='red',alpha=0.35)
         for i in range(len(temp_list)):
             ax.plot(temp_list[i],em_list[i],color='blue',linestyle=self.linestyles[-1])
-        ax.plot(mean_temp,mean_em,color='black')
+        ax.plot(self.temp_mean,self.em_mean,color='black')
 
         #set labels
         ax.set_title(r"EBTEL EM, $T_n$ = "+str(self.Tn[tn_index])+" s",fontsize=self.fs)
@@ -148,18 +150,18 @@ class DEMPlotter(object):
             plt.show()
 
 
-    def plot_em_slopes(self,a_cool_mean,a_cool_std,a_hot_mean,a_hot_std,**kwargs):
+    def plot_em_slopes(self,**kwargs):
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         
         marker_cool,marker_hot = [],[]
-        for i in range(len(self.Tn)):
-            if a_cool_mean[i] is not False and a_cool_std[i] is not False:
-                marker_cool = ax.errorbar(self.Tn[i],a_cool_mean[i],yerr=a_cool_std[i],fmt='o',color='blue',label=r'cool')
+        for i in range(len(self.cool_fits)):
+            if self.cool_fits[i][0] is not False and self.cool_fits[i][2] is not False:
+                marker_cool = ax.errorbar(self.Tn[i],self.cool_fits[i][0],yerr=self.cool_fits[i][2],fmt='o',color='blue',label=r'cool')
 
-            if a_hot_mean[i] is not False and a_hot_std[i] is not False:
-                marker_hot = ax.errorbar(self.Tn[i],np.fabs(a_hot_mean[i]),yerr=a_hot_std[i],fmt='o',color='red',label=r'hot')
+            if self.hot_fits[i][0] is not False and self.hot_fits[i][2] is not False:
+                marker_hot = ax.errorbar(self.Tn[i],np.fabs(self.hot_fits[i][0]),yerr=self.hot_fits[i][2],fmt='o',color='red',label=r'hot')
 
         #set labels
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
