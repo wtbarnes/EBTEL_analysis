@@ -237,7 +237,7 @@ class DEMAnalyze(object):
             b_coolward = False
             sigma_coolward = False
         else:
-            pars_cool,covar_cool = curve_fit(linear_fit,bound_arrays['temp_cool'],bound_arrays['dem_cool'],sigma=bound_arrays['sigma_cool'],absolute_sigma=True)
+            pars_cool,covar_cool = curve_fit(linear_fit,bound_arrays['temp_cool'],bound_arrays['dem_cool'])#,sigma=bound_arrays['sigma_cool'],absolute_sigma=True)
             a_coolward,b_coolward = pars_cool[0],pars_cool[1]
             sigma_coolward = np.sqrt(np.diag(covar_cool))
             
@@ -247,7 +247,7 @@ class DEMAnalyze(object):
             b_hotward = False
             sigma_hotward = False
         else:
-            pars_hot,covar_hot = curve_fit(linear_fit,bound_arrays['temp_hot'],bound_arrays['dem_hot'],sigma=bound_arrays['sigma_hot'],absolute_sigma=True)
+            pars_hot,covar_hot = curve_fit(linear_fit,bound_arrays['temp_hot'],bound_arrays['dem_hot'])#,sigma=bound_arrays['sigma_hot'],absolute_sigma=True)
             a_hotward,b_hotward = pars_hot[0],pars_hot[1]
             sigma_hotward = np.sqrt(np.diag(covar_hot))
             
