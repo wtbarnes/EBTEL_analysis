@@ -59,7 +59,8 @@ class DEMPlotter(object):
 
         #print lines
         for i in range(len(self.em_mean)):
-            ax.plot(self.temp_mean[i],self.em_mean[i]+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')    
+            ax.plot(self.temp_mean[i],self.em_mean[i]+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')
+            ax.fill_between(self.temp_mean[i], self.em_mean[i]-self.em_sigma[i]+i*delta_em, self.em_mean[i]+self.em_sigma[i]+i*delta_em, facecolor='red', edgecolor='red', alpha=0.35)
             if 'fit_lines' in kwargs:
                 try:
                     ax.plot(kwargs['fit_lines']['t_cool'][i],(self.cool_fits[i][0]*kwargs['fit_lines']['t_cool'][i] + self.cool_fits[i][1]) + i*delta_em,linewidth=2.0,color='blue')
