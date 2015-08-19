@@ -240,7 +240,7 @@ class DEMAnalyze(object):
             pars_cool,covar_cool = curve_fit(linear_fit,bound_arrays['temp_cool'],bound_arrays['dem_cool'],sigma=bound_arrays['sigma_cool'],absolute_sigma=True)
             a_coolward,b_coolward = pars_cool[0],pars_cool[1]
             #compute residual variance
-            res = np.sum((linear_fit(bound_arrays['temp_cool'],*pars_cool) - bound_arrays['dem_cool'])**2)/(len(bound_arrays['dem_cool']) - len(pars_cool))
+            res = 1#np.sum((linear_fit(bound_arrays['temp_cool'],*pars_cool) - bound_arrays['dem_cool'])**2)/(len(bound_arrays['dem_cool']) - len(pars_cool))
             sigma_coolward = np.sqrt(np.diag(covar_cool/res))
             
         #hot
@@ -251,7 +251,7 @@ class DEMAnalyze(object):
         else:
             pars_hot,covar_hot = curve_fit(linear_fit,bound_arrays['temp_hot'],bound_arrays['dem_hot'],sigma=bound_arrays['sigma_hot'],absolute_sigma=True)
             a_hotward,b_hotward = pars_hot[0],pars_hot[1]
-            res = np.sum((linear_fit(bound_arrays['temp_hot'],*pars_hot) - bound_arrays['dem_hot'])**2)/(len(bound_arrays['dem_hot']) - len(pars_hot))
+            res = 1#np.sum((linear_fit(bound_arrays['temp_hot'],*pars_hot) - bound_arrays['dem_hot'])**2)/(len(bound_arrays['dem_hot']) - len(pars_hot))
             sigma_hotward = np.sqrt(np.diag(covar_hot/res))
             
         return a_coolward,b_coolward,sigma_coolward,a_hotward,b_hotward,sigma_hotward
