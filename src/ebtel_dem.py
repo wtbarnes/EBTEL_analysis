@@ -261,7 +261,7 @@ class DEMAnalyze(object):
         """Compute mean and standard deviation for fit parameters to hot and cool branches"""
         
         if not self.a_cool or not self.a_hot:
-            raise ValueError("Before computing statistics of slopes, first calculate slopes using self.many_slopes()")
+            raise ValueError("Before computing statistics of slopes, first calculate slopes using self.many_fits()")
             
         #compute mean and standard deviation for fit parameters for each T_n value
         for i in range(len(self.a_cool)):
