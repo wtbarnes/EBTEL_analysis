@@ -193,7 +193,7 @@ class Configurer(object):
             #calculate wait time sum
             if self.t_wait_q_scaling:
                 #make sure that amplitude arrays exist
-                if hasattr(self,config_dictionary['amp_array']):
+                if hasattr(self.config_dictionary['amp_array']):
                     pass
                 else:
                     raise ValueError("Cannot calculate T_N,Q scaling. No amplitude arrays defined.")
