@@ -194,9 +194,9 @@ class Configurer(object):
             if self.t_wait_q_scaling:
                 #calculate start time for wait time scaled to amplitude (Q=xi*T_N^b)
                 #calculate coefficient (xi^(1/b))
-                xi_1ob = (config_dictionary['amp_array']**(1.0/self.t_wait_q_scaling)).sum()/(config_dictionary['total_time'] - config_dictionary['num_events']*2.0*config_dictionary['t_pulse_half'])
+                xi_1ob = (self.config_dictionary['amp_array']**(1.0/self.t_wait_q_scaling)).sum()/(self.config_dictionary['total_time'] - self.config_dictionary['num_events']*2.0*self.config_dictionary['t_pulse_half'])
                 #calculate resulting wait time
-                t_wait_temp = (config_dictionary['amp_array'][i])**(1.0/self.t_wait_q_scaling)/xi_1ob
+                t_wait_temp = (self.config_dictionary['amp_array'][i])**(1.0/self.t_wait_q_scaling)/xi_1ob
                 #increment start time sum
                 t_wait_sum = t_wait_sum + t_wait_temp
             else:
