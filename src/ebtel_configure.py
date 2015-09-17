@@ -22,9 +22,9 @@ class Configurer(object):
             self.delta_q = kwargs['delta_q']
             
         if 't_wait_q_scaling' in kwargs:
-            self.t_wait_mean_q_scaling = kwargs['t_wait_q_scaling']
+            self.t_wait_q_scaling = kwargs['t_wait_q_scaling']
         else:
-            self.t_wait_mean_q_scaling = []
+            self.t_wait_q_scaling = []
             
         #check if we are using a Monte-Carlo Approach
         self.nmc_list = []
@@ -51,8 +51,8 @@ class Configurer(object):
             gen_path = gen_path + 'alpha' + str(np.fabs(self.config_dictionary['alpha'])) + '/'
             
         #check for t_wait-q scaling
-        if self.t_wait_mean_q_scaling:
-            scaling_suffix = '-b'+str(self.t_wait_mean_q_scaling)
+        if self.t_wait_q_scaling:
+            scaling_suffix = '-b'+str(self.t_wait_q_scaling)
         else:
             scaling_suffix = ''
         

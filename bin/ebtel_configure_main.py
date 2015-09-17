@@ -19,6 +19,7 @@ parser.add_argument("-L","--loop_length",type=float,help="Loop half-length.")
 parser.add_argument("-t","--t_pulse",type=float,help="Width of the heating pulse used for the particular run.")
 parser.add_argument("-S","--solver",help="Solver used to compute solutions.")
 parser.add_argument("--root_dir",help="Optional root directory for config files")
+parser.add_argument("--t_wait_scaling",help="Optional parameter to force scaling between wait time and event amplitude, Q\propto T_N^b; b in Cargill(2014)")
 #Declare the parser dictionary
 args = parser.parse_args()
 
@@ -27,6 +28,12 @@ if args.root_dir:
     root_dir = args.root_dir
 else:
     root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'
+    
+#check for wait time scaling exponent
+if  args.t_wait_scaling:
+    t_wait_scaling = args.t_wait_scaling
+else:
+    t_wait_scaling = []
 
 #Set heating parameters--configure power-law bounds such that loop is maintained at an equilibrium temperature of T_peak
 tpeak = 4.0e+6 #peak temperature for time-averaged heating rate
@@ -64,6 +71,6 @@ else:
     mc = 1.0e+4
 
 #instantiate configuration class and print configuration files as well as job configuration file
-config = Configurer(config_dict,root_dir,Hn=Hn,delta_q=delta_q,mc=mc,build_paths=True)
+config = Configurer(config_dict,root_dir,Hn=Hn,delta_q=delta_q,mc=mc,build_paths=True,t_wait_q_scaling=t_wait_scaling)
 config.vary_wait_time(250,5000,250)
 config.print_job_array_config()
