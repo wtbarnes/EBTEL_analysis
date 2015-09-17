@@ -192,12 +192,6 @@ class Configurer(object):
             self.config_dictionary['end_time_array'][i] = self.config_dictionary['start_time_array'][i] + 2.0*self.config_dictionary['t_pulse_half']
             #calculate wait time sum
             if self.t_wait_q_scaling:
-                #make sure that amplitude arrays exist
-                if hasattr(self.config_dictionary['amp_array']):
-                    pass
-                else:
-                    raise ValueError("Cannot calculate T_N,Q scaling. No amplitude arrays defined.")
-                
                 #calculate start time for wait time scaled to amplitude (Q=xi*T_N^b)
                 #calculate coefficient (xi^(1/b))
                 xi_1ob = (config_dictionary['amp_array']**(1.0/self.t_wait_q_scaling)).sum()/(config_dictionary['total_time'] - config_dictionary['num_events']*2.0*config_dictionary['t_pulse_half'])
