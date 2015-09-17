@@ -13,9 +13,15 @@ class DEMProcess(object):
     em_max_eps_percent = 0.999
     
     def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs):
+        #check for wait time scaling option
+        if 't_wait_q_scaling' in kwargs:
+            scaling_suffix = '-b'+str(kwargs['t_wait_q_scaling'])
+        else:
+            scaling_suffix = ''
+            
         #set up paths
         child_path = root_dir+species+'_heating_runs/alpha'+str(alpha)+'/data/'
-        self.file_path = 'ebtel_L'+str(loop_length)+'_tn%d_tpulse'+str(tpulse)+'_'+solver
+        self.file_path = 'ebtel_L'+str(loop_length)+'_tn%d'+scaling_suffix+'_tpulse'+str(tpulse)+'_'+solver
         self.root_path = child_path + self.file_path
         #configure keyword arguments
         if 'verbose' in kwargs:
@@ -35,24 +41,32 @@ class DEMProcess(object):
             em = []
             temp_em = []
             #initialize counter and flag
-            eol_flag=False
             counter=0
+            #failed read-in tolerance parameters
+            MAX_FAIL = 5
+            fail_count = 0
             #build wait-time specific path
             tn_path = self.root_path%Tn[i]
-            while eol_flag is False:
+            while fail_count <= MAX_FAIL:
                 try:
                     temp = np.loadtxt(tn_path+'/'+self.file_path%Tn[i]+'_'+str(counter)+'_dem.txt')
                     temp[np.where(np.isnan(temp))] = -np.inf
                     temp_em.append(temp[:,0])
                     em.append(temp[:,4])
-                    counter += 1
-                except:
+                    #reset fail count after success
+                    fail_count = 0
+                except FileNotFoundError:
+                    fail_count += 1
                     if self.verbose:
                         print("Unable to process file for Tn = "+str(Tn[i])+", run = "+str(counter))
-                        print("Reached end of list or there was an error reading the file.")
+                        
+                    if fail_count > MAX_FAIL:
+                        print("Reached end of list or too many missing files.")
+                        print("Estimated percentage of files read = %f"%(len(em)/(counter - MAX_FAIL)*100))
                     
-                    eol_flag=True
                     pass
+                #increment counter
+                counter += 1
                     
             self.temp_em.append(temp_em)
             self.em.append(em)
