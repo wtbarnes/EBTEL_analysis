@@ -19,7 +19,7 @@ parser.add_argument("-L","--loop_length",type=float,help="Loop half-length.")
 parser.add_argument("-t","--t_pulse",type=float,help="Width of the heating pulse used for the particular run.")
 parser.add_argument("-S","--solver",help="Solver used to compute solutions.")
 parser.add_argument("--root_dir",help="Optional root directory for config files")
-parser.add_argument("--t_wait_scaling",help="Optional parameter to force scaling between wait time and event amplitude, Q\propto T_N^b; b in Cargill(2014)")
+parser.add_argument("--t_wait_scaling",type=float,help="Optional parameter to force scaling between wait time and event amplitude, Q\propto T_N^b; b in Cargill(2014)")
 #Declare the parser dictionary
 args = parser.parse_args()
 
