@@ -13,17 +13,18 @@ class Configurer(object):
     def __init__(self,config_dictionary,root_dir,**kwargs):
         self.config_dictionary = config_dictionary
         self.root_dir = root_dir
-        #Set up paths
-        if 'build_paths' in kwargs and kwargs['build_paths'] is True:
-            self.path_builder()
-        else:
-            print("Warning: Build paths not constructed! You will not be able to build config files for variable Tn until you run self.path_builder().")
         
+        #set optional heating variables
         if 'Hn' in kwargs:
             self.Hn = kwargs['Hn']
             
         if 'delta_q' in kwargs:
             self.delta_q = kwargs['delta_q']
+            
+        if 't_wait_q_scaling' in kwargs:
+            self.t_wait_mean_q_scaling = kwargs['t_wait_q_scaling']
+        else:
+            self.t_wait_mean_q_scaling = []
             
         #check if we are using a Monte-Carlo Approach
         self.nmc_list = []
@@ -32,6 +33,12 @@ class Configurer(object):
             self.mc = kwargs['mc']
         else:
             self.mc = False
+            
+        #Set up paths
+        if 'build_paths' in kwargs and kwargs['build_paths'] is True:
+            self.path_builder()
+        else:
+            print("Warning: Build paths not constructed! You will not be able to build config files for variable Tn until you run self.path_builder().")
 
 
     def path_builder(self,**kwargs):
@@ -42,11 +49,17 @@ class Configurer(object):
             gen_path = gen_path + 'alpha' + self.config_dictionary['amp_switch'] + '/'
         else:
             gen_path = gen_path + 'alpha' + str(np.fabs(self.config_dictionary['alpha'])) + '/'
+            
+        #check for t_wait-q scaling
+        if self.t_wait_mean_q_scaling:
+            scaling_suffix = '-b'+str(self.t_wait_mean_q_scaling)
+        else:
+            scaling_suffix = ''
         
         #set data and config paths
         self.data_path = self.root_dir + gen_path + 'data/'
         self.config_path = self.root_dir + gen_path + 'config/'
-        self.fn = 'ebtel_L' + str(self.config_dictionary['loop_length']) + '_tn%d_tpulse' + str(2.0*self.config_dictionary['t_pulse_half']) + '_' + self.config_dictionary['solver']
+        self.fn = 'ebtel_L' + str(self.config_dictionary['loop_length']) + '_tn%d' + scaling_suffix + '_tpulse' + str(2.0*self.config_dictionary['t_pulse_half']) + '_' + self.config_dictionary['solver']
 
 
     def print_xml_config(self,**kwargs):
@@ -110,10 +123,10 @@ class Configurer(object):
         
         try:
             top_list = []
-            for i in range(len(self.t_wait)):
+            for i in range(len(self.t_wait_mean)):
                 sub_list = []
                 for j in range(self.nmc_list[i]):
-                    sub_list.append([self.t_wait[i],j])
+                    sub_list.append([self.t_wait_mean[i],j])
                     
                 top_list.append(sub_list)
                 
@@ -127,17 +140,17 @@ class Configurer(object):
         """Print configuration files for varying wait-time between successive heating events"""
         
         #Build wait time list
-        self.t_wait = np.arange(tn_a,tn_b+delta_tn,delta_tn)
+        self.t_wait_mean = np.arange(tn_a,tn_b+delta_tn,delta_tn)
         #Iterate over wait times
-        for i in range(len(self.t_wait)):
-            #create start time arrays and end time arrays
-            self.time_arrays(self.t_wait[i])
+        for i in range(len(self.t_wait_mean)):
+            #set total number of events
+            self.config_dictionary['num_events'] = int(np.ceil(self.config_dictionary['total_time']/(2.0*self.config_dictionary['t_pulse_half'] + self.t_wait_mean[i])))
             #Create directories in data and config if needed
-            if not os.path.exists(self.config_path+self.fn%self.t_wait[i]):
-                os.makedirs(self.config_path+self.fn%self.t_wait[i])
+            if not os.path.exists(self.config_path+self.fn%self.t_wait_mean[i]):
+                os.makedirs(self.config_path+self.fn%self.t_wait_mean[i])
                 
-            if not os.path.exists(self.data_path+self.fn%self.t_wait[i]):
-                os.makedirs(self.data_path+self.fn%self.t_wait[i])
+            if not os.path.exists(self.data_path+self.fn%self.t_wait_mean[i]):
+                os.makedirs(self.data_path+self.fn%self.t_wait_mean[i])
                 
             #Print config files for each run
             #Check if Monte-Carlo run
@@ -150,11 +163,13 @@ class Configurer(object):
             #Iterate over runs
             for j in range(num_runs):
                 #build amplitude arrays
-                self.amp_arrays(self.t_wait[i])
+                self.amp_arrays(self.t_wait_mean[i])
+                #build start and end time arrays
+                self.time_arrays(self.t_wait_mean[i])
                 #set name of output file
-                self.config_dictionary['output_file'] = self.data_path+self.fn%self.t_wait[i]+'/'+self.fn%self.t_wait[i]+'_'+str(j)
+                self.config_dictionary['output_file'] = self.data_path+self.fn%self.t_wait_mean[i]+'/'+self.fn%self.t_wait_mean[i]+'_'+str(j)
                 #print configuration files
-                self.print_xml_config(config_file=self.config_path + self.fn%self.t_wait[i] + '/' + self.fn%self.t_wait[i] + '_' + str(j) + '.xml')
+                self.print_xml_config(config_file=self.config_path + self.fn%self.t_wait_mean[i] + '/' + self.fn%self.t_wait_mean[i] + '_' + str(j) + '.xml')
                 
                 
     def calc_nmc(self,**kwargs):
@@ -166,11 +181,24 @@ class Configurer(object):
     def time_arrays(self,ti,**kwargs):
         """Create start time and end time arrays"""
         
-        self.config_dictionary['num_events'] = int(np.ceil(self.config_dictionary['total_time']/(2.0*self.config_dictionary['t_pulse_half'] + ti)))
         self.config_dictionary['start_time_array'],self.config_dictionary['end_time_array'] = np.empty([self.config_dictionary['num_events']]),np.empty([self.config_dictionary['num_events']])
         #configure start and end time for each event
         for i in range(self.config_dictionary['num_events']):
-            self.config_dictionary['start_time_array'][i] = i*(2.0*self.config_dictionary['t_pulse_half'] + ti)
+            #calculate start time
+            if self.t_wait_q_scaling:
+                #make sure that amplitude arrays exist
+                if hasattr(self,config_dictionary['amp_array']):
+                    pass
+                else:
+                    raise ValueError("Cannot calculate T_N,Q scaling. No amplitude arrays defined.")
+                
+                #calculate start time for wait time scaled to amplitude
+                #TODO: add in calculation of xi coefficient, calculate tn, set start time
+            else:
+                #calculate start time for static wait time
+                self.config_dictionary['start_time_array'][i] = i*(2.0*self.config_dictionary['t_pulse_half'] + ti)
+                
+            #set end time based on pulse duration
             self.config_dictionary['end_time_array'][i] = self.config_dictionary['start_time_array'][i] + 2.0*self.config_dictionary['t_pulse_half']    
                 
                 
