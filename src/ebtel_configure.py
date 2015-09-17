@@ -182,9 +182,15 @@ class Configurer(object):
         """Create start time and end time arrays"""
         
         self.config_dictionary['start_time_array'],self.config_dictionary['end_time_array'] = np.empty([self.config_dictionary['num_events']]),np.empty([self.config_dictionary['num_events']])
+        #initialize running wait time sum
+        t_wait_sum = 0.0
         #configure start and end time for each event
         for i in range(self.config_dictionary['num_events']):
-            #calculate start time
+            #calculate start time for static wait time
+            self.config_dictionary['start_time_array'][i] = i*(2.0*self.config_dictionary['t_pulse_half']) + t_wait_sum
+            #set end time based on pulse duration
+            self.config_dictionary['end_time_array'][i] = self.config_dictionary['start_time_array'][i] + 2.0*self.config_dictionary['t_pulse_half']
+            #calculate wait time sum
             if self.t_wait_q_scaling:
                 #make sure that amplitude arrays exist
                 if hasattr(self,config_dictionary['amp_array']):
@@ -192,14 +198,16 @@ class Configurer(object):
                 else:
                     raise ValueError("Cannot calculate T_N,Q scaling. No amplitude arrays defined.")
                 
-                #calculate start time for wait time scaled to amplitude
-                #TODO: add in calculation of xi coefficient, calculate tn, set start time
+                #calculate start time for wait time scaled to amplitude (Q=xi*T_N^b)
+                #calculate coefficient (xi^(1/b))
+                xi_1ob = (config_dictionary['amp_array']**(1.0/self.t_wait_q_scaling)).sum()/(config_dictionary['total_time'] - config_dictionary['num_events']*2.0*config_dictionary['t_pulse_half'])
+                #calculate resulting wait time
+                t_wait_temp = (config_dictionary['amp_array'][i])**(1.0/self.t_wait_q_scaling)/xi_1ob
+                #increment start time sum
+                t_wait_sum = t_wait_sum + t_wait_temp
             else:
-                #calculate start time for static wait time
-                self.config_dictionary['start_time_array'][i] = i*(2.0*self.config_dictionary['t_pulse_half'] + ti)
-                
-            #set end time based on pulse duration
-            self.config_dictionary['end_time_array'][i] = self.config_dictionary['start_time_array'][i] + 2.0*self.config_dictionary['t_pulse_half']    
+                #increment start time sum
+                t_wait_sum = t_wait_sum + ti    
                 
                 
     def amp_arrays(self,ti,**kwargs):
