@@ -62,7 +62,7 @@ class DEMProcess(object):
                         
                     if fail_count > MAX_FAIL:
                         print("Reached end of list or too many missing files.")
-                        print("Estimated percentage of files read = %f%"%(len(em)/(counter - MAX_FAIL)*100))
+                        print("Estimated percentage of files read = %f %%"%(len(em)/(counter - MAX_FAIL)*100))
                     
                     pass
                 #increment counter
