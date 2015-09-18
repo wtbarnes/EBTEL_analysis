@@ -95,13 +95,13 @@ class DEMPlotter(object):
         ax = fig.gca()
 
         #print lines
-        ax.fill_between(self.temp_mean,self.em_mean-self.em_sigma,self.em_mean+self.em_sigma,facecolor='red',edgecolor='red',alpha=0.35)
+        ax.fill_between(self.temp_mean[tn_index],self.em_mean[tn_index]-self.em_sigma[tn_index],self.em_mean[tn_index]+self.em_sigma[tn_index],facecolor='red',edgecolor='red',alpha=0.35)
         for i in range(len(temp_list)):
             ax.plot(temp_list[i],em_list[i],color='blue',linestyle=self.linestyles[-1])
-        ax.plot(self.temp_mean,self.em_mean,color='black')
+        ax.plot(self.temp_mean[tn_index],self.em_mean[tn_index],color='black')
 
         #set labels
-        ax.set_title(r"EBTEL EM, $T_n$ = "+str(self.Tn[tn_index])+" s",fontsize=self.fs)
+        ax.set_title(r"EBTEL EM, $\langle T_n\rangle$ = "+str(self.Tn[tn_index])+" s",fontsize=self.fs)
         ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
