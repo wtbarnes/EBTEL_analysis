@@ -62,7 +62,7 @@ class DEMProcess(object):
                         
                     if fail_count > MAX_FAIL:
                         print("Reached end of list or too many missing files.")
-                        print("Estimated percentage of files read = %f"%(len(em)/(counter - MAX_FAIL)*100))
+                        print("Estimated percentage of files read = %f%"%(len(em)/(counter - MAX_FAIL)*100))
                     
                     pass
                 #increment counter
@@ -89,6 +89,11 @@ class DEMProcess(object):
             self.temp_mean[i] = temp_new
             self.em_mean[i] = dem_new
             self.em_std[i] = sigma_new
+            
+        #convert to numpy arrays for convenience
+        self.temp_mean = np.array(self.temp_mean)
+        self.em_mean = np.array(self.em_mean)
+        self.em_std = np.array(self.em_std)
                 
                 
     def calc_stats(self,**kwargs):
