@@ -31,7 +31,7 @@ else:
 if args.root_dir_figs:
     root_dir_figs = args.root_dir_figs
 else:
-    root_dir_figs = '/data/datadrive1/EBTEL-2fluid_figs/'
+    root_dir_figs = '/data/datadrive2/EBTEL-2fluid_figs/'
     
 #set figure file format
 figdir = '%s_heating_runs/alpha%s/'
