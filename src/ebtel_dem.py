@@ -190,7 +190,7 @@ class DEMAnalyze(object):
                 slope_limits = []
                 
             bound_arrays = self.bounds(self.temp_em[i],self.em[i],self.sigma_em[i],slope_limits)
-            ac,bc,sc,ah,bh,sh = self.branch_fit(self.temp_em[i],self.em[i],bound_arrays)
+            ac,bc,sc,ah,bh,sh = self.branch_fit(bound_arrays['temp_cool'], bound_arrays['dem_cool'], bound_arrays['temp_hot'], bound_arrays['dem_hot'], sigma_cool=bound_arrays['sigma_cool'], sigma_hot=bound_arrays['sigma_hot'])
             self.cool_fits.append([ac,bc,sc]),self.hot_fits.append([ah,bh,sh])
                             
             
@@ -242,33 +242,48 @@ class DEMAnalyze(object):
         return {'temp_cool':temp_cool,'dem_cool':dem_cool,'sigma_cool':sigma_cool,'temp_hot':temp_hot,'dem_hot':dem_hot,'sigma_hot':sigma_hot}
         
         
-    def branch_fit(self,temp,dem,bound_arrays,**kwargs):
+    def branch_fit(self,temp_cool,dem_cool,temp_hot,dem_hot,**kwargs):
         """Linear fit to hot and cool branches of EM curve using hot and cool branches constructed according to hot and cool limits."""
+        
+        #unpack uncertainties
+        if 'sigma_cool' in kwargs:
+            sigma_cool = kwargs['sigma_cool']
+            absolute_sigma_cool = True
+        else:
+            sigma_cool = np.ones(len(temp_cool))
+            absolute_sigma_cool = False
+            
+        if 'sigma_hot' in kwargs:
+            sigma_hot = kwargs['sigma_hot']
+            absolute_sigma_hot = True
+        else:
+            sigma_hot = np.ones(len(temp_hot))
+            absolute_sigma_hot = False
         
         #Function for linear fit
         def linear_fit(x,a,b):
             return a*x + b
             
-        #Check if inside interpolated array and calculate slope
+        #perform linear fit
         #cool
-        if bound_arrays['temp_cool'] is False:
+        if temp_cool is False:
             a_coolward = False
             b_coolward = False
             sigma_coolward = False
         else:
-            pars_cool,covar_cool = curve_fit(linear_fit,bound_arrays['temp_cool'],bound_arrays['dem_cool'],sigma=bound_arrays['sigma_cool'],absolute_sigma=True)
+            pars_cool,covar_cool = curve_fit(linear_fit,temp_cool,dem_cool,sigma=sigma_cool,absolute_sigma=absolute_sigma_cool)
             a_coolward,b_coolward = pars_cool[0],pars_cool[1]
             #compute residual variance
             res = 1#np.sum((linear_fit(bound_arrays['temp_cool'],*pars_cool) - bound_arrays['dem_cool'])**2)/(len(bound_arrays['dem_cool']) - len(pars_cool))
             sigma_coolward = np.sqrt(np.diag(covar_cool/res))
             
         #hot
-        if bound_arrays['temp_hot'] is False:
+        if temp_hot is False:
             a_hotward = False
             b_hotward = False
             sigma_hotward = False
         else:
-            pars_hot,covar_hot = curve_fit(linear_fit,bound_arrays['temp_hot'],bound_arrays['dem_hot'],sigma=bound_arrays['sigma_hot'],absolute_sigma=True)
+            pars_hot,covar_hot = curve_fit(linear_fit,temp_hot,dem_hot,sigma=sigma_hot,absolute_sigma=absolute_sigma_hot)
             a_hotward,b_hotward = pars_hot[0],pars_hot[1]
             res = 1#np.sum((linear_fit(bound_arrays['temp_hot'],*pars_hot) - bound_arrays['dem_hot'])**2)/(len(bound_arrays['dem_hot']) - len(pars_hot))
             sigma_hotward = np.sqrt(np.diag(covar_hot/res))
