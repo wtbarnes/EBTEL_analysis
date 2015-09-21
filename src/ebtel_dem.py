@@ -133,8 +133,10 @@ class DEMAnalyze(object):
     def __init__(self,em,temp,em_mean,temp_mean,sigma,**kwargs):
         #get nested lists with EM and T values
         self.em = em
-        self.temp_em = temp
-        self.sigma_em = sigma
+        self.temp= temp
+        self.em_mean = em_mean
+        self.temp_mean = temp_mean
+        self.sigma = sigma
         #keyword arguments
         if 'verbose' in kwargs:
             self.verbose = kwargs['verbose']
@@ -175,7 +177,7 @@ class DEMAnalyze(object):
             #reshape temperature and interpolate emission measure
             temp_new = np.linspace(self.temp_mean[i][inf_index[0][0]],self.temp_mean[i][inf_index[0][-1]],2000)
             dem_new = np.interp(temp_new,self.temp_mean[i][inf_index[0][0]:inf_index[0][-1]],self.em_mean[i][inf_index[0][0]:inf_index[0][-1]])
-            sigma_new = np.interp(temp_new,self.temp_mean[i][inf_index[0][0]:inf_index[0][-1]],self.em_sigma[i][inf_index[0][0]:inf_index[0][-1]])
+            sigma_new = np.interp(temp_new,self.temp_mean[i][inf_index[0][0]:inf_index[0][-1]],self.sigma[i][inf_index[0][0]:inf_index[0][-1]])
             #reassign to nested list
             self.temp_mean[i] = temp_new
             self.em_mean[i] = dem_new
