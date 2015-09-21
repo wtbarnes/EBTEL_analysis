@@ -223,10 +223,15 @@ class DEMAnalyze(object):
                 bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i], self.sigma[i], self.fit_limits(self.temp_mean[i], self.em_mean[i]))
                 fits = self.branch_fit(bound_arrays['temp_cool'],bound_arrays['dem_cool'],bound_arrays['temp_hot'],bound_arrays['dem_hot'])
                 #calculate sigma and store values
-                sac = np.max(np.fabs(fits['a_c']-fits_minus['a_c']),np.fabs(fits['a_c']-fits_plus['a_c']))
-                sbc = np.max(np.fabs(fits['b_c']-fits_minus['b_c']),np.fabs(fits['b_c']-fits_plus['b_c']))
-                sah = np.max(np.fabs(fits['a_h']-fits_minus['a_h']),np.fabs(fits['a_h']-fits_plus['a_h']))
-                sbh = np.max(np.fabs(fits['b_h']-fits_minus['b_h']),np.fabs(fits['b_h']-fits_plus['b_h']))
+                sac,sbc,sah,sbh = False,False,False,False
+                if fits['a_c'] and fits_minus['a_c'] and fits_plus['a_c']:
+                    sac = np.max(np.fabs(fits['a_c']-fits_minus['a_c']),np.fabs(fits['a_c']-fits_plus['a_c']))
+                if fits['b_c'] and fits_minus['b_c'] and fits_plus['b_c']:
+                    sbc = np.max(np.fabs(fits['b_c']-fits_minus['b_c']),np.fabs(fits['b_c']-fits_plus['b_c']))
+                if fits['a_h'] and fits_minus['a_h'] and fits_plus['a_h']:
+                    sah = np.max(np.fabs(fits['a_h']-fits_minus['a_h']),np.fabs(fits['a_h']-fits_plus['a_h']))
+                if fits['b_h'] and fits_minus['b_h'] and fits_plus['b_h']:
+                    sbh = np.max(np.fabs(fits['b_h']-fits_minus['b_h']),np.fabs(fits['b_h']-fits_plus['b_h']))
                 self.cool_fits.append([fits['a_c'],fits['b_c'],[sac,sbc]]),self.hot_fits.append([fits['a_h'],fits['b_h'],[sah,sbh]])
                 
             elif self.fit_method is 'fit_mean_weighted':
