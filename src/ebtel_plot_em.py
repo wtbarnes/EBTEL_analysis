@@ -36,9 +36,9 @@ class DEMPlotter(object):
         #arguments
         self.temp_list = temp_list
         self.em_list = em_list
-        self.temp_mean = temp_mean
-        self.em_mean = em_mean
-        self.em_sigma = em_sigma
+        self.temp_mean = np.array(temp_mean)
+        self.em_mean = np.array(em_mean)
+        self.em_sigma = np.array(em_sigma)
         self.cool_fits = cool_fits
         self.hot_fits = hot_fits
         #keyword arguments
@@ -59,15 +59,15 @@ class DEMPlotter(object):
 
         #print lines
         for i in range(len(self.em_mean)):
-            ax.plot(self.temp_mean[i],self.em_mean[i]+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='black')
+            ax.plot(self.temp_mean[i], self.em_mean[i]+i*delta_em, linestyle=self.linestyles[i%len(self.linestyles)], color='black')
             if 'fit_lines' in kwargs:
                 try:
-                    ax.plot(kwargs['fit_lines']['t_cool'][i],(self.cool_fits[i][0]*kwargs['fit_lines']['t_cool'][i] + self.cool_fits[i][1]) + i*delta_em,linewidth=2.0,color='blue')
+                    ax.plot(kwargs['fit_lines']['t_cool'][i], (self.cool_fits[i][0]*kwargs['fit_lines']['t_cool'][i] + self.cool_fits[i][1]) + i*delta_em, linewidth=2.0, color='blue')
                 except:
                     pass
                     
                 try:
-                    ax.plot(kwargs['fit_lines']['t_hot'][i],(self.hot_fits[i][0]*kwargs['fit_lines']['t_hot'][i] + self.hot_fits[i][1]) + i*delta_em,linewidth=2.0,color='red')
+                    ax.plot(kwargs['fit_lines']['t_hot'][i], (self.hot_fits[i][0]*kwargs['fit_lines']['t_hot'][i] + self.hot_fits[i][1]) + i*delta_em, linewidth=2.0, color='red')
                 except:
                     pass
 
@@ -95,7 +95,7 @@ class DEMPlotter(object):
         ax = fig.gca()
 
         #print lines
-        ax.fill_between(self.temp_mean[tn_index],self.em_mean[tn_index]-self.em_sigma[tn_index],self.em_mean[tn_index]+self.em_sigma[tn_index],facecolor='red',edgecolor='red',alpha=0.35)
+        ax.fill_between(self.temp_mean[tn_index], self.em_mean[tn_index]-self.em_sigma[tn_index], self.em_mean[tn_index]+self.em_sigma[tn_index], facecolor='red', edgecolor='red', alpha=0.35)
         for i in range(len(temp_list)):
             ax.plot(temp_list[i],em_list[i],color='blue',linestyle=self.linestyles[-1])
         ax.plot(self.temp_mean[tn_index],self.em_mean[tn_index],color='black')
