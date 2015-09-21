@@ -294,14 +294,16 @@ class DEMAnalyze(object):
             sigma_cool = kwargs['sigma_cool']
             absolute_sigma_cool = True
         else:
-            sigma_cool = np.ones(len(temp_cool))
+            if temp_cool:
+                sigma_cool = np.ones(len(temp_cool))
             absolute_sigma_cool = False
             
         if 'sigma_hot' in kwargs:
             sigma_hot = kwargs['sigma_hot']
             absolute_sigma_hot = True
         else:
-            sigma_hot = np.ones(len(temp_hot))
+            if temp_hot:
+                sigma_hot = np.ones(len(temp_hot))
             absolute_sigma_hot = False
         
         #Function for linear fit
