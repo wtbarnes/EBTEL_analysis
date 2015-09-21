@@ -197,7 +197,7 @@ class DEMAnalyze(object):
             if self.fit_method is 'fit_all':
                 cool_temp =[], hot_temp =[]
                 for j in range(len(self.em[i])):
-                    bound_arrays = self.bounds(self.temp[i][j], self.em[i][j], np.ones(len(self.em[i][j])), self.fit_limits(self.temp[i][j], self.em[i][j]))
+                    bound_arrays = self.bounds(self.temp[i][j], self.em[i][j], np.ones(len(self.em[i][j])))
                     fits = self.branch_fit(bound_arrays['temp_cool'], bound_arrays['dem_cool'], bound_arrays['temp_hot'], bound_arrays['dem_hot'])
                     cool_temp.append([fits['a_c'],fits['b_c']]), hot_temp.append([fits['a_h'],fits['b_h']])
                 #calculate standard deviation and mean and store values
@@ -214,13 +214,13 @@ class DEMAnalyze(object):
                 
             elif self.fit_method is 'fit_plus_minus':
                 #mean + sigma
-                bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i]+self.sigma[i], self.sigma[i], self.fit_limits(self.temp_mean[i], self.em_mean[i]+self.sigma[i]))
+                bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i]+self.sigma[i], self.sigma[i])
                 fits_plus = self.branch_fit(bound_arrays['temp_cool'],bound_arrays['dem_cool'],bound_arrays['temp_hot'],bound_arrays['dem_hot'])
                 #mean - sigma
-                bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i]-self.sigma[i], self.sigma[i], self.fit_limits(self.temp_mean[i], self.em_mean[i]-self.sigma[i]))
+                bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i]-self.sigma[i], self.sigma[i])
                 fits_minus = self.branch_fit(bound_arrays['temp_cool'],bound_arrays['dem_cool'],bound_arrays['temp_hot'],bound_arrays['dem_hot'])
                 #mean
-                bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i], self.sigma[i], self.fit_limits(self.temp_mean[i], self.em_mean[i]))
+                bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i], self.sigma[i])
                 fits = self.branch_fit(bound_arrays['temp_cool'],bound_arrays['dem_cool'],bound_arrays['temp_hot'],bound_arrays['dem_hot'])
                 #calculate sigma and store values
                 sac,sbc,sah,sbh = False,False,False,False
@@ -235,7 +235,7 @@ class DEMAnalyze(object):
                 self.cool_fits.append([fits['a_c'],fits['b_c'],[sac,sbc]]),self.hot_fits.append([fits['a_h'],fits['b_h'],[sah,sbh]])
                 
             elif self.fit_method is 'fit_mean_weighted':
-                bound_arrays = self.bounds(self.temp_mean[i],self.em_mean[i],self.sigma[i],self.fit_limits(self.temp_mean[i],self.em_mean[i]))
+                bound_arrays = self.bounds(self.temp_mean[i],self.em_mean[i],self.sigma[i])
                 fits = self.branch_fit(bound_arrays['temp_cool'], bound_arrays['dem_cool'], bound_arrays['temp_hot'], bound_arrays['dem_hot'], sigma_cool=bound_arrays['sigma_cool'], sigma_hot=bound_arrays['sigma_hot'])
                 self.cool_fits.append([fits['a_c'],fits['b_c'],fits['s_c']]),self.hot_fits.append([fits['a_h'],fits['b_h'],fits['s_h']])
                 
@@ -243,20 +243,10 @@ class DEMAnalyze(object):
                 raise ValueError("Unrecognized fit method option.")
             
             
-    def bounds(self,temp,dem,sigma,slope_limits,**kwargs):
+    def bounds(self,temp,dem,sigma,**kwargs):
         """Create bounded hot and cool branches from given hot and cool branch limits (or default values); interpolation over EM curves should be done before this step."""
-        
-        #Set default values for hot and cool limits if they have not been specified
-        if not slope_limits:
-            slope_limits['cool_upper'],slope_limits['hot_lower'] = temp[np.argmax(dem)],temp[np.argmax(dem)]
-            slope_limits['cool_lower'] = slope_limits['cool_upper'] + self.cool_diff
-            slope_limits['hot_upper'] = slope_limits['hot_lower'] + self.hot_diff
-            if self.verbose:
-                print("No slope limits specified; using default values:")
-                print("    T_cool_upper = "+str(slope_limits['cool_upper'])+" K")
-                print("    T_cool_lower = "+str(slope_limits['cool_lower'])+" K")
-                print("    T_hot_upper = "+str(slope_limits['hot_upper'])+" K")
-                print("    T_hot_lower = "+str(slope_limits['hot_lower'])+" K")
+        #find limits over which temperature will be calculated
+        slope_limits = self.fit_limits(temp,dem)
         
         #Construct hot and cool dem and temp arrays for given bounds
         i_cool_lower = np.where(temp<slope_limits['cool_lower'])
@@ -347,6 +337,8 @@ class DEMAnalyze(object):
         
         
     def fit_limits(self,temp,em,**kwargs):
+        """Calculate limits over which fit is calculated depending on input option."""
+        
         if self.lim_method is 'dynamic':
             ninf_i = np.where(np.isinf(em) == False) #find non-inf indices
             max_i = np.argmax(em) #find index corresponding to max value
@@ -355,11 +347,25 @@ class DEMAnalyze(object):
             delta_em_hot = np.fabs(np.diff(em_hot)) #delta(em) of hot branch
             delta_i = np.where(delta_em_hot>0.5)[0][0]
             lim_i = hot_i[delta_i - 1]-1
-            t_upper = temp[lim_i]
-            t_lower = t_upper - self.delta_t
+            th_upper = temp[lim_i]
+            th_lower = t_upper - self.delta_t
+            tc_lower = self.slope_limits['cool_lower']
+            tc_upper = self.slope_limits['cool_upper']
+        elif self.lim_method is 'peak':
+            tc_upper,th_lower = temp[np.argmax(dem)],temp[np.argmax(dem)]
+            tc_lower = slope_limits['cool_upper'] + self.cool_diff
+            th_upper = slope_limits['hot_lower'] + self.hot_diff
         else:
-            t_upper = self.slope_limits['hot_upper']
-            t_lower = self.slope_limits['hot_lower']
+            th_upper = self.slope_limits['hot_upper']
+            th_lower = self.slope_limits['hot_lower']
+            tc_lower = self.slope_limits['cool_lower']
+            tc_upper = self.slope_limits['cool_upper']
+            
+        if self.verbose:
+            print("T_cool_upper = "+str(tc_upper)+" K")
+            print("T_cool_lower = "+str(tc_lower)+" K")
+            print("T_hot_upper = "+str(th_upper)+" K")
+            print("T_hot_lower = "+str(th_lower)+" K")
         
-        return {'cool_upper':self.slope_limits['cool_upper'],'cool_lower':self.slope_limits['cool_lower'],'hot_upper':t_upper,'hot_lower':t_lower}
+        return {'cool_upper':tc_upper,'cool_lower':tc_lower,'hot_upper':th_upper,'hot_lower':th_lower}
           
