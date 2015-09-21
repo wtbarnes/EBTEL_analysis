@@ -344,8 +344,9 @@ class DEMAnalyze(object):
             max_i = np.argmax(em) #find index corresponding to max value
             hot_i = ninf_i[0][np.where(ninf_i[0]>max_i)] #indices for hot branch
             em_hot = em[hot_i] #hot branch em
-            delta_em_hot = np.fabs(np.diff(em_hot)) #delta(em) of hot branch
-            delta_i = np.where(delta_em_hot>0.5)[0][0]
+            temp_hot = temp[hot_i]
+            delta_em_hot_dT = np.fabs(np.diff(em_hot)/np.diff(temp_hot)) #delta(em) of hot branch
+            delta_i = np.where(delta_em_hot_dT>0.5)[0][0]
             lim_i = hot_i[delta_i - 1]-1
             th_upper = temp[lim_i]
             th_lower = t_upper - self.delta_t
