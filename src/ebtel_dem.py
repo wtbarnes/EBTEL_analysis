@@ -5,7 +5,6 @@
 
 #Import needed modules
 import numpy as np
-import sys
 from scipy.optimize import curve_fit
 
 class DEMProcess(object):
@@ -213,7 +212,7 @@ class DEMAnalyze(object):
                 sigma_b = np.std(np.array(hot_temp)[1],axis=0)
                 self.hot_fits.append([a,b,[sigma_a,sigma_b]])
                 
-            elif self.fit_method is 'fit_plus-minus':
+            elif self.fit_method is 'fit_plus_minus':
                 #mean + sigma
                 bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i]+self.sigma[i], self.sigma[i], self.fit_limits(self.temp_mean[i], self.em_mean[i]+self.sigma[i]))
                 fits_plus = self.branch_fit(bound_arrays['temp_cool'],bound_arrays['dem_cool'],bound_arrays['temp_hot'],bound_arrays['dem_hot'])
@@ -231,13 +230,12 @@ class DEMAnalyze(object):
                 self.cool_fits.append([fits['a_c'],fits['b_c'],[sac,sbc]]),self.hot_fits.append([fits['a_h'],fits['b_h'],[sah,sbh]])
                 
             elif self.fit_method is 'fit_mean_weighted':
-                bound_arrays = self.bounds(self.temp_mean[i],self.em_mean[i],self.sigma[i],self.fit_limits(self.temp_mean[i],self.em_mean[i],method='dynamic'))
+                bound_arrays = self.bounds(self.temp_mean[i],self.em_mean[i],self.sigma[i],self.fit_limits(self.temp_mean[i],self.em_mean[i]))
                 fits = self.branch_fit(bound_arrays['temp_cool'], bound_arrays['dem_cool'], bound_arrays['temp_hot'], bound_arrays['dem_hot'], sigma_cool=bound_arrays['sigma_cool'], sigma_hot=bound_arrays['sigma_hot'])
                 self.cool_fits.append([fits['a_c'],fits['b_c'],fits['s_c']]),self.hot_fits.append([fits['a_h'],fits['b_h'],fits['s_h']])
                 
             else:
-                print("Unrecognized fit method. Exiting...")
-                sys.exit()
+                raise ValueError("Unrecognized fit method option.")
             
             
     def bounds(self,temp,dem,sigma,slope_limits,**kwargs):
