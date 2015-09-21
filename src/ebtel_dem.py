@@ -5,11 +5,11 @@
 
 #Import needed modules
 import numpy as np
+import sys
 from scipy.optimize import curve_fit
 
 class DEMProcess(object):
     
-    em_cutoff = 23.0
     em_max_eps_percent = 0.999
     
     def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs):
@@ -70,30 +70,6 @@ class DEMProcess(object):
                     
             self.temp_em.append(temp_em)
             self.em.append(em)
-            
-            
-    def interp_and_filter(self,**kwargs):
-        """Interpolate and filter mean and standard deviation for EM, T arrays; this step is mandatory for later slope calculations."""
-        
-        if not self.em_mean or not self.em_std:
-            raise ValueError("Mean and standard deviation must be calculated before they can be interpolated.")
-        
-        for i in range(len(self.em_mean)):
-            #find cutoff index
-            inf_index = np.where(self.em_mean[i] > self.em_cutoff)
-            #reshape temperature and interpolate emission measure
-            temp_new = np.linspace(self.temp_mean[i][inf_index[0][0]],self.temp_mean[i][inf_index[0][-1]],2000)
-            dem_new = np.interp(temp_new,self.temp_mean[i][inf_index[0][0]:inf_index[0][-1]],self.em_mean[i][inf_index[0][0]:inf_index[0][-1]])
-            sigma_new = np.interp(temp_new,self.temp_mean[i][inf_index[0][0]:inf_index[0][-1]],self.em_std[i][inf_index[0][0]:inf_index[0][-1]])
-            #reassign to nested list
-            self.temp_mean[i] = temp_new
-            self.em_mean[i] = dem_new
-            self.em_std[i] = sigma_new
-            
-        #convert to numpy arrays for convenience
-        self.temp_mean = np.array(self.temp_mean)
-        self.em_mean = np.array(self.em_mean)
-        self.em_std = np.array(self.em_std)
                 
                 
     def calc_stats(self,**kwargs):
@@ -154,7 +130,7 @@ class DEMAnalyze(object):
     cool_diff = -0.6
     hot_diff = 0.4
     
-    def __init__(self,em,temp,sigma,**kwargs):
+    def __init__(self,em,temp,em_mean,temp_mean,sigma,**kwargs):
         #get nested lists with EM and T values
         self.em = em
         self.temp_em = temp
@@ -168,31 +144,94 @@ class DEMAnalyze(object):
             self.slope_limits = kwargs['slope_limits']
         else:
             self.slope_limits = {}
+        if 'fit_method' in kwargs:
+            self.fit_method = kwargs['fit_method']
+        else:
+            self.fit_method = 'fit_all'
+        if 'lim_method' in kwargs:
+            self.lim_method = kwargs['lim_method']
+        else:
+            self.lim_method = 'static'
+        #class parameters
+        if 'em_cutoff' in kwargs:
+            self.em_cutoff = kwargs['em_cutoff']
+        else:
+            self.em_cutoff = 23.0
+        if 'delta_t' in kwargs:
+            self.delta_t = kwargs['delta_t']
+        else:
+            self.delta_t = 0.4
         #define variables to be used later
         self.cool_fits = []
         self.hot_fits = []
+        
+    
+    def interp_and_filter(self,**kwargs):
+        """Interpolate and filter mean and standard deviation for EM, T arrays; this step is mandatory for later slope calculations."""
+        
+        for i in range(len(self.em)):
+            #find cutoff index
+            inf_index = np.where(self.em_mean[i] > self.em_cutoff)
+            #reshape temperature and interpolate emission measure
+            temp_new = np.linspace(self.temp_mean[i][inf_index[0][0]],self.temp_mean[i][inf_index[0][-1]],2000)
+            dem_new = np.interp(temp_new,self.temp_mean[i][inf_index[0][0]:inf_index[0][-1]],self.em_mean[i][inf_index[0][0]:inf_index[0][-1]])
+            sigma_new = np.interp(temp_new,self.temp_mean[i][inf_index[0][0]:inf_index[0][-1]],self.em_sigma[i][inf_index[0][0]:inf_index[0][-1]])
+            #reassign to nested list
+            self.temp_mean[i] = temp_new
+            self.em_mean[i] = dem_new
+            self.sigma[i] = sigma_new
+            #do the same for nested MC entries
+            for j in range(len(self.em[i])):
+                inf_index = np.where(self.em[i][j] > self.em_cutoff)
+                temp_new = np.linspace(self.temp[i][j][inf_index[0][0]],self.temp[i][j][inf_index[0][-1]],2000)
+                self.em[i][j] = np.interp(temp_new,self.temp[i][j][inf_index[0][0]:inf_index[0][-1]],self.em[i][j][inf_index[0][0]:inf_index[0][-1]])
+                self.temp[i][j] = temp_new
         
         
     def many_fits(self,**kwargs):
         """Calculate fits to hot and cool branches for all EM and T data sets"""
         
         for i in range(len(self.em)):
-            acl = []
-            ahl = []
-            #redefine slope limits if kwargs
-            if self.slope_limits:
-                if len(self.slope_limits) > 4:
-                    slope_limits = self.slope_limits[i]
-                else:
-                    slope_limits = self.slope_limits
-                    
-            else:
-                slope_limits = []
+            #calculate slopes and associated error bars depending on chosen method
+            if self.fit_method is 'fit_all':
+                cool_temp =[], hot_temp =[]
+                for j in range(len(self.em[i])):
+                    bound_arrays = self.bounds(self.temp[i][j], self.em[i][j], np.ones(len(self.em[i][j])), self.fit_limits(self.temp[i][j], self.em[i][j]))
+                    fits = self.branch_fit(bound_arrays['temp_cool'], bound_arrays['dem_cool'], bound_arrays['temp_hot'], bound_arrays['dem_hot'])
+                    cool_temp.append([fits['a_c'],fits['b_c']]), hot_temp.append([fits['a_h'],fits['b_h']])
+                #calculate standard deviation and mean and store values
+                #a = 
+                #b = 
+                #sigma_a = 
+                #sigma_b = 
+                self.cool_fits.append([])
                 
-            bound_arrays = self.bounds(self.temp_em[i],self.em[i],self.sigma_em[i],slope_limits)
-            ac,bc,sc,ah,bh,sh = self.branch_fit(bound_arrays['temp_cool'], bound_arrays['dem_cool'], bound_arrays['temp_hot'], bound_arrays['dem_hot'], sigma_cool=bound_arrays['sigma_cool'], sigma_hot=bound_arrays['sigma_hot'])
-            self.cool_fits.append([ac,bc,sc]),self.hot_fits.append([ah,bh,sh])
-                            
+            elif self.fit_method is 'fit_plus-minus':
+                #mean + sigma
+                bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i]+self.sigma[i], self.sigma[i], self.fit_limits(self.temp_mean[i], self.em_mean[i]+self.sigma[i]))
+                fits_plus = self.branch_fit(bound_arrays['temp_cool'],bound_arrays['dem_cool'],bound_arrays['temp_hot'],bound_arrays['dem_hot'])
+                #mean - sigma
+                bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i]-self.sigma[i], self.sigma[i], self.fit_limits(self.temp_mean[i], self.em_mean[i]-self.sigma[i]))
+                fits_minus = self.branch_fit(bound_arrays['temp_cool'],bound_arrays['dem_cool'],bound_arrays['temp_hot'],bound_arrays['dem_hot'])
+                #mean
+                bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i], self.sigma[i], self.fit_limits(self.temp_mean[i], self.em_mean[i]))
+                fits = self.branch_fit(bound_arrays['temp_cool'],bound_arrays['dem_cool'],bound_arrays['temp_hot'],bound_arrays['dem_hot'])
+                #calculate sigma and store values
+                sac = np.max(np.fabs(fits['a_c']-fits_minus['a_c']),np.fabs(fits['a_c']-fits_plus['a_c']))
+                sbc = np.max(np.fabs(fits['b_c']-fits_minus['b_c']),np.fabs(fits['b_c']-fits_plus['b_c']))
+                sah = np.max(np.fabs(fits['a_h']-fits_minus['a_h']),np.fabs(fits['a_h']-fits_plus['a_h']))
+                sbh = np.max(np.fabs(fits['b_h']-fits_minus['b_h']),np.fabs(fits['b_h']-fits_plus['b_h']))
+                self.cool_fits.append([fits['a_c'],fits['b_c'],[sac,sbc]]),self.hot_fits.append([fits['a_h'],fits['b_h'],[sah,sbh]])
+                
+            elif self.fit_method is 'fit_mean_weighted':
+                bound_arrays = self.bounds(self.temp_mean[i],self.em_mean[i],self.sigma[i],self.fit_limits(self.temp_mean[i],self.em_mean[i],method='dynamic'))
+                fits = self.branch_fit(bound_arrays['temp_cool'], bound_arrays['dem_cool'], bound_arrays['temp_hot'], bound_arrays['dem_hot'], sigma_cool=bound_arrays['sigma_cool'], sigma_hot=bound_arrays['sigma_hot'])
+                self.cool_fits.append([fits['a_c'],fits['b_c'],fits['s_c']]),self.hot_fits.append([fits['a_h'],fits['b_h'],fits['s_h']])
+                
+            else:
+                print("Unrecognized fit method. Exiting...")
+                sys.exit()
+            
             
     def bounds(self,temp,dem,sigma,slope_limits,**kwargs):
         """Create bounded hot and cool branches from given hot and cool branch limits (or default values); interpolation over EM curves should be done before this step."""
@@ -288,7 +327,25 @@ class DEMAnalyze(object):
             res = 1#np.sum((linear_fit(bound_arrays['temp_hot'],*pars_hot) - bound_arrays['dem_hot'])**2)/(len(bound_arrays['dem_hot']) - len(pars_hot))
             sigma_hotward = np.sqrt(np.diag(covar_hot/res))
             
-        return a_coolward,b_coolward,sigma_coolward,a_hotward,b_hotward,sigma_hotward
+        return {'a_c':a_coolward,'b_c':b_coolward,'s_c':sigma_coolward,'a_h':a_hotward,'b_h':b_hotward,'s_h':sigma_hotward}
+        
+        
+    def fit_limits(self,temp,em,**kwargs):
+        if self.lim_method is 'dynamic':
+            ninf_i = np.where(np.isinf(em) == False) #find non-inf indices
+            max_i = np.argmax(em) #find index corresponding to max value
+            hot_i = ninf_i[0][np.where(ninf_i[0]>max_i)] #indices for hot branch
+            em_hot = em[hot_i] #hot branch em
+            delta_em_hot = np.fabs(np.diff(em_hot)) #delta(em) of hot branch
+            delta_i = np.where(delta_em_hot>0.5)[0][0]
+            lim_i = hot_i[delta_i - 1]-1
+            t_upper = temp[lim_i]
+            t_lower = t_upper - self.delta_t
+        else:
+            t_upper = self.slope_limits['hot_upper']
+            t_lower = self.slope_limits['hot_lower']
+        
+        return {'cool_upper':self.slope_limits['cool_upper'],'cool_lower':self.slope_limits['cool_lower'],'hot_upper':t_upper,'hot_lower':t_lower}
         
         
     def branch_fit_statistics(self,**kwargs):
