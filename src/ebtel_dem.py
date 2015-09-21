@@ -349,7 +349,7 @@ class DEMAnalyze(object):
             delta_i = np.where(delta_em_hot_dT>0.5)[0][0]
             lim_i = hot_i[delta_i - 1]-1
             th_upper = temp[lim_i]
-            th_lower = t_upper - self.delta_t
+            th_lower = th_upper - self.delta_t
             tc_lower = self.slope_limits['cool_lower']
             tc_upper = self.slope_limits['cool_upper']
         elif self.lim_method is 'peak':
