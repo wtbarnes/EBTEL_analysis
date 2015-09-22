@@ -162,6 +162,10 @@ class DEMAnalyze(object):
             self.delta_t = kwargs['delta_t']
         else:
             self.delta_t = 0.4
+        if 'max_percent_drop' in kwargs:
+            self.max_percent_drop = kwargs['max_percent_drop']
+        else:
+            self.max_percent_drop = 0.95
         #define variables to be used later
         self.cool_fits = []
         self.hot_fits = []
@@ -354,7 +358,7 @@ class DEMAnalyze(object):
             em_hot = em[i_hot]
             temp_hot = temp[i_hot]
             #set upper and lower temperature bounds for 80% drop in EM from peak
-            th_upper = temp[i_hot[np.where(em_hot<0.90*np.max(em))[0]][0]-1]
+            th_upper = temp[i_hot[np.where(em_hot<self.max_percent_drop*np.max(em))[0]][0]-1]
             th_lower = th_upper - self.delta_t
             tc_lower = self.slope_limits['cool_lower']
             tc_upper = self.slope_limits['cool_upper']
