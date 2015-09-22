@@ -254,9 +254,9 @@ class DEMAnalyze(object):
             
     def bounds(self,temp,dem,sigma,**kwargs):
         """Create bounded hot and cool branches from given hot and cool branch limits (or default values); interpolation over EM curves should be done before this step."""
+        
         #find limits over which temperature will be calculated
         slope_limits = self.fit_limits(temp,dem)
-        
         #Construct hot and cool dem and temp arrays for given bounds
         i_cool_lower = np.where(temp<slope_limits['cool_lower'])
         i_cool_upper = np.where(temp>slope_limits['cool_upper'])
@@ -349,15 +349,14 @@ class DEMAnalyze(object):
         """Calculate limits over which fit is calculated depending on input option."""
         
         if self.lim_method is 'dynamic':
-            ninf_i = np.where(np.isinf(em) == False) #find non-inf indices
-            max_i = np.argmax(em) #find index corresponding to max value
-            hot_i = ninf_i[0][np.where(ninf_i[0]>max_i)] #indices for hot branch
-            em_hot = em[hot_i] #hot branch em
-            temp_hot = temp[hot_i]
-            delta_em_hot_dT = np.fabs(np.diff(em_hot)/np.diff(temp_hot)) #delta(em) of hot branch
-            delta_i = np.where(delta_em_hot_dT>1.0)[0][0]
-            lim_i = hot_i[delta_i - 1]-1
-            th_upper = temp[lim_i]
+            #isolate hot branch
+            i_hot = np.where(em > np.max(em))[0]
+            em_hot = em[i_hot]
+            temp_hot = temp[i_hot]
+            #calculate derivative
+            dEMdT = np.gradient(em_hot,np.gradient(temp_hot))
+            #set upper and lower temperature bounds
+            th_upper = temp[np.where(np.fabs(dEMdT)>2.0)[0][0]-1]
             th_lower = th_upper - self.delta_t
             tc_lower = self.slope_limits['cool_lower']
             tc_upper = self.slope_limits['cool_upper']
