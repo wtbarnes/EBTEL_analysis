@@ -195,21 +195,30 @@ class DEMAnalyze(object):
         for i in range(len(self.em)):
             #calculate slopes and associated error bars depending on chosen method
             if self.fit_method is 'fit_all':
-                cool_temp =[], hot_temp =[]
+                cool_temp =[]
+                hot_temp =[]
                 for j in range(len(self.em[i])):
                     bound_arrays = self.bounds(self.temp[i][j], self.em[i][j], np.ones(len(self.em[i][j])))
                     fits = self.branch_fit(bound_arrays['temp_cool'], bound_arrays['dem_cool'], bound_arrays['temp_hot'], bound_arrays['dem_hot'])
                     cool_temp.append([fits['a_c'],fits['b_c']]), hot_temp.append([fits['a_h'],fits['b_h']])
                 #calculate standard deviation and mean and store values
-                a = np.mean(np.array(cool_temp)[0],axis=0)
-                b = np.mean(np.array(cool_temp)[1],axis=0)
-                sigma_a = np.std(np.array(cool_temp)[0],axis=0)
-                sigma_b = np.std(np.array(cool_temp)[1],axis=0)
+                #cool
+                true_cool = np.where(np.array(cool_temp)[:,0] != False)[0]
+                a,b,sigma_a,sigma_b = False,False,False,False
+                if len(true_cool)/len(np.array(cool_temp)[:,0]) >= 0.9:
+                    a = np.mean(np.array(cool_temp)[true_cool,0],axis=0)
+                    b = np.mean(np.array(cool_temp)[true_cool,1],axis=0)
+                    sigma_a = np.std(np.array(cool_temp)[true_cool,0],axis=0)
+                    sigma_b = np.std(np.array(cool_temp)[true_cool,1],axis=0)
                 self.cool_fits.append([a,b,[sigma_a,sigma_b]])
-                a = np.mean(np.array(hot_temp)[0],axis=0)
-                b = np.mean(np.array(hot_temp)[1],axis=0)
-                sigma_a = np.std(np.array(hot_temp)[0],axis=0)
-                sigma_b = np.std(np.array(hot_temp)[1],axis=0)
+                #hot
+                true_hot = np.where(np.array(hot_temp)[:,0] != False)[0]
+                a,b,sigma_a,sigma_b = False,False,False,False
+                if len(true_hot)/len(hot_temp) >= 0.9:
+                    a = np.mean(np.array(hot_temp)[true_hot,0],axis=0)
+                    b = np.mean(np.array(hot_temp)[true_hot,1],axis=0)
+                    sigma_a = np.std(np.array(hot_temp)[true_hot,0],axis=0)
+                    sigma_b = np.std(np.array(hot_temp)[true_hot,1],axis=0)
                 self.hot_fits.append([a,b,[sigma_a,sigma_b]])
                 
             elif self.fit_method is 'fit_plus_minus':
