@@ -350,7 +350,7 @@ class DEMAnalyze(object):
         
         if self.lim_method is 'dynamic':
             #isolate hot branch
-            i_hot = np.where(em > np.max(em))[0]
+            i_hot = np.where(temp > temp[np.argmax(em)])[0]
             em_hot = em[i_hot]
             temp_hot = temp[i_hot]
             #calculate derivative
