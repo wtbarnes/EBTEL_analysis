@@ -355,7 +355,7 @@ class DEMAnalyze(object):
             em_hot = em[hot_i] #hot branch em
             temp_hot = temp[hot_i]
             delta_em_hot_dT = np.fabs(np.diff(em_hot)/np.diff(temp_hot)) #delta(em) of hot branch
-            delta_i = np.where(delta_em_hot_dT>0.5)[0][0]
+            delta_i = np.where(delta_em_hot_dT>1.0)[0][0]
             lim_i = hot_i[delta_i - 1]-1
             th_upper = temp[lim_i]
             th_lower = th_upper - self.delta_t
