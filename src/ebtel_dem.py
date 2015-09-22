@@ -353,10 +353,8 @@ class DEMAnalyze(object):
             i_hot = np.where(temp > temp[np.argmax(em)])[0]
             em_hot = em[i_hot]
             temp_hot = temp[i_hot]
-            #calculate derivative
-            dEMdT = np.gradient(em_hot,np.gradient(temp_hot))
-            #set upper and lower temperature bounds
-            th_upper = temp[i_hot[np.where(np.fabs(dEMdT)>2.0)[0]][0]-1]
+            #set upper and lower temperature bounds for 80% drop in EM from peak
+            th_upper = temp[i_hot[np.where(em_hot<0.8*em_hot)[0]][0]-1]
             th_lower = th_upper - self.delta_t
             tc_lower = self.slope_limits['cool_lower']
             tc_upper = self.slope_limits['cool_upper']
