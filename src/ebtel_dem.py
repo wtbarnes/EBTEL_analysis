@@ -358,8 +358,7 @@ class DEMAnalyze(object):
             em_hot = em[i_hot]
             temp_hot = temp[i_hot]
             #set upper and lower temperature bounds for 80% drop in EM from peak
-            #th_upper = temp[i_hot[np.where(em_hot<self.max_percent_drop*np.max(em))[0]][0]-1]
-            th_upper = temp[i_hot[np.where(np.fabs(np.gradient(em_hot,np.gradient(temp_hot))) < 5)][-1] + 1]
+            th_upper = temp[i_hot[np.where(em_hot<self.max_percent_drop*np.max(em))[0]][0]-1]
             th_lower = th_upper - self.delta_t
             tc_lower = self.slope_limits['cool_lower']
             tc_upper = self.slope_limits['cool_upper']
