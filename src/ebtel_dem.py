@@ -222,8 +222,6 @@ class DEMAnalyze(object):
                 #mean
                 bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i], self.sigma[i])
                 fits = self.branch_fit(bound_arrays['temp_cool'],bound_arrays['dem_cool'],bound_arrays['temp_hot'],bound_arrays['dem_hot'])
-                #DEBUG
-                print(fits,fits_plus,fits_minus)
                 #calculate sigma and store values
                 sac,sbc,sah,sbh = False,False,False,False
                 if fits['a_c'] and fits_minus['a_c'] and fits_plus['a_c']:
