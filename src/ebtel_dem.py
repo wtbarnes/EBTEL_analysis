@@ -366,12 +366,14 @@ class DEMAnalyze(object):
             tc_upper,th_lower = temp[np.argmax(dem)],temp[np.argmax(dem)]
             tc_lower = slope_limits['cool_upper'] + self.cool_diff
             th_upper = slope_limits['hot_lower'] + self.hot_diff
-        else:
+        elif self.lim_method is 'static':
             th_upper = self.slope_limits['hot_upper']
             th_lower = self.slope_limits['hot_lower']
             tc_lower = self.slope_limits['cool_lower']
             tc_upper = self.slope_limits['cool_upper']
-            
+        else:
+            raise ValueError("Unrecognized limit method calculation.")
+        
         if self.verbose:
             print("T_cool_upper = "+str(tc_upper)+" K")
             print("T_cool_lower = "+str(tc_lower)+" K")
