@@ -7,7 +7,7 @@
 import sys
 import os
 import argparse
-import pickle
+import dill as pickle
 import numpy as np
 sys.path.append('/home/wtb2/Documents/EBTEL_analysis/src/')
 import ebtel_dem as ebd
@@ -76,10 +76,8 @@ analyzer.interp_and_filter()
 analyzer.many_fits()
 
 #Pickle the total slope data structures
-cfa_temp = analyzer.cool_fits_all
-hfa_temp = analyzer.hot_fits_all
 with open(root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_all_a.fits','wb') as f:
-    pickle.dump([cfa_temp,hfa_temp],f)
+    pickle.dump([analyze.cool_fits_all,analyze.hot_fits_all],f)
 f.close()
 
 #Check for existence of needed directories and create temp names
