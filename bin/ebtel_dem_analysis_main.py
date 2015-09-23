@@ -37,6 +37,8 @@ if args.t_wait_q_scaling:
     t_wait_q_scaling = args.t_wait_q_scaling
 else:
     t_wait_q_scaling = ''
+if t_wait_q_scaling is True:
+    t_wait_q_scaling = '-b' + str(t_wait_q_scaling)
     
 
 #figure formatting parameters

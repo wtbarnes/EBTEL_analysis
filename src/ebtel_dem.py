@@ -14,7 +14,7 @@ class DEMProcess(object):
     def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs):
         #check for wait time scaling option
         if 't_wait_q_scaling' in kwargs and kwargs['t_wait_q_scaling'] is True:
-            scaling_suffix = '-b' + str(kwargs['t_wait_q_scaling'])
+            scaling_suffix = kwargs['t_wait_q_scaling']
         else:
             scaling_suffix = ''
             
@@ -374,7 +374,7 @@ class DEMAnalyze(object):
         else:
             raise ValueError("Unrecognized limit method calculation.")
         
-        if self.verbose:
+        if self.verbose and self.lim_method is not 'static':
             print("T_cool_upper = "+str(tc_upper)+" K")
             print("T_cool_lower = "+str(tc_lower)+" K")
             print("T_hot_upper = "+str(th_upper)+" K")
