@@ -52,7 +52,7 @@ class DEMProcess(object):
             while fail_count <= MAX_FAIL:
                 try:
                     #DEBUG
-                    print("Reading file: %s"%())
+                    print("Reading file: %s"%(tn_path+'/'+self.file_path%Tn[i]+'_'+str(counter)+'_dem.txt'))
                     #
                     temp = np.loadtxt(tn_path+'/'+self.file_path%Tn[i]+'_'+str(counter)+'_dem.txt')
                     temp[np.where(np.isnan(temp))] = -np.inf
