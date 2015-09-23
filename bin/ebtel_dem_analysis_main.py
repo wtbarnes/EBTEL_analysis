@@ -65,7 +65,7 @@ processer.import_raw(t_wait)
 processer.calc_stats()
 
 #Instantiate Analyze class
-analyzer = ebd.DEMAnalyze(processer.em, processer.temp, processer.em_mean, processer.temp_mean, processer.em_std, verbose=True, slope_limits=slope_limits, fit_method=fit_method, lim_method=lim_method, delta_t=delta_t, max_percent_drop=max_percent_drop)
+analyzer = ebd.DEMAnalyze(processer.em, processer.temp_em, processer.em_mean, processer.temp_mean, processer.em_std, verbose=True, slope_limits=slope_limits, fit_method=fit_method, lim_method=lim_method, delta_t=delta_t, max_percent_drop=max_percent_drop)
 #Filter and interpolate EM curves
 analyzer.interp_and_filter()
 #Fit all curves
@@ -86,7 +86,7 @@ for k in range(len(analyzer.hot_fits)):
 fit_lines = {'t_cool':tc,'t_hot':th}
 
 #Instantiate Plotter class
-plotter = ebpe.DEMPlotter(processer.temp, processer.em, processer.temp_mean, processer.em_mean, processer.em_std, analyzer.cool_fits, analyzer.hot_fits, dpi=dpi, format=format, fs=fontsize, figsize=figsize)
+plotter = ebpe.DEMPlotter(processer.temp_em, processer.em, processer.temp_mean, processer.em_mean, processer.em_std, analyzer.cool_fits, analyzer.hot_fits, dpi=dpi, format=format, fs=fontsize, figsize=figsize)
 #Build composite EM plot
 plotter.plot_em_curves(fit_lines=fit_lines, print_fig_filename=root_dir_figs + fn_temp + '_dem')
 #Build composite slope plot
