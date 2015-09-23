@@ -13,13 +13,11 @@ class DEMProcess(object):
     
     def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs):
         #check for wait time scaling option
-        if 't_wait_q_scaling' in kwargs and kwargs['t_wait_q_scaling'] is True:
+        if 't_wait_q_scaling' in kwargs:
             scaling_suffix = kwargs['t_wait_q_scaling']
         else:
             scaling_suffix = ''
             
-        #DEBUG
-        print("Scaling suffix is %s"%scaling_suffix)
             
         #set up paths
         child_path = root_dir+species+'_heating_runs/alpha'+str(alpha)+'/data/'
@@ -51,9 +49,6 @@ class DEMProcess(object):
             tn_path = self.root_path%Tn[i]
             while fail_count <= MAX_FAIL:
                 try:
-                    #DEBUG
-                    print("Reading file: %s"%(tn_path+'/'+self.file_path%Tn[i]+'_'+str(counter)+'_dem.txt'))
-                    #
                     temp = np.loadtxt(tn_path+'/'+self.file_path%Tn[i]+'_'+str(counter)+'_dem.txt')
                     temp[np.where(np.isnan(temp))] = -np.inf
                     temp_em.append(temp[:,0])

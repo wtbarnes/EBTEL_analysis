@@ -35,10 +35,11 @@ else:
     root_dir_figs = '/data/datadrive2/EBTEL-2fluid_figs/'
 if args.t_wait_q_scaling:
     t_wait_q_scaling = args.t_wait_q_scaling
+    if len(t_wait_q_scaling) > 0:
+        t_wait_q_scaling = '-b' + str(t_wait_q_scaling)
 else:
     t_wait_q_scaling = ''
-if t_wait_q_scaling is True:
-    t_wait_q_scaling = '-b' + str(t_wait_q_scaling)
+
     
 
 #figure formatting parameters
