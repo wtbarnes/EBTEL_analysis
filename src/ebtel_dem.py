@@ -18,6 +18,9 @@ class DEMProcess(object):
         else:
             scaling_suffix = ''
             
+        #DEBUG
+        print("Scaling suffix is %s"%scaling_suffix)
+            
         #set up paths
         child_path = root_dir+species+'_heating_runs/alpha'+str(alpha)+'/data/'
         self.file_path = 'ebtel_L'+str(loop_length)+'_tn%d'+scaling_suffix+'_tpulse'+str(tpulse)+'_'+solver
@@ -48,6 +51,9 @@ class DEMProcess(object):
             tn_path = self.root_path%Tn[i]
             while fail_count <= MAX_FAIL:
                 try:
+                    #DEBUG
+                    print("Reading file: %s"%())
+                    #
                     temp = np.loadtxt(tn_path+'/'+self.file_path%Tn[i]+'_'+str(counter)+'_dem.txt')
                     temp[np.where(np.isnan(temp))] = -np.inf
                     temp_em.append(temp[:,0])
