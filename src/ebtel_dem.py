@@ -14,7 +14,7 @@ class DEMProcess(object):
     def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs):
         #check for wait time scaling option
         if 't_wait_q_scaling' in kwargs:
-            scaling_suffix = '-b'+str(kwargs['t_wait_q_scaling'])
+            scaling_suffix = kwargs['t_wait_q_scaling']
         else:
             scaling_suffix = ''
             
