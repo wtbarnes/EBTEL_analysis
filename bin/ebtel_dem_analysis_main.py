@@ -42,7 +42,7 @@ else:
 #figure formatting parameters
 fontsize = 18
 figsize = (10,10*3/4)
-format = 'eps'
+format = 'pdf'
 dpi = 1000 
 
 #static parameters
