@@ -92,7 +92,7 @@ plotter.plot_em_curves(fit_lines=fit_lines, print_fig_filename=root_dir_figs + f
 #Build composite slope plot
 plotter.plot_em_slopes(print_fig_filename=root_dir_figs + fn_temp + '_hs_compare')
 #Check for existence of needed directories to construct MC curves
-if alpha is not 'uniform':
+if args.alpha is not 'uniform':
     if not os.path.exists(root_dir_figs + fn_temp + '_dem_mc/'):
         os.makedirs(root_dir_figs + fn_temp + '_dem_mc/')
     #Build MC plots for each Tn value
