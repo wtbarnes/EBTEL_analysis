@@ -7,6 +7,7 @@
 import sys
 import os
 import argparse
+import pickle
 import numpy as np
 sys.path.append('/home/wtb2/Documents/EBTEL_analysis/src/')
 import ebtel_dem as ebd
@@ -73,6 +74,11 @@ analyzer = ebd.DEMAnalyze(processer.em, processer.temp_em, processer.em_mean, pr
 analyzer.interp_and_filter()
 #Fit all curves
 analyzer.many_fits()
+
+#Pickle the total slope data structures
+with open(root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_all_a.fits','wb') as f:
+    pickle.dump([analyzer.cool_fits_all,analyzer.hot_fits_all],f)
+f.close()
 
 #Check for existence of needed directories and create temp names
 if not os.path.exists(root_dir_figs + figdir%(args.species,args.alpha)):

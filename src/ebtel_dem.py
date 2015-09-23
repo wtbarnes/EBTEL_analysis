@@ -170,6 +170,9 @@ class DEMAnalyze(object):
         #define variables to be used later
         self.cool_fits = []
         self.hot_fits = []
+        #define lists to store all list values
+        self.cool_fits_all = []
+        self.hot_fits_all = []
         
     
     def interp_and_filter(self,**kwargs):
@@ -225,6 +228,9 @@ class DEMAnalyze(object):
                     sigma_a = np.std(np.array(hot_temp)[true_hot,0],axis=0)
                     sigma_b = np.std(np.array(hot_temp)[true_hot,1],axis=0)
                 self.hot_fits.append([a,b,[sigma_a,sigma_b]])
+                #store all values
+                self.cool_fits_all.append([s[0] for s in cool_temp])
+                self.hot_fits_all.append(s[0] for s in hot_temp)
                 
             elif self.fit_method is 'fit_plus_minus':
                 #mean + sigma
