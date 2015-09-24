@@ -269,9 +269,9 @@ class EMHistoBuilder(object):
                 
         #Filter out False values that get put in when fitting cannot be performed
         for key in self.histo_dict_cool:
-            self.histo_dict_cool[key] = [x for x in self.histo_dict_cool if x is not False and x is not np.float('NaN')]
+            self.histo_dict_cool[key] = [x for x in self.histo_dict_cool if x is not np.float('NaN')]
         for key in self.histo_dict_hot:
-            self.histo_dict_hot[key] = [x for x in self.histo_dict_hot if x is not False and x is not np.float('NaN')]
+            self.histo_dict_hot[key] = [x for x in self.histo_dict_hot if x is not np.float('NaN')]
             
                 
     def histo_maker(self,temp_choice,**kwargs):
