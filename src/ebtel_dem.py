@@ -170,6 +170,9 @@ class DEMAnalyze(object):
         #define variables to be used later
         self.cool_fits = []
         self.hot_fits = []
+        #define lists to store all list values
+        self.cool_fits_all = []
+        self.hot_fits_all = []
         
     
     def interp_and_filter(self,**kwargs):
@@ -196,10 +199,6 @@ class DEMAnalyze(object):
         
     def many_fits(self,**kwargs):
         """Calculate fits to hot and cool branches for all EM and T data sets"""
-        
-        #define lists to store all list values
-        cool_fits_all = []
-        hot_fits_all = []
         
         for i in range(len(self.em)):
             #calculate slopes and associated error bars depending on chosen method
@@ -230,8 +229,8 @@ class DEMAnalyze(object):
                     sigma_b = np.std(np.array(hot_temp)[true_hot,1],axis=0)
                 self.hot_fits.append([a,b,[sigma_a,sigma_b]])
                 #store all values
-                cool_fits_all.append([s[0] for s in cool_temp])
-                hot_fits_all.append(s[0] for s in hot_temp)
+                self.cool_fits_all.append([s[0] for s in cool_temp])
+                self.hot_fits_all.append(s[0] for s in hot_temp)
                 
             elif self.fit_method is 'fit_plus_minus':
                 #mean + sigma
@@ -263,7 +262,11 @@ class DEMAnalyze(object):
             else:
                 raise ValueError("Unrecognized fit method option.")
                 
-        return cool_fits_all,hot_fits_all
+        if 'pickle_file' in kwargs:
+            #Pickle the total slope data structures
+            with open(kwargs['pickle_file'],'wb') as f:
+                pickle.dump([self.cool_fits_all,self.hot_fits_all],f)
+            f.close() 
             
             
     def bounds(self,temp,dem,sigma,**kwargs):
