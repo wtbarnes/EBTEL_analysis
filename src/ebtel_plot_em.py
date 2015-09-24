@@ -256,7 +256,7 @@ class EMHistoBuilder(object):
                 self.histo_dict_hot[''.join(ab)] = list(itertools.chain(*hot))
             #Group by Tn method
             elif self.group is 'by_t_wait':
-                for i in len(cool):
+                for i in range(len(cool)):
                     try:
                         self.histo_dict_cool[str(i)] = self.histo_dict_cool[str(i)] + cool[i]
                         self.histo_dict_hot[str(i)] = self.histo_dict_hot[str(i)] + hot[i]
