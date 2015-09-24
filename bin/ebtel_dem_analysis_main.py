@@ -72,7 +72,7 @@ analyzer = ebd.DEMAnalyze(processer.em, processer.temp_em, processer.em_mean, pr
 #Filter and interpolate EM curves
 analyzer.interp_and_filter()
 #Fit all curves
-analyzer.many_fits(pickle_file=root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_all_a.fits')
+analyzer.many_fits(fits_file=root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_all_a.fits')
 
 #Check for existence of needed directories and create temp names
 if not os.path.exists(root_dir_figs + figdir%(args.species,args.alpha)):
