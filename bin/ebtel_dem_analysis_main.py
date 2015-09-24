@@ -77,18 +77,18 @@ analyzer.many_fits()
 
 #Write all hot and cool slopes to file using pandas/numpy
 fits_file=root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_all_a.fits'
-temp = np.array(pd.DataFrame(analyzer.cool_fits_all))
+temp = analyzer.cool_fits_all
 for i in range(len(temp)):
     for j in range(len(temp[i])):
         if temp[i,j] is False:
             temp[i,j] = np.float('NaN')
-np.savetxt(fits_file+'.cool',temp)
-temp = np.array(pd.DataFrame(analyzer.hot_fits_all))
+np.savetxt(fits_file+'.cool',np.array(pd.DataFrame(temp)))
+temp = analyzer.hot_fits_all
 for i in range(len(temp)):
     for j in range(len(temp[i])):
         if temp[i,j] is False:
             temp[i,j] = np.float('NaN')
-np.savetxt(fits_file+'.hot',temp)
+np.savetxt(fits_file+'.hot',np.array(pd.DataFrame(temp)))
 
 #Check for existence of needed directories and create temp names
 if not os.path.exists(root_dir_figs + figdir%(args.species,args.alpha)):
