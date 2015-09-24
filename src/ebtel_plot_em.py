@@ -219,6 +219,23 @@ class EMHistoBuilder(object):
             self.fn_temp = kwargs['fn_temp']
         else:
             self.fn_temp = '/data/datadrive2/EBTEL-2fluid_runs/' + species + '_heating_runs/alpha%s/ebtel_L' +str(loop_length) + '_tpulse' + str(tpulse) + '_alpha%s%s_' + species + '_heating_all_a.fits'
+        #Plotting options
+        if 'dpi' in kwargs:
+            self.dpi = kwargs['dpi']
+        else:
+            self.dpi = 1000
+        if 'format' in kwargs:
+            self.format = kwargs['format']
+        else:
+            self.format = 'eps'
+        if 'fs' in kwargs:
+            self.fs = kwargs['fs']
+        else:
+            self.fs = 18.0
+        if 'figsize' in kwargs:
+            self.figsize = kwargs['figsize']
+        else:
+            self.figsize = (12,12)
         #Initialize dictionary to store separate histograms
         self.histo_dict_cool = {}
         self.histo_dict_hot = {}
@@ -255,9 +272,47 @@ class EMHistoBuilder(object):
             self.histo_dict_cool[key] = [x for x in self.histo_dict_cool if x is not False]
         for key in self.histo_dict_hot:
             self.histo_dict_hot[key] = [x for x in self.histo_dict_hot if x is not False]
+            
                 
-    def histo_maker(self,**kwargs):
+    def histo_maker(self,temp_choice,**kwargs):
         """Build histograms from hot and cool dictionaries built up by self.loader()"""
-        pass
         
+        #Look for dictionary of histogram options
+        if 'histo_opts' not in kwargs:
+            raise ValueError("Missing histogram options for styling.")
+        
+        #Choose hot or cool
+        if temp_choice = 'cool':
+            hist_dict = self.histo_dict_cool
+        elif temp_choice = 'hot':
+            hist_dict = self.histo_dict_hot
+        else:
+            raise ValueError("Invalid choice of histogram dictionary.")
+
+        #Set up figure
+        fig = plt.figure(figsize=self.figsize)
+        ax = fig.gca()
+        
+        #Loop over histograms
+        for key in hist_dict:
+            ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step', color=kwargs['histo_opts'][key]['color'], linestyle = kwargs['histo_opts'][key]['style'], label=kwargs['histo_opts'][key]['label'])
+            
+        #Labels
+        ax.set_xlabel(r'$a$',fontsize=self.fs)
+        ax.set_ylabel(r'Number of Fits',fontsize=self.fs)
+        ax.legend(fontsize=0.75*self.fs,loc='best',ncol=2)
+        
+        #Print or show figure
+        if 'print_fig_filename' in kwargs:
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+            plt.close('all')
+        else:
+            plt.show()
+        
+        
+    def freedman_diaconis(self,hist,**kwargs):
+        q75,q25 = np.percentile(hist,[75,25])
+        iqr = q75 - q25
+        w = 2.0*iqr*(len(hist))**(-1.0/3.0)
+        return int((np.max(np.array(hist)) - np.min(np.array(hist)))/w)
                     
