@@ -301,7 +301,8 @@ class EMHistoBuilder(object):
         #Labels
         ax.set_xlabel(r'$a$',fontsize=self.fs)
         ax.set_ylabel(r'Number of Fits',fontsize=self.fs)
-        ax.set_yscale('log')
+        ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
+        ax.tick_params(axis='both',labelsize=0.75*self.fs)
         ax.legend(fontsize=0.75*self.fs,loc='best',ncol=2)
         
         #Print or show figure
