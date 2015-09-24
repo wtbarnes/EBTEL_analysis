@@ -80,14 +80,14 @@ fits_file=root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_
 temp = analyzer.cool_fits_all
 for i in range(len(temp)):
     for j in range(len(temp[i])):
-        if temp[i,j] is False:
-            temp[i,j] = np.float('NaN')
+        if temp[i][j] is False:
+            temp[i][j] = np.float('NaN')
 np.savetxt(fits_file+'.cool',np.array(pd.DataFrame(temp)))
 temp = analyzer.hot_fits_all
 for i in range(len(temp)):
     for j in range(len(temp[i])):
-        if temp[i,j] is False:
-            temp[i,j] = np.float('NaN')
+        if temp[i][j] is False:
+            temp[i][j] = np.float('NaN')
 np.savetxt(fits_file+'.hot',np.array(pd.DataFrame(temp)))
 
 #Check for existence of needed directories and create temp names
