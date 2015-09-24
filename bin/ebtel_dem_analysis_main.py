@@ -7,6 +7,7 @@
 import sys
 import os
 import argparse
+import dill as pickle
 import numpy as np
 sys.path.append('/home/wtb2/Documents/EBTEL_analysis/src/')
 import ebtel_dem as ebd
@@ -72,7 +73,12 @@ analyzer = ebd.DEMAnalyze(processer.em, processer.temp_em, processer.em_mean, pr
 #Filter and interpolate EM curves
 analyzer.interp_and_filter()
 #Fit all curves
-analyzer.many_fits(fits_file=root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_all_a.fits')
+analyzer.many_fits()
+
+#Pickle results
+with open(root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_all_a.fits','wb') as f:
+    pickle.dump([analyzer.cool_fits_all,analyzer.hot_fits_all],f)
+f.close()
 
 #Check for existence of needed directories and create temp names
 if not os.path.exists(root_dir_figs + figdir%(args.species,args.alpha)):
@@ -101,3 +107,19 @@ if args.alpha is not 'uniform':
     #Build MC plots for each Tn value
     for k in range(len(t_wait)):
         plotter.plot_em_curve(k, print_fig_filename=root_dir_figs + fn_temp + '_dem_mc/' + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_%d_dem'%k)
+        
+        
+       # if 'fits_file' in kwargs:
+       #     #Write all hot and cool slopes to file using pandas/numpy
+       #     temp = self.cool_fits_all
+       #     for i in range(len(temp)):
+       #         for j in range(len(temp[i])):
+       #             if temp[i][j] is False:
+       #                 temp[i][j] = np.float('NaN')
+       #     np.savetxt(kwargs['fits_file']+'.cool',np.array(pd.DataFrame(temp)))
+       #     temp = self.hot_fits_all
+       #     for i in range(len(temp)):
+       #         for j in range(len(temp[i])):
+       #             if temp[i][j] is False:
+       #                 temp[i][j] = np.float('NaN')
+       #     np.savetxt(kwargs['fits_file']+'.hot',np.array(pd.DataFrame(temp)))

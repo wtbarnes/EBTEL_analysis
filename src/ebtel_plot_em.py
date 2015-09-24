@@ -4,7 +4,7 @@
 #14 May 2015
 
 #Import needed modules
-import pandas as pd
+import dill as pickle
 import itertools
 import numpy as np
 import matplotlib
@@ -246,9 +246,10 @@ class EMHistoBuilder(object):
         
         #Loop over (alpha,b) values 
         for ab in self.alpha:
-            #Unpack the file
-            cool = list(np.loadtxt(self.fn_temp%(ab[0],ab[0],ab[1])+'.cool'))
-            hot = list(np.loadtxt(self.fn_temp%(ab[0],ab[0],ab[1])+'.hot'))
+            #Unpickle the file
+            with open(self.fn_temp%(ab[0],ab[0],ab[1]),'rb') as f: 
+                cool,hot = pickle.load(f)
+            f.close()
             #Group by alpha method
             if self.group is 'by_alpha':
                 self.histo_dict_cool[''.join(ab)] = list(itertools.chain(*cool))
@@ -269,9 +270,9 @@ class EMHistoBuilder(object):
                 
         #Filter out False values that get put in when fitting cannot be performed
         for key in self.histo_dict_cool:
-            self.histo_dict_cool[key] = [x for x in self.histo_dict_cool if x is not np.float('NaN')]
+            self.histo_dict_cool[key] = [x for x in self.histo_dict_cool if x is not False]
         for key in self.histo_dict_hot:
-            self.histo_dict_hot[key] = [x for x in self.histo_dict_hot if x is not np.float('NaN')]
+            self.histo_dict_hot[key] = [x for x in self.histo_dict_hot if x is not False]
             
                 
     def histo_maker(self,temp_choice,**kwargs):
