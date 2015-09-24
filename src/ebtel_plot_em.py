@@ -296,7 +296,10 @@ class EMHistoBuilder(object):
         
         #Loop over histograms
         for key in hist_dict:
-            ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step',**kwargs['histo_opts'][key])
+            if len(hist_dict[key]) < 10:
+                pass
+            else:
+                ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step',**kwargs['histo_opts'][key])
             
         #Labels and styling
         ax.set_xlabel(r'$a$',fontsize=self.fs)
