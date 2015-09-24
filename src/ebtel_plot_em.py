@@ -297,8 +297,8 @@ class EMHistoBuilder(object):
         #Loop over histograms
         for key in hist_dict:
             #multiplier for uniform case
+            print(key)
             if key is 'uniform':
-                print('foo!')
                 hist_dict[key] = 100*hist_dict[key]
             ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step',**kwargs['histo_opts'][key])# color=kwargs['histo_opts'][key]['color'], linestyle = kwargs['histo_opts'][key]['style'], label=kwargs['histo_opts'][key]['label'])
             
