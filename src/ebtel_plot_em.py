@@ -168,9 +168,9 @@ class DEMPlotter(object):
         #set labels
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
         ax.set_ylabel(r'$a$',fontsize=self.fs)
-        ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[2,2],'--k')
-        ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[3,3],'-k')
-        ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[5,5],'-.k')
+        ax.axhline(y=2,color='k',linestyle='--')
+        ax.axhline(y=3,color='k',linestyle='-')
+        ax.axhline(y=5,color='k',linestyle='-.')
         ax.set_ylim([0,8])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
@@ -298,11 +298,15 @@ class EMHistoBuilder(object):
         for key in hist_dict:
             ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step',**kwargs['histo_opts'][key])
             
-        #Labels
+        #Labels and styling
         ax.set_xlabel(r'$a$',fontsize=self.fs)
         ax.set_ylabel(r'Number of Fits',fontsize=self.fs)
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
+        ax.set_xlim([2,6])
+        ax.axvline(x=2,color='k',linestyle='--',linewidth=2)
+        ax.axvline(x=3,color='k',linestyle='-',linewidth=2)
+        ax.axvline(x=5,color='k',linestyle='-.',linewidth=2)
         ax.legend(fontsize=0.75*self.fs,loc='best',ncol=2)
         
         #Print or show figure
