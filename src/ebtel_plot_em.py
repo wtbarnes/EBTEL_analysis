@@ -300,7 +300,7 @@ class EMHistoBuilder(object):
             
         #Labels and styling
         ax.set_xlabel(r'$a$',fontsize=self.fs)
-        ax.set_ylabel(r'Number of Fits',fontsize=self.fs)
+        ax.set_ylabel(r'Frequency',fontsize=self.fs)
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
         ax.set_xlim([2,6])
