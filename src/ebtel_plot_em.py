@@ -296,7 +296,7 @@ class EMHistoBuilder(object):
         
         #Loop over histograms
         for key in hist_dict:
-            ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step', color=kwargs['histo_opts'][key]['color'], linestyle = kwargs['histo_opts'][key]['style'], label=kwargs['histo_opts'][key]['label'])
+            ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step',**kwargs['histo_opts'])# color=kwargs['histo_opts'][key]['color'], linestyle = kwargs['histo_opts'][key]['style'], label=kwargs['histo_opts'][key]['label'])
             
         #Labels
         ax.set_xlabel(r'$a$',fontsize=self.fs)
