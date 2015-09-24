@@ -307,7 +307,7 @@ class EMHistoBuilder(object):
         ax.axvline(x=2,color='k',linestyle='--',linewidth=2)
         ax.axvline(x=3,color='k',linestyle='-',linewidth=2)
         ax.axvline(x=5,color='k',linestyle='-.',linewidth=2)
-        ax.legend(fontsize=0.75*self.fs,loc='best',ncol=2)
+        ax.legend(fontsize=0.75*self.fs,loc=0,ncol=2)
         
         #Print or show figure
         if 'print_fig_filename' in kwargs:
