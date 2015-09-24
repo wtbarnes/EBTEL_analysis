@@ -4,7 +4,7 @@
 #13 May 2015
 
 #Import needed modules
-import dill as pickle
+import pandas as pd
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -263,11 +263,10 @@ class DEMAnalyze(object):
             else:
                 raise ValueError("Unrecognized fit method option.")
                 
-        if 'pickle_file' in kwargs:
-            #Pickle the total slope data structures
-            with open(kwargs['pickle_file'],'wb') as f:
-                pickle.dump([self.cool_fits_all,self.hot_fits_all],f)
-            f.close() 
+        if 'fits_file' in kwargs:
+            #Write all fits to files
+            np.savetxt(kwargs['fits_file']+'.cool',np.array(pd.DataFrame(self.cool_fits_all)))
+            np.savetxt(kwargs['fits_file']+'.hot',np.array(pd.DataFrame(self.hot_fits_all)))
             
             
     def bounds(self,temp,dem,sigma,**kwargs):
