@@ -4,6 +4,8 @@
 #14 May 2015
 
 #Import needed modules
+import dill as pickle
+import itertools
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -198,6 +200,59 @@ class DEMPlotter(object):
         
         new_ticks.append(old_ticks[0] + n*delta)
         return new_ticks
+        
+        
+class EMHistoBuilder(object):
+    """Class to build histograms of slope values to compare across heating functions and heating frequencies"""
     
+    def __init__(self,species,loop_length,tpulse,alpha,**kwargs):
+        
+        #Load in heating function values and set needed variables
+        self.alpha = alpha
+        if len(self.alpha) == 1:
+            print("Warning: You have only specified one heating function.")
+        if 'group' in kwargs:
+            self.group = kwargs['group']
+        else:
+            self.group = 'by_alpha'
+        if 'root_dir' in kwargs:
+            self.fn_temp = kwargs['fn_temp']
+        else:
+            self.fn_temp = '/data/datadrive2/EBTEL-2fluid_runs/' + species + '_heating_runs/alpha%s/ebtel_L' +str(loop_length) + '_tpulse' + str(tpulse) + '_alpha%s%s_' + species + '_heating_all_a.fits'
+        #Initialize dictionary to store separate histograms
+        self.histo_dict_cool = {}
+        self.histo_dict_hot = {}
+        
             
+    def loader(self,**kwargs):
+        """Load in data and create dictionaries with slope values grouped according to 'group' option"""
             
+            #Loop over (alpha,b) values 
+            for ab in alpha:
+                #Unpickle the file
+                with open(self.fn_temp%(ab[0],ab[0],ab[1]),'rb') as f:
+                    cool,hot = pickle.load(f)
+                #Group by alpha method
+                if self.group is 'by_alpha':
+                    self.histo_dict_cool[''.join(ab)] = list(itertools.chain(*cool))
+                    self.histo_dict_hot[''.join(ab)] = list(itertools.chain(*hot))
+                #Group by Tn method
+                elif self.group is 'by_t_wait':
+                    for i in len(cool):
+                        try:
+                            self.histo_dict_cool[str(i)] = self.histo_dict_cool[str(i)] + cool[i]
+                            self.histo_dict_hot[str(i)] = self.histo_dict_hot[str(i)] + hot[i]
+                        except KeyError:
+                            self.histo_dict_cool[str(i)] = []
+                            self.histo_dict_cool[str(i)] = self.histo_dict_cool[str(i)] + cool[i]
+                            self.histo_dict_hot[str(i)] = []
+                            self.histo_dict_hot[str(i)] = self.histo_dict_hot[str(i)] + hot[i]
+                else:
+                    raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
+                    
+            #Filter out False values that get put in when fitting cannot be performed
+            for key in self.histo_dict_cool:
+                self.histo_dict_cool[key] = [x for x in self.histo_dict_cool if x is not False]
+            for key in self.histo_dict_hot:
+                self.histo_dict_hot[key] = [x for x in self.histo_dict_hot if x is not False]
+                    
