@@ -7,7 +7,7 @@
 import sys
 import os
 import argparse
-import dill as pickle
+import pickle
 import numpy as np
 sys.path.append('/home/wtb2/Documents/EBTEL_analysis/src/')
 import ebtel_dem as ebd
