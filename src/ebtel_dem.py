@@ -4,6 +4,7 @@
 #13 May 2015
 
 #Import needed modules
+import pickle
 import numpy as np
 from scipy.optimize import curve_fit
 
