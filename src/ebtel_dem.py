@@ -4,7 +4,6 @@
 #13 May 2015
 
 #Import needed modules
-import pandas as pd
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -262,21 +261,6 @@ class DEMAnalyze(object):
                 
             else:
                 raise ValueError("Unrecognized fit method option.")
-                
-        if 'fits_file' in kwargs:
-            #Write all fits to files
-            temp = np.array(pd.DataFrame(self.cool_fits_all))
-            for i in range(len(temp)):
-                for j in range(len(temp[i])):
-                    if temp[i,j] is False:
-                        temp[i,j] = np.float('NaN')
-            np.savetxt(kwargs['fits_file']+'.cool',temp)
-            temp = np.array(pd.DataFrame(self.hot_fits_all))
-            for i in range(len(temp)):
-                for j in range(len(temp[i])):
-                    if temp[i,j] is False:
-                        temp[i,j] = np.float('NaN')
-            np.savetxt(kwargs['fits_file']+'.hot',temp)
             
             
     def bounds(self,temp,dem,sigma,**kwargs):
