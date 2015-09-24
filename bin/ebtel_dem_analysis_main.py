@@ -7,7 +7,6 @@
 import sys
 import os
 import argparse
-import pandas as pd
 import numpy as np
 sys.path.append('/home/wtb2/Documents/EBTEL_analysis/src/')
 import ebtel_dem as ebd
@@ -73,22 +72,7 @@ analyzer = ebd.DEMAnalyze(processer.em, processer.temp_em, processer.em_mean, pr
 #Filter and interpolate EM curves
 analyzer.interp_and_filter()
 #Fit all curves
-analyzer.many_fits()
-
-#Write all hot and cool slopes to file using pandas/numpy
-fits_file=root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_all_a.fits'
-temp = analyzer.cool_fits_all
-for i in range(len(temp)):
-    for j in range(len(temp[i])):
-        if temp[i][j] is False:
-            temp[i][j] = np.float('NaN')
-np.savetxt(fits_file+'.cool',np.array(pd.DataFrame(temp)))
-temp = analyzer.hot_fits_all
-for i in range(len(temp)):
-    for j in range(len(temp[i])):
-        if temp[i][j] is False:
-            temp[i][j] = np.float('NaN')
-np.savetxt(fits_file+'.hot',np.array(pd.DataFrame(temp)))
+analyzer.many_fits(fits_file=root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_all_a.fits')
 
 #Check for existence of needed directories and create temp names
 if not os.path.exists(root_dir_figs + figdir%(args.species,args.alpha)):

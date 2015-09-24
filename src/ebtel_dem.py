@@ -4,6 +4,7 @@
 #13 May 2015
 
 #Import needed modules
+import pandas as pd
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -261,7 +262,22 @@ class DEMAnalyze(object):
                 
             else:
                 raise ValueError("Unrecognized fit method option.")
-            
+                
+        if 'fits_file' in kwargs:
+            #Write all hot and cool slopes to file using pandas/numpy
+            temp = self.cool_fits_all
+            for i in range(len(temp)):
+                for j in range(len(temp[i])):
+                    if temp[i][j] is False:
+                        temp[i][j] = np.float('NaN')
+            np.savetxt(kwargs['fits_file']+'.cool',np.array(pd.DataFrame(temp)))
+            temp = self.hot_fits_all
+            for i in range(len(temp)):
+                for j in range(len(temp[i])):
+                    if temp[i][j] is False:
+                        temp[i][j] = np.float('NaN')
+            np.savetxt(kwargs['fits_file']+'.hot',np.array(pd.DataFrame(temp)))
+                        
             
     def bounds(self,temp,dem,sigma,**kwargs):
         """Create bounded hot and cool branches from given hot and cool branch limits (or default values); interpolation over EM curves should be done before this step."""
