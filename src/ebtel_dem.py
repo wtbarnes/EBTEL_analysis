@@ -264,7 +264,7 @@ class DEMAnalyze(object):
                 
                 
     def return_all_slopes(self,**kwargs):
-        return cool_fits_all,hot_fits_all
+        return self.cool_fits_all,self.hot_fits_all
             
             
     def bounds(self,temp,dem,sigma,**kwargs):
