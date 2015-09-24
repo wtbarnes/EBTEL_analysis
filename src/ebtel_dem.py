@@ -261,6 +261,10 @@ class DEMAnalyze(object):
                 
             else:
                 raise ValueError("Unrecognized fit method option.")
+                
+                
+    def return_all_slopes(self,**kwargs):
+        return cool_fits_all,hot_fits_all
             
             
     def bounds(self,temp,dem,sigma,**kwargs):

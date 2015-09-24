@@ -76,8 +76,9 @@ analyzer.interp_and_filter()
 analyzer.many_fits()
 
 #Pickle the total slope data structures
+cfa,hfa = analyzer.return_all_slopes()
 with open(root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_all_a.fits','wb') as f:
-    pickle.dump([analyzer.cool_fits_all,analyzer.hot_fits_all],f)
+    pickle.dump([cfa,hfa],f)
 f.close()
 
 #Check for existence of needed directories and create temp names
