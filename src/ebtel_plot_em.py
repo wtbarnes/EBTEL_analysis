@@ -218,7 +218,7 @@ class EMHistoBuilder(object):
         if 'root_dir' in kwargs:
             self.fn_temp = kwargs['fn_temp']
         else:
-            self.fn_temp = '/data/datadrive2/EBTEL-2fluid_runs/' + species + '_heating_runs/alpha%s/ebtel_L' +str(loop_length) + '_tpulse' + str(tpulse) + '_alpha%s%s_' + species + '_heating_all_a.fits'
+            self.fn_temp = '/data/datadrive2/EBTEL-2fluid_figs/' + species + '_heating_runs/alpha%s/ebtel_L' +str(loop_length) + '_tpulse' + str(tpulse) + '_alpha%s%s_' + species + '_heating_all_a.fits'
         #Plotting options
         if 'dpi' in kwargs:
             self.dpi = kwargs['dpi']
