@@ -243,12 +243,17 @@ class EMHistoBuilder(object):
             
     def loader(self,**kwargs):
         """Load in data and create dictionaries with slope values grouped according to 'group' option"""
-            
+        
+        #Load a temp class to unpickle the class attributes
+        import ebtel_dem as ebd
+        temp_class = ebd.DEMAnalyze([],[],[],[],[])
+        
         #Loop over (alpha,b) values 
         for ab in self.alpha:
             #Unpickle the file
             with open(self.fn_temp%(ab[0],ab[0],ab[1]),'rb') as f:
                 cool,hot = pickle.load(f)
+            f.close()
             #Group by alpha method
             if self.group is 'by_alpha':
                 self.histo_dict_cool[''.join(ab)] = list(itertools.chain(*cool))
