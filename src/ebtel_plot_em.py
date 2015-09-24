@@ -227,32 +227,37 @@ class EMHistoBuilder(object):
     def loader(self,**kwargs):
         """Load in data and create dictionaries with slope values grouped according to 'group' option"""
             
-            #Loop over (alpha,b) values 
-            for ab in alpha:
-                #Unpickle the file
-                with open(self.fn_temp%(ab[0],ab[0],ab[1]),'rb') as f:
-                    cool,hot = pickle.load(f)
-                #Group by alpha method
-                if self.group is 'by_alpha':
-                    self.histo_dict_cool[''.join(ab)] = list(itertools.chain(*cool))
-                    self.histo_dict_hot[''.join(ab)] = list(itertools.chain(*hot))
-                #Group by Tn method
-                elif self.group is 'by_t_wait':
-                    for i in len(cool):
-                        try:
-                            self.histo_dict_cool[str(i)] = self.histo_dict_cool[str(i)] + cool[i]
-                            self.histo_dict_hot[str(i)] = self.histo_dict_hot[str(i)] + hot[i]
-                        except KeyError:
-                            self.histo_dict_cool[str(i)] = []
-                            self.histo_dict_cool[str(i)] = self.histo_dict_cool[str(i)] + cool[i]
-                            self.histo_dict_hot[str(i)] = []
-                            self.histo_dict_hot[str(i)] = self.histo_dict_hot[str(i)] + hot[i]
-                else:
-                    raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
-                    
-            #Filter out False values that get put in when fitting cannot be performed
-            for key in self.histo_dict_cool:
-                self.histo_dict_cool[key] = [x for x in self.histo_dict_cool if x is not False]
-            for key in self.histo_dict_hot:
-                self.histo_dict_hot[key] = [x for x in self.histo_dict_hot if x is not False]
+        #Loop over (alpha,b) values 
+        for ab in alpha:
+            #Unpickle the file
+            with open(self.fn_temp%(ab[0],ab[0],ab[1]),'rb') as f:
+                cool,hot = pickle.load(f)
+            #Group by alpha method
+            if self.group is 'by_alpha':
+                self.histo_dict_cool[''.join(ab)] = list(itertools.chain(*cool))
+                self.histo_dict_hot[''.join(ab)] = list(itertools.chain(*hot))
+            #Group by Tn method
+            elif self.group is 'by_t_wait':
+                for i in len(cool):
+                    try:
+                        self.histo_dict_cool[str(i)] = self.histo_dict_cool[str(i)] + cool[i]
+                        self.histo_dict_hot[str(i)] = self.histo_dict_hot[str(i)] + hot[i]
+                    except KeyError:
+                        self.histo_dict_cool[str(i)] = []
+                        self.histo_dict_cool[str(i)] = self.histo_dict_cool[str(i)] + cool[i]
+                        self.histo_dict_hot[str(i)] = []
+                        self.histo_dict_hot[str(i)] = self.histo_dict_hot[str(i)] + hot[i]
+            else:
+                raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
+                
+        #Filter out False values that get put in when fitting cannot be performed
+        for key in self.histo_dict_cool:
+            self.histo_dict_cool[key] = [x for x in self.histo_dict_cool if x is not False]
+        for key in self.histo_dict_hot:
+            self.histo_dict_hot[key] = [x for x in self.histo_dict_hot if x is not False]
+                
+    def histo_maker(self,**kwargs):
+        """Build histograms from hot and cool dictionaries built up by self.loader()"""
+        pass
+        
                     
