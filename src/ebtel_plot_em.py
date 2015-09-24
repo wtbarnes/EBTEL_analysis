@@ -245,7 +245,7 @@ class EMHistoBuilder(object):
         """Load in data and create dictionaries with slope values grouped according to 'group' option"""
             
         #Loop over (alpha,b) values 
-        for ab in alpha:
+        for ab in self.alpha:
             #Unpickle the file
             with open(self.fn_temp%(ab[0],ab[0],ab[1]),'rb') as f:
                 cool,hot = pickle.load(f)
