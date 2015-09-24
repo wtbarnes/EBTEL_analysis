@@ -303,7 +303,8 @@ class EMHistoBuilder(object):
         ax.set_ylabel(r'Frequency',fontsize=self.fs)
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
-        ax.set_xlim([2,6])
+        if 'x_limits' in kwargs:
+            ax.set_xlim(kwargs['x_limits'])
         ax.axvline(x=2,color='k',linestyle='--',linewidth=2)
         ax.axvline(x=3,color='k',linestyle='-',linewidth=2)
         ax.axvline(x=5,color='k',linestyle='-.',linewidth=2)
