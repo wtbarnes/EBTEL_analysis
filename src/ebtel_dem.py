@@ -265,8 +265,18 @@ class DEMAnalyze(object):
                 
         if 'fits_file' in kwargs:
             #Write all fits to files
-            np.savetxt(kwargs['fits_file']+'.cool',np.array(pd.DataFrame(self.cool_fits_all)))
-            np.savetxt(kwargs['fits_file']+'.hot',np.array(pd.DataFrame(self.hot_fits_all)))
+            temp = np.array(pd.DataFrame(self.cool_fits_all))
+            for i in range(len(temp)):
+                for j in range(len(temp[i])):
+                    if temp[i,j] is False:
+                        temp[i,j] = np.float('NaN')
+            np.savetxt(kwargs['fits_file']+'.cool',temp)
+            temp = np.array(pd.DataFrame(self.hot_fits_all))
+            for i in range(len(temp)):
+                for j in range(len(temp[i])):
+                    if temp[i,j] is False:
+                        temp[i,j] = np.float('NaN')
+            np.savetxt(kwargs['fits_file']+'.hot',temp)
             
             
     def bounds(self,temp,dem,sigma,**kwargs):
