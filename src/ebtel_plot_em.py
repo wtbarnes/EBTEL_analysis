@@ -282,9 +282,9 @@ class EMHistoBuilder(object):
             raise ValueError("Missing histogram options for styling.")
         
         #Choose hot or cool
-        if temp_choice = 'cool':
+        if temp_choice is 'cool':
             hist_dict = self.histo_dict_cool
-        elif temp_choice = 'hot':
+        elif temp_choice is 'hot':
             hist_dict = self.histo_dict_hot
         else:
             raise ValueError("Invalid choice of histogram dictionary.")
