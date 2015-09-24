@@ -4,7 +4,7 @@
 #14 May 2015
 
 #Import needed modules
-import pickle
+import dill as pickle
 import itertools
 import numpy as np
 import matplotlib
