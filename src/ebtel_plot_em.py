@@ -318,4 +318,18 @@ class EMHistoBuilder(object):
         iqr = q75 - q25
         w = 2.0*iqr*(len(hist))**(-1.0/3.0)
         return int((np.max(np.array(hist)) - np.min(np.array(hist)))/w)
+        
+    
+    def tick_maker(self,old_ticks,n,**kwargs):
+        if n < 2:
+            raise ValueError('n must be greater than 1')
+        
+        n = n-1
+        delta = (old_ticks[-1] - old_ticks[0])/n
+        new_ticks = []
+        for i in range(n):
+            new_ticks.append(old_ticks[0] + i*delta)
+        
+        new_ticks.append(old_ticks[0] + n*delta)
+        return new_ticks
                     
