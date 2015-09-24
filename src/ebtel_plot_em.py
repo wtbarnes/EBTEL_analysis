@@ -4,7 +4,7 @@
 #14 May 2015
 
 #Import needed modules
-import dill as pickle
+import pickle
 import itertools
 import numpy as np
 import matplotlib
@@ -243,10 +243,6 @@ class EMHistoBuilder(object):
             
     def loader(self,**kwargs):
         """Load in data and create dictionaries with slope values grouped according to 'group' option"""
-        
-        #Load a temp class to unpickle the class attributes
-        import ebtel_dem as ebd
-        temp_class = ebd.DEMAnalyze([],[],[],[],[])
         
         #Loop over (alpha,b) values 
         for ab in self.alpha:
