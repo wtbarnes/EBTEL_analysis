@@ -5,8 +5,8 @@
 
 #Import needed libraries
 import sys
+import argparse
 import seaborn.apionly as sns
-import matplotlib.pyplot as plt
 import numpy as np
 sys.path.append('/home/wtb2/Documents/EBTEL_analysis/src/')
 import ebtel_plot_em as ebpe
