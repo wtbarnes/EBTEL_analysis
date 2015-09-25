@@ -30,7 +30,7 @@ figsize = (10,10*3/4)
 format = 'pdf'
 dpi = 1000
 linewidth = 3
-fn_temp = 'ebtel_L%.1f_tpulse%.1f_%s_heating'%(args.loop_length,args.tpulse,args.species) + '_all_hist'
+fn_temp = root_dir + '%s_heating_runs/'%(args.species) + 'ebtel_L%.1f_tpulse%.1f_%s_heating'%(args.loop_length,args.tpulse,args.species) + '_all_hist'
 
 #Build colorpalette
 xkcd_cols = ['black','windows blue','medium green','fire engine red','barney purple']
