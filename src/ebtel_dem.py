@@ -132,11 +132,11 @@ class DEMAnalyze(object):
     
     def __init__(self,em,temp,em_mean,temp_mean,sigma,**kwargs):
         #get nested lists with EM and T values
-        self.em = em
-        self.temp= temp
-        self.em_mean = em_mean
-        self.temp_mean = temp_mean
-        self.sigma = sigma
+        self.em = list(em)
+        self.temp= list(temp)
+        self.em_mean = list(em_mean)
+        self.temp_mean = list(temp_mean)
+        self.sigma = list(sigma)
         #keyword arguments
         if 'verbose' in kwargs:
             self.verbose = kwargs['verbose']
@@ -271,7 +271,7 @@ class DEMAnalyze(object):
         #Construct hot and cool dem and temp arrays for given bounds
         i_cool_lower = np.where(temp<slope_limits['cool_lower'])
         i_cool_upper = np.where(temp>slope_limits['cool_upper'])
-        if len(i_cool_lower[0]) > 0 and len(i_cool_upper[0]) > 0 and temp[i_cool_upper[0][0] - 1] <= slope_limits['hot_lower']:
+        if len(i_cool_lower[0]) > 0 and len(i_cool_upper[0]) > 0:
             temp_cool = temp[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
             dem_cool = dem[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
             sigma_cool = sigma[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]    
@@ -366,7 +366,7 @@ class DEMAnalyze(object):
             temp_hot = temp[i_hot]
             #set upper and lower temperature bounds for 80% drop in EM from peak
             th_upper = temp[i_hot[np.where(em_hot>self.max_percent_drop*np.max(em))[0]][-1]]
-            th_lower = th_upper - self.delta_t
+            th_lower = temp[i_hot[np.where(em_hot>0.98*np.max(em))[0]][-1]]#th_upper - self.delta_t
             tc_lower = self.slope_limits['cool_lower']
             tc_upper = self.slope_limits['cool_upper']
         elif self.lim_method is 'peak':

@@ -69,7 +69,7 @@ processer.import_raw(t_wait)
 processer.calc_stats()
 
 #Instantiate Analyze class
-analyzer = ebd.DEMAnalyze(processer.em, processer.temp_em, processer.em_mean, processer.temp_mean, processer.em_std, verbose=True, slope_limits=slope_limits, fit_method=fit_method, lim_method=lim_method, delta_t=delta_t, max_percent_drop=max_percent_drop)
+analyzer = ebd.DEMAnalyze(tuple(processer.em), tuple(processer.temp_em), tuple(processer.em_mean), tuple(processer.temp_mean), tuple(processer.em_std), verbose=True, slope_limits=slope_limits, fit_method=fit_method, lim_method=lim_method, delta_t=delta_t, max_percent_drop=max_percent_drop)
 #Filter and interpolate EM curves
 analyzer.interp_and_filter()
 #Fit all curves
