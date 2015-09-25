@@ -6,10 +6,10 @@
 #Import needed libraries
 import sys
 import argparse
-import seaborn.apionly as sns
 import numpy as np
 sys.path.append('/home/wtb2/Documents/EBTEL_analysis/src/')
 import ebtel_plot_em as ebpe
+import seaborn.apionly as sns
 
 #Argument parser
 parser = argparse.ArgumentParser(description='Script that performs DEM analysis for EBTEL-2fluid runs.')
@@ -60,7 +60,7 @@ alpha_list = [['uniform',''],
 ['2.5',''],['2.5','-b1.0'],['2.5','-b2.0']]
 
 #Instantiate the builder class for the by-alpha histogram
-histo_builder = ebpe.EMHistoBuilder(species,loop_length,tpulse,alpha_list,group='by_alpha',fs=fontsize,figsize=figsize,format=format,dpi=dpi)
+histo_builder = ebpe.EMHistoBuilder(args.species,args.loop_length,args.tpulse,alpha_list,group='by_alpha',fs=fontsize,figsize=figsize,format=format,dpi=dpi)
 #Load data
 histo_builder.loader()
 #Load histogram options
@@ -73,7 +73,7 @@ histo_builder.histo_maker('cool',histo_opts=histo_opts,x_limits=[1.9,5.1],leg_lo
 histo_builder.histo_maker('hot',histo_opts=histo_opts,x_limits=[2.9,6.0],leg_loc=1,print_fig_filename=fn_temp+'.alpha.hot')
 
 #Instantiate the builder class for the by_t_wait
-histo_builder = ebpe.EMHistoBuilder(species,loop_length,tpulse,alpha_list,group='by_t_wait',fs=fontsize,figsize=figsize,format=format,dpi=dpi)
+histo_builder = ebpe.EMHistoBuilder(args.species,args.loop_length,args.tpulse,alpha_list,group='by_t_wait',fs=fontsize,figsize=figsize,format=format,dpi=dpi)
 #Load data
 histo_builder.loader()
 #Load histogram options
