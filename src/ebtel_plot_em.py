@@ -216,9 +216,9 @@ class EMHistoBuilder(object):
         else:
             self.group = 'by_alpha'
         if 'root_dir' in kwargs:
-            self.fn_temp = kwargs['fn_temp']
+            root_dir = kwargs['root_dir']
         else:
-            self.fn_temp = '/data/datadrive2/EBTEL-2fluid_figs/' + species + '_heating_runs/alpha%s/ebtel_L' +str(loop_length) + '_tpulse' + str(tpulse) + '_alpha%s%s_' + species + '_heating_all_a.fits'
+            root_dir = '/data/datadrive2/EBTEL-2fluid_figs/'
         #Plotting options
         if 'dpi' in kwargs:
             self.dpi = kwargs['dpi']
@@ -236,6 +236,8 @@ class EMHistoBuilder(object):
             self.figsize = kwargs['figsize']
         else:
             self.figsize = (12,12)
+        #Assemble temp file name
+        self.fn_temp = root_dir + species + '_heating_runs/alpha%s/ebtel_L' +str(loop_length) + '_tpulse' + str(tpulse) + '_alpha%s%s_' + species + '_heating_all_a.fits'
         #Initialize dictionary to store separate histograms
         self.histo_dict_cool = {}
         self.histo_dict_hot = {}
