@@ -100,6 +100,8 @@ plotter = ebpe.DEMPlotter(processer.temp_em, processer.em, processer.temp_mean, 
 plotter.plot_em_curves(fit_lines=fit_lines, print_fig_filename=root_dir_figs + fn_temp + '_dem')
 #Build composite slope plot
 plotter.plot_em_slopes(print_fig_filename=root_dir_figs + fn_temp + '_hs_compare')
+#Build derivatives plots
+plotter.plot_em_derivs(print_fig_filename=root_dir_figs + fn_temp + '_dem_derivs')
 #Check for existence of needed directories to construct MC curves
 if args.alpha is not 'uniform':
     if not os.path.exists(root_dir_figs + fn_temp + '_dem_mc/'):
