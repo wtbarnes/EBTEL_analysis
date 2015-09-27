@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import seaborn.apionly as sns
 from matplotlib.ticker import MaxNLocator
 from scipy.optimize import curve_fit
 
@@ -18,7 +19,12 @@ class DEMPlotter(object):
     def __init__(self,temp_list,em_list,temp_mean,em_mean,em_sigma,cool_fits,hot_fits,**kwargs):
         #static parameters
         self.linestyles = ('-','--','-.',':')
+        self.colors = sns.xkcd_palette(4*['black'] + 4*['windows blue'] + 4*['medium green'] + 4*['fire engine red'] + 4*['barney purple'])
         #check for custom parameters
+        if 'em_cutoff' in kwargs:
+            self.em_cutoff = kwargs['em_cutoff']
+        else:
+            self.em_cutoff = 23.0
         if 'dpi' in kwargs:
             self.dpi = kwargs['dpi']
         else:
@@ -180,6 +186,45 @@ class DEMPlotter(object):
         if marker_cool and marker_hot:
             ax.legend([marker_cool,marker_hot],[r'cool',r'hot'],loc=1,fontsize=0.75*self.fs,numpoints=1)
 
+        #save or show figure
+        if 'print_fig_filename' in kwargs:
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+            plt.close('all')
+        else:
+            plt.show()
+            
+            
+    def plot_em_derivs(self,**kwargs):
+        """Plot d(log(EM))/d(log(T)) as a function of T for all values of Tn"""
+        
+        #set up figure
+        fig = plt.figure(figsize=self.figsize)
+        ax = fig.gca()
+        
+        #Iterate over t_wait values
+        for i in range(self.em_mean):    
+            #remove data below given threshold of mean EM and T
+            filter_inds = np.where(self.em_mean[i] > self.em_cutoff)
+            em_filter = np.array(self.em_mean[i])[filter_inds[0]]
+            temp_filter = np.array(self.temp_mean[i])[filter_inds]
+            #compute derivative 
+            dem_dt = np.gradient(em_filter,np.gradient(temp_filter))
+            #plotting
+            ax.plot(temp_filter, em_filter, color=self.colors[i], linestyle=self.linestyles[i%len(self.linestyles)], label=r'$T_N$=%d s'%self.Tn[i])
+            
+        #set labels
+        ax.set_xlabel(r'$\log{T}$',fontsize=self.fs)
+        ax.set_ylabel(r'$d\log{EM}/d\log{T}$',fontsize=self.fs)
+        ax.axhline(y=2,color='k',linestyle='--')
+        ax.axhline(y=3,color='k',linestyle='-')
+        ax.axhline(y=5,color='k',linestyle='-.')
+        ax.set_ylim([-10,6])
+        ax.set_xlim([5.5,7.5])
+        ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
+        ax.tick_params(axis='both',labelsize=0.75*self.fs)
+        #legend
+        ax.legend(loc=1,fontsize=0.75*self.fs)
+        
         #save or show figure
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
