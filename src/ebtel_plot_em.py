@@ -210,7 +210,7 @@ class DEMPlotter(object):
             #compute derivative 
             dem_dt = np.gradient(em_filter,np.gradient(temp_filter))
             #plotting
-            ax.plot(temp_filter, em_filter, color=self.colors[i], linestyle=self.linestyles[i%len(self.linestyles)], label=r'$T_N$=%d s'%self.Tn[i])
+            ax.plot(temp_filter, dem_dt, color=self.colors[i], linestyle=self.linestyles[i%len(self.linestyles)], label='%d'%self.Tn[i])
             
         #set labels
         ax.set_xlabel(r'$\log{T}$',fontsize=self.fs)
@@ -227,7 +227,7 @@ class DEMPlotter(object):
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
         #legend
-        ax.legend(loc=1,fontsize=0.75*self.fs)
+        ax.legend(loc=1,fontsize=0.75*self.fs,title=r'$T_N$ (s)')
         
         #save or show figure
         if 'print_fig_filename' in kwargs:
