@@ -206,7 +206,7 @@ class DEMPlotter(object):
             #remove data below given threshold of mean EM and T
             filter_inds = np.where(self.em_mean[i] > self.em_cutoff)
             em_filter = np.array(self.em_mean[i])[filter_inds[0]]
-            temp_filter = np.array(self.temp_mean[i])[filter_inds]
+            temp_filter = np.array(self.temp_mean[i])[filter_inds[0]]
             #compute derivative 
             dem_dt = np.gradient(em_filter,np.gradient(temp_filter))
             #plotting
@@ -215,10 +215,14 @@ class DEMPlotter(object):
         #set labels
         ax.set_xlabel(r'$\log{T}$',fontsize=self.fs)
         ax.set_ylabel(r'$d\log{EM}/d\log{T}$',fontsize=self.fs)
-        ax.axhline(y=2,color='k',linestyle='--')
-        ax.axhline(y=3,color='k',linestyle='-')
-        ax.axhline(y=5,color='k',linestyle='-.')
-        ax.set_ylim([-10,6])
+        ax.axhline(y=2,color='k',linestyle=':')
+        ax.axhline(y=3,color='k',linestyle=':')
+        ax.axhline(y=-2.5,color='k',linestyle=':')
+        ax.axhline(y=-5.5,color='k',linestyle=':')
+        if 'y_limits' in kwargs:
+            ax.set_ylim(kwargs['y_limits'])
+        else:
+            ax.set_ylim([-10,6])
         ax.set_xlim([5.5,7.5])
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
