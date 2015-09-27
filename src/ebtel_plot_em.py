@@ -228,7 +228,7 @@ class DEMPlotter(object):
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
         #legend
         ax.legend(loc=1,fontsize=0.75*self.fs,title=r'$T_N$ (s)',ncol=2)
-        plt.setp(legend.get_title(),fontsize=0.75.fs)
+        plt.setp(ax.legend.get_title(),fontsize=0.75.fs)
         
         #save or show figure
         if 'print_fig_filename' in kwargs:
