@@ -227,7 +227,7 @@ class DEMPlotter(object):
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
         #legend
-        ax.legend(loc=1,fontsize=0.75*self.fs,title=r'$T_N$ (s)',ncol=2)
+        ax.legend(loc='best',fontsize=0.75*self.fs,title=r'$T_N$ (s)',ncol=2)
         plt.setp(ax.get_legend().get_texts(),fontsize=0.75*self.fs)
         
         #save or show figure
