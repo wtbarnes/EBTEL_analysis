@@ -202,7 +202,7 @@ class DEMPlotter(object):
         ax = fig.gca()
         
         #Iterate over t_wait values
-        for i in range(self.em_mean):    
+        for i in range(len(self.em_mean)):    
             #remove data below given threshold of mean EM and T
             filter_inds = np.where(self.em_mean[i] > self.em_cutoff)
             em_filter = np.array(self.em_mean[i])[filter_inds[0]]
