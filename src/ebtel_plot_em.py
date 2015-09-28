@@ -370,8 +370,8 @@ class EMHistoBuilder(object):
         if self.group is 'by_alpha':
             leg_title = r'$\alpha$'
         elif self.group is 'by_t_wait':
-            leg_title = r'$T_N\quad\mathrm{(s)}$'
-        ax.legend(fontsize=0.75*self.fs,loc=leg_loc,ncol=1,title=leg_title,bbox_to_anchor=(1.1,1.05))
+            leg_title = r'$T_N$ $\mathrm{(s)}$'
+        ax.legend(fontsize=0.75*self.fs,loc=leg_loc,ncol=2,title=leg_title,bbox_to_anchor=(1.1,1.05))
         
         #Print or show figure
         if 'print_fig_filename' in kwargs:
