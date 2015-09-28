@@ -369,7 +369,7 @@ class EMHistoBuilder(object):
             leg_loc = 'best'
         if self.group is 'by_alpha':
             leg_title = r'$\alpha$'
-        elif self.goup is 'by_t_wait':
+        elif self.group is 'by_t_wait':
             leg_title = r'$T_N\quad\mathrm{(s)}$'
         ax.legend(fontsize=0.75*self.fs,loc=leg_loc,ncol=1)
         
