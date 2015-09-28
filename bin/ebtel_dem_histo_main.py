@@ -47,11 +47,11 @@ styles_alpha = ['dotted'] + 3*['solid','dashdot','dashed']
 styles_tn = 5*['solid','dashed','dashdot','dotted'] 
 
 #Make alpha and tn labels
-labels_alpha = [r'$\alpha=\mathrm{uniform}$',
-r'$\alpha=-1.5$',r'$\alpha=-1.5$, $b=1$',r'$\alpha=-1.5$, $b=2$',
-r'$\alpha=-2.0$',r'$\alpha=-2.0$, $b=1$',r'$\alpha=-2.0$, $b=2$',
-r'$\alpha=-2.5$',r'$\alpha=-2.5$, $b=1$',r'$\alpha=-2.5$, $b=2$',]
-labels_tn = [r'$T_N=%d$ s'%tn for tn in np.arange(250,5250,250)]
+labels_alpha = [r'$\mathrm{uniform}$',
+r'$-1.5$',r'$-1.5$, $b=1$',r'$-1.5$, $b=2$',
+r'$-2.0$',r'$-2.0$, $b=1$',r'$-2.0$, $b=2$',
+r'$-2.5$',r'$-2.5$, $b=1$',r'$-2.5$, $b=2$',]
+labels_tn = [r'$%d$'%tn for tn in np.arange(250,5250,250)]
 
 #Set list of unique heating functions; should correspond to alpha labels list
 alpha_list = [['uniform',''],
