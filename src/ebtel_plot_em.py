@@ -346,16 +346,24 @@ class EMHistoBuilder(object):
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         
+        #Initialize y-limits values to find max values
+        ylims_final = [0.0,0.0]
         #Loop over histograms
         for key in hist_dict:
             if len(hist_dict[key]) < 10:
                 pass
             else:
                 ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step',**kwargs['histo_opts'][key])
+                ylims = ax.get_ylim()
+                if ylims[1] > ylims_final:
+                    ylims_final[1] = ylims[1]
+                if ylims[0] < ylims_final:
+                    ylims_final[0] = ylims[0]
             
         #Labels and styling
         ax.set_xlabel(r'$a$',fontsize=self.fs)
         ax.set_ylabel(r'Frequency',fontsize=self.fs)
+        ax.set_ylim(ylims_final)
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
         if 'x_limits' in kwargs:
