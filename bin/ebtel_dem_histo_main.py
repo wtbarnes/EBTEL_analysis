@@ -70,7 +70,7 @@ for i in range(len(alpha_list)):
 #Build cool histogram
 histo_builder.histo_maker('cool',histo_opts=histo_opts,x_limits=[1.9,5.1],leg_loc=1,print_fig_filename=fn_temp+'.alpha.cool')
 #Build hot histogram
-histo_builder.histo_maker('hot',histo_opts=histo_opts,leg_loc=1,print_fig_filename=fn_temp+'.alpha.hot')
+histo_builder.histo_maker('hot',histo_opts=histo_opts,x_limits=[2.9,6.0],leg_loc=1,print_fig_filename=fn_temp+'.alpha.hot')
 
 #Instantiate the builder class for the by_t_wait
 histo_builder = ebpe.EMHistoBuilder(args.species, args.loop_length, args.tpulse, alpha_list, group='by_t_wait', fs=fontsize, figsize=figsize, format=format, dpi=dpi, root_dir=root_dir)
@@ -83,4 +83,4 @@ for i in range(len(styles_tn)):
 #Build cool histogram
 histo_builder.histo_maker('cool',histo_opts=histo_opts,x_limits=[1.9,5.1],leg_loc=1,print_fig_filename=fn_temp+'.t_wait.cool')
 #Build hot histogram
-histo_builder.histo_maker('hot',histo_opts=histo_opts,leg_loc=1,print_fig_filename=fn_temp+'.t_wait.hot')
+histo_builder.histo_maker('hot',histo_opts=histo_opts,x_limits=[2.9,6.0],leg_loc=1,print_fig_filename=fn_temp+'.t_wait.hot')
