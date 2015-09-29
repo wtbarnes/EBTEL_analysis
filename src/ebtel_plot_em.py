@@ -355,9 +355,9 @@ class EMHistoBuilder(object):
             else:
                 ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step',**kwargs['histo_opts'][key])
                 ylims = ax.get_ylim()
-                if ylims[1] > ylims_final:
+                if ylims[1] > ylims_final[1]:
                     ylims_final[1] = ylims[1]
-                if ylims[0] < ylims_final:
+                if ylims[0] < ylims_final[0]:
                     ylims_final[0] = ylims[0]
             
         #Labels and styling
