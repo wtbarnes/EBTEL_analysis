@@ -50,7 +50,7 @@ styles_tn = 5*['solid','dashed','dashdot','dotted']
 labels_alpha = [r'$\mathrm{uniform}$',
 r'$-1.5$',r'$-1.5$, $b=1$',r'$-1.5$, $b=2$',
 r'$-2.0$',r'$-2.0$, $b=1$',r'$-2.0$, $b=2$',
-r'$-2.5$',r'$-2.5$, $b=1$',r'$-2.5$, $b=2$',]
+r'$-2.5$',r'$-2.5$, $b=1$',r'$-2.5$, $b=2$']
 labels_tn = [r'$%d$'%tn for tn in np.arange(250,5250,250)]
 
 #Set list of unique heating functions; should correspond to alpha labels list
