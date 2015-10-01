@@ -88,7 +88,7 @@ class DEMPlotter(object):
         ax.set_ylabel(r'$\log\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,33])
-        ax.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
+        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         #legend
         leg = ax.legend(loc=2,fontsize=self.alfs*self.fs,title=r'$T_N$ (s)',ncol=2,bbox_to_anchor=(-0.1,1.01))
         plt.setp(leg.get_title(),fontsize=self.alfs*self.fs)
@@ -123,7 +123,7 @@ class DEMPlotter(object):
         ax.set_ylabel(r'$\log{\mathrm{EM}}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,30])
-        ax.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
+        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         #avoid cutting off labels
         plt.tight_layout()
 
@@ -159,7 +159,7 @@ class DEMPlotter(object):
         ax.tick_params(axis='both',labelsize=self.alfs*self.fs)
         ax_twin.set_ylabel(r'$\log{\mathrm{EM}(T_{max})}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax_twin.set_ylim([28,30])
-        ax_twin.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
+        ax_twin.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         #avoid cutting off labels
         plt.tight_layout()
 
@@ -193,7 +193,7 @@ class DEMPlotter(object):
         ax.set_ylim([0,8])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
-        ax.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
+        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         
         #legend
         if marker_cool and marker_hot:
@@ -241,7 +241,7 @@ class DEMPlotter(object):
             ax.set_ylim([-10,6])
         ax.set_xlim([5.5,7.5])
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
-        ax.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
+        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         #avoid cutting off labels
         plt.tight_layout()
         
@@ -384,7 +384,7 @@ class EMHistoBuilder(object):
         ax.set_ylabel(r'Frequency',fontsize=self.fs)
         ax.set_ylim(ylims_final)
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
-        ax.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
+        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         if 'x_limits' in kwargs:
             ax.set_xlim(kwargs['x_limits'])
         ax.axvline(x=2,color='k',linestyle='--',linewidth=2)
