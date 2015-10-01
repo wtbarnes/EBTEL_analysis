@@ -87,8 +87,8 @@ class DEMProcess(object):
             if len(np.shape(np.array(self.em[i]))) > 1:
                 temporary_mean_em = np.array(np.mean(self.inf_filter(self.em[i]),axis=0))
                 temporary_std_em = np.array(np.std(self.inf_filter(self.em[i]),axis=0))
-                temporary_mean_em[np.where(temporary_mean_em==0.0)]=-np.float('Inf')
-                temporary_std_em[np.where(temporary_mean_em==0.0)]=-np.float('Inf')
+                temporary_mean_em[np.where(temporary_mean_em<self.em_cutoff)]=-np.float('Inf')
+                temporary_std_em[np.where(temporary_mean_em<self.em_cutoff)]=-np.float('Inf')
                 self.em_mean.append(temporary_mean_em)
                 self.em_std.append(temporary_std_em)
                 self.temp_mean.append(np.mean(self.temp_em[i],axis=0))
