@@ -37,6 +37,10 @@ class DEMPlotter(object):
             self.fs = kwargs['fs']
         else:
             self.fs = 18.0
+        if 'alfs' in kwargs:
+            self.alfs = kwargs['alfs']
+        else:
+            self.alfs = 0.75
         if 'figsize' in kwargs:
             self.figsize = kwargs['figsize']
         else:
@@ -84,10 +88,10 @@ class DEMPlotter(object):
         ax.set_ylabel(r'$\log\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,33])
-        ax.tick_params(axis='both',labelsize=0.5*self.fs)
+        ax.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
         #legend
-        leg = ax.legend(loc=2,fontsize=0.5*self.fs,title=r'$T_N$ (s)',ncol=2,bbox_to_anchor=(-0.1,1.05))
-        plt.setp(leg.get_title(),fontsize=0.5*self.fs)
+        leg = ax.legend(loc=2,fontsize=self.alfs*self.fs,title=r'$T_N$ (s)',ncol=2,bbox_to_anchor=(-0.1,1.01))
+        plt.setp(leg.get_title(),fontsize=self.alfs*self.fs)
         #avoid cutting off labels
         plt.tight_layout()
 
@@ -119,7 +123,7 @@ class DEMPlotter(object):
         ax.set_ylabel(r'$\log{\mathrm{EM}}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,30])
-        ax.tick_params(axis='both',labelsize=0.5*self.fs)
+        ax.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
         #avoid cutting off labels
         plt.tight_layout()
 
@@ -152,10 +156,10 @@ class DEMPlotter(object):
         ax.set_ylabel(r'$\log{T_{max}}$ $\mathrm{(K)}$',fontsize=self.fs)
         ax.set_ylim([5.5,7.0])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
-        ax.tick_params(axis='both',labelsize=0.5*self.fs)
+        ax.tick_params(axis='both',labelsize=self.alfs*self.fs)
         ax_twin.set_ylabel(r'$\log{\mathrm{EM}(T_{max})}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax_twin.set_ylim([28,30])
-        ax_twin.tick_params(axis='both',labelsize=0.5*self.fs)
+        ax_twin.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
         #avoid cutting off labels
         plt.tight_layout()
 
@@ -189,11 +193,11 @@ class DEMPlotter(object):
         ax.set_ylim([0,8])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
-        ax.tick_params(axis='both',labelsize=0.5*self.fs)
+        ax.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
         
         #legend
         if marker_cool and marker_hot:
-            ax.legend([marker_cool,marker_hot],[r'cool',r'hot'],loc=1,fontsize=0.5*self.fs,numpoints=1)
+            ax.legend([marker_cool,marker_hot],[r'cool',r'hot'],loc=1,fontsize=self.alfs*self.fs,numpoints=1)
             
         #avoid cutting off labels
         plt.tight_layout()
@@ -237,7 +241,7 @@ class DEMPlotter(object):
             ax.set_ylim([-10,6])
         ax.set_xlim([5.5,7.5])
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
-        ax.tick_params(axis='both',labelsize=0.5*self.fs)
+        ax.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
         #avoid cutting off labels
         plt.tight_layout()
         
@@ -293,6 +297,10 @@ class EMHistoBuilder(object):
             self.fs = kwargs['fs']
         else:
             self.fs = 18.0
+        if 'alfs' in kwargs:
+            self.alfs = kwargs['alfs']
+        else:
+            self.alfs = 0.75
         if 'figsize' in kwargs:
             self.figsize = kwargs['figsize']
         else:
@@ -376,7 +384,7 @@ class EMHistoBuilder(object):
         ax.set_ylabel(r'Frequency',fontsize=self.fs)
         ax.set_ylim(ylims_final)
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
-        ax.tick_params(axis='both',labelsize=0.5*self.fs)
+        ax.tick_params(axis='both',padding=8,labelsize=self.alfs*self.fs)
         if 'x_limits' in kwargs:
             ax.set_xlim(kwargs['x_limits'])
         ax.axvline(x=2,color='k',linestyle='--',linewidth=2)
@@ -390,8 +398,8 @@ class EMHistoBuilder(object):
             leg_title = r'$\alpha$'
         elif self.group is 'by_t_wait':
             leg_title = r'$T_N$ $\mathrm{(s)}$'
-        leg = ax.legend(fontsize=0.5*self.fs,loc=leg_loc,ncol=2,title=leg_title,bbox_to_anchor=(1.1,1.05))
-        plt.setp(leg.get_title(),fontsize=0.5*self.fs)
+        leg = ax.legend(fontsize=self.alfs*self.fs,loc=leg_loc,ncol=2,title=leg_title,bbox_to_anchor=(1.1,1.05))
+        plt.setp(leg.get_title(),fontsize=self.alfs*self.fs)
         
         #Print or show figure
         if 'print_fig_filename' in kwargs:
