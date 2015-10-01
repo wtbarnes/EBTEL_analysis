@@ -67,7 +67,7 @@ class DEMPlotter(object):
 
         #print lines
         for i in range(len(self.em_mean)):
-            ax.plot(self.temp_mean[i], self.em_mean[i]+i*delta_em, linestyle=self.linestyles[i%len(self.linestyles)], color='black')
+            ax.plot(self.temp_mean[i], self.em_mean[i]+i*delta_em, linestyle=self.linestyles[i%len(self.linestyles)], color=self.colors[i], label='%d'%self.Tn[i] )
             if 'fit_lines' in kwargs:
                 try:
                     ax.plot(kwargs['fit_lines']['t_cool'][i], (self.cool_fits[i][0]*kwargs['fit_lines']['t_cool'][i] + self.cool_fits[i][1]) + i*delta_em, linewidth=2.0, color='blue')
@@ -80,11 +80,14 @@ class DEMPlotter(object):
                     pass
 
         #set labels
-        ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
-        ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
+        ax.set_xlabel(r'$\log T\mathrm{ (K)}$',fontsize=self.fs)
+        ax.set_ylabel(r'$\log\mathrm{EM}\mathrm{ (cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,33])
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
+        #legend
+        ax.legend(loc=2,fontsize=0.75*self.fs,title=r'$T_N$ (s)',ncol=2,bbox_to_anchor=(-0.1,1.05))
+        plt.setp(ax.get_legend().get_texts(),fontsize=0.75*self.fs)
 
         #save or show the figure
         if 'print_fig_filename' in kwargs:
@@ -110,8 +113,8 @@ class DEMPlotter(object):
 
         #set labels
         ax.set_title(r"EBTEL EM, $\langle T_n\rangle$ = "+str(self.Tn[tn_index])+" s",fontsize=self.fs)
-        ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
-        ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
+        ax.set_xlabel(r'$\log T\mathrm{ (K)}$',fontsize=self.fs)
+        ax.set_ylabel(r'$\log\mathrm{EM}\mathrm{ (cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,30])
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
@@ -142,7 +145,7 @@ class DEMPlotter(object):
 
         #set labels
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
-        ax.set_ylabel(r'$\log(T_{max})$',fontsize=self.fs)
+        ax.set_ylabel(r'$\log(T_{max})\mathrm{ (K)}$',fontsize=self.fs)
         ax.set_ylim([5.5,7.0])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
@@ -172,7 +175,7 @@ class DEMPlotter(object):
                 marker_hot = ax.errorbar(self.Tn[i],np.fabs(self.hot_fits[i][0]),yerr=self.hot_fits[i][2][0],fmt='o',color='red',label=r'hot')
 
         #set labels
-        ax.set_xlabel(r'$T_N$',fontsize=self.fs)
+        ax.set_xlabel(r'$T_N\mathrm{ (s)}$',fontsize=self.fs)
         ax.set_ylabel(r'$a$',fontsize=self.fs)
         ax.axhline(y=2,color='k',linestyle='--')
         ax.axhline(y=3,color='k',linestyle='-')
@@ -210,10 +213,10 @@ class DEMPlotter(object):
             #compute derivative 
             dem_dt = np.gradient(em_filter,np.gradient(temp_filter))
             #plotting
-            ax.plot(temp_filter, dem_dt, color=self.colors[i], linestyle=self.linestyles[i%len(self.linestyles)], label='%d'%self.Tn[i])
+            ax.plot(temp_filter, dem_dt, color=self.colors[i], linestyle=self.linestyles[i%len(self.linestyles)])
             
         #set labels
-        ax.set_xlabel(r'$\log{T}$',fontsize=self.fs)
+        ax.set_xlabel(r'$\log{T}\mathrm{ (K)}$',fontsize=self.fs)
         ax.set_ylabel(r'$d\log{EM}/d\log{T}$',fontsize=self.fs)
         ax.axhline(y=2,color='k',linestyle=':')
         ax.axhline(y=3,color='k',linestyle=':')
@@ -226,9 +229,6 @@ class DEMPlotter(object):
         ax.set_xlim([5.5,7.5])
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
-        #legend
-        ax.legend(loc='best',fontsize=0.75*self.fs,title=r'$T_N$ (s)',ncol=2)
-        plt.setp(ax.get_legend().get_texts(),fontsize=0.75*self.fs)
         
         #save or show figure
         if 'print_fig_filename' in kwargs:
