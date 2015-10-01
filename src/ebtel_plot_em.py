@@ -88,6 +88,8 @@ class DEMPlotter(object):
         #legend
         ax.legend(loc=2,fontsize=0.75*self.fs,title=r'$T_N$ (s)',ncol=2,bbox_to_anchor=(-0.1,1.05))
         plt.setp(ax.get_legend().get_texts(),fontsize=0.75*self.fs)
+        #avoid cutting off labels
+        plt.tight_layout()
 
         #save or show the figure
         if 'print_fig_filename' in kwargs:
@@ -118,6 +120,8 @@ class DEMPlotter(object):
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,30])
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
+        #avoid cutting off labels
+        plt.tight_layout()
 
         #save or show figure
         if 'print_fig_filename' in kwargs:
@@ -152,6 +156,8 @@ class DEMPlotter(object):
         ax_twin.set_ylabel(r'$\log{\mathrm{EM}(T_{max})}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax_twin.set_ylim([28,30])
         ax_twin.tick_params(axis='both',labelsize=0.75*self.fs)
+        #avoid cutting off labels
+        plt.tight_layout()
 
         #save or show figure
         if 'print_fig_filename' in kwargs:
@@ -188,6 +194,9 @@ class DEMPlotter(object):
         #legend
         if marker_cool and marker_hot:
             ax.legend([marker_cool,marker_hot],[r'cool',r'hot'],loc=1,fontsize=0.75*self.fs,numpoints=1)
+            
+        #avoid cutting off labels
+        plt.tight_layout()
 
         #save or show figure
         if 'print_fig_filename' in kwargs:
@@ -229,6 +238,8 @@ class DEMPlotter(object):
         ax.set_xlim([5.5,7.5])
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
+        #avoid cutting off labels
+        plt.tight_layout()
         
         #save or show figure
         if 'print_fig_filename' in kwargs:
