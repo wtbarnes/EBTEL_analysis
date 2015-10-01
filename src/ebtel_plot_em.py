@@ -80,8 +80,8 @@ class DEMPlotter(object):
                     pass
 
         #set labels
-        ax.set_xlabel(r'$\log T\enskip\mathrm{(K)}$',fontsize=self.fs)
-        ax.set_ylabel(r'$\log\mathrm{EM}\enskip\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
+        ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fs)
+        ax.set_ylabel(r'$\log\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,33])
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
@@ -113,8 +113,8 @@ class DEMPlotter(object):
 
         #set labels
         ax.set_title(r"EBTEL EM, $\langle T_n\rangle$ = "+str(self.Tn[tn_index])+" s",fontsize=self.fs)
-        ax.set_xlabel(r'$\logT\enskip\mathrm{(K)}$',fontsize=self.fs)
-        ax.set_ylabel(r'$\log\mathrm{EM}\enskip\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
+        ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fs)
+        ax.set_ylabel(r'$\log{\mathrm{EM}}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,30])
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
@@ -144,12 +144,12 @@ class DEMPlotter(object):
             ax_twin.errorbar(self.Tn[i],mean_em_max,yerr=std_em_max,fmt='*',color='black')
 
         #set labels
-        ax.set_xlabel(r'$T_N$',fontsize=self.fs)
-        ax.set_ylabel(r'$\log(T_{max})\enskip\mathrm{(K)}$',fontsize=self.fs)
+        ax.set_xlabel(r'$T_N$ $(s)$',fontsize=self.fs)
+        ax.set_ylabel(r'$\log{T_{max}}$ $\mathrm{(K)}$',fontsize=self.fs)
         ax.set_ylim([5.5,7.0])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
         ax.tick_params(axis='both',labelsize=0.75*self.fs)
-        ax_twin.set_ylabel(r'$\log$EM($T_{max}$) (cm$^{-5}$)',fontsize=self.fs)
+        ax_twin.set_ylabel(r'$\log{\mathrm{EM}(T_{max})}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax_twin.set_ylim([28,30])
         ax_twin.tick_params(axis='both',labelsize=0.75*self.fs)
 
@@ -175,7 +175,7 @@ class DEMPlotter(object):
                 marker_hot = ax.errorbar(self.Tn[i],np.fabs(self.hot_fits[i][0]),yerr=self.hot_fits[i][2][0],fmt='o',color='red',label=r'hot')
 
         #set labels
-        ax.set_xlabel(r'$T_N\enskip\mathrm{(s)}$',fontsize=self.fs)
+        ax.set_xlabel(r'$T_N$ $\mathrm{(s)}$',fontsize=self.fs)
         ax.set_ylabel(r'$a$',fontsize=self.fs)
         ax.axhline(y=2,color='k',linestyle='--')
         ax.axhline(y=3,color='k',linestyle='-')
@@ -216,7 +216,7 @@ class DEMPlotter(object):
             ax.plot(temp_filter, dem_dt, color=self.colors[i], linestyle=self.linestyles[i%len(self.linestyles)])
             
         #set labels
-        ax.set_xlabel(r'$\log{T}\enskip\mathrm{(K)}$',fontsize=self.fs)
+        ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fs)
         ax.set_ylabel(r'$d\log{EM}/d\log{T}$',fontsize=self.fs)
         ax.axhline(y=2,color='k',linestyle=':')
         ax.axhline(y=3,color='k',linestyle=':')
