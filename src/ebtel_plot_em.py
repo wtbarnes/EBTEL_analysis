@@ -97,7 +97,7 @@ class DEMPlotter(object):
 
         #save or show the figure
         if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi,bbox_extra_artists=leg,bbox_inches='tight')
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi,bbox_extra_artists=[leg],bbox_inches='tight')
         else:
             plt.show()
 
