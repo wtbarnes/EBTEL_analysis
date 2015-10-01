@@ -129,7 +129,7 @@ class DEMPlotter(object):
         ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fs)
         ax.set_ylabel(r'$\log{\mathrm{EM}}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
-        ax.set_ylim([27,30])
+        #ax.set_ylim([27,30])
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         #avoid cutting off labels
         plt.tight_layout()
