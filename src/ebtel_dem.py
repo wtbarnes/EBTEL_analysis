@@ -28,6 +28,10 @@ class DEMProcess(object):
             self.verbose = kwargs['verbose']
         else:
             self.verbose = True
+        if 'em_cutoff' in kwargs:
+            self.em_cutoff = kwargs['em_cutoff']
+        else:
+            self.em_cutoff = 23.0
         #define variables to be used later
         self.em,self.em_max,self.em_mean,self.em_std = [],[],[],[]
         self.temp_em,self.temp_max,self.temp_mean = [],[],[]
@@ -119,7 +123,7 @@ class DEMProcess(object):
         #filter out infs in list and set to zero for averaging
         for i in nested_list:
             temp_array = np.array(i)
-            temp_array[np.where(np.isinf(temp_array)==True)]=0.0
+            temp_array[np.where(temp_array < self.em_cutoff)]=0.0
             filtered_list.append(temp_array)
         
         return filtered_list

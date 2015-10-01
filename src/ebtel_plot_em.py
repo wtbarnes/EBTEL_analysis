@@ -106,20 +106,13 @@ class DEMPlotter(object):
         #get single list
         em_list = self.em_list[tn_index]
         temp_list = self.temp_list[tn_index]
-        #Use only mean, std above the threshold to avoid big spikes in sigma where its noisy
-        try:
-            i_no_noise = np.where(self.em_mean[tn_index] > self.em_cutoff)[0]
-        except IndexError:
-            i_no_noise = np.linspace(0,len(self.em_mean[tn_index])-1,len(self.em_mean[tn_index]))
-            print("Could not filter mean EM curve.")
-            pass
         
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
 
         #print lines
-        ax.fill_between(self.temp_mean[tn_index][i_no_noise], self.em_mean[tn_index][i_no_noise]-self.em_sigma[tn_index][i_no_noise], self.em_mean[tn_index][i_no_noise]+self.em_sigma[tn_index][i_no_noise], facecolor='red', edgecolor='red', alpha=0.45)
+        ax.fill_between(self.temp_mean[tn_index], self.em_mean[tn_index]-self.em_sigma[tn_index], self.em_mean[tn_index]+self.em_sigma[tn_index], facecolor='red', edgecolor='red', alpha=0.45)
         for i in range(len(temp_list)):
             ax.plot(temp_list[i],em_list[i],color='black',linestyle=self.linestyles[-1],alpha=0.25)
         ax.plot(self.temp_mean[tn_index],self.em_mean[tn_index],color='black')
