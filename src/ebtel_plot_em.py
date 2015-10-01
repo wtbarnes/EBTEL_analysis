@@ -90,14 +90,14 @@ class DEMPlotter(object):
         ax.set_ylim([27,33])
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         #legend
-        leg = ax.legend(loc=2,fontsize=self.alfs*self.fs,title=r'$T_N$ (s)',ncol=2,bbox_to_anchor=(-0.1,1.01))
+        leg = ax.legend(loc=2,fontsize=self.alfs*self.fs,title=r'$T_N$ (s)',ncol=2,bbox_to_anchor=(-0.1,1.05))
         plt.setp(leg.get_title(),fontsize=self.alfs*self.fs)
         #avoid cutting off labels
         plt.tight_layout()
 
         #save or show the figure
         if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi,bbox_extra_artists=leg,bbox_inches='tight')
         else:
             plt.show()
 
