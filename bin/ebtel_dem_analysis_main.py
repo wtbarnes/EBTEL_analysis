@@ -44,8 +44,8 @@ else:
     
 
 #figure formatting parameters
-fontsize = 18
-figsize = (10,10*3/4)
+fontsize = 22
+figsize = (8,8)
 format = 'pdf'
 dpi = 1000 
 
@@ -95,9 +95,11 @@ for k in range(len(analyzer.hot_fits)):
 fit_lines = {'t_cool':tc,'t_hot':th}
 
 #Instantiate Plotter class
-plotter = ebpe.DEMPlotter(processer.temp_em, processer.em, processer.temp_mean, processer.em_mean, processer.em_std, analyzer.cool_fits, analyzer.hot_fits, dpi=dpi, format=format, fs=fontsize, figsize=figsize)
+plotter = ebpe.DEMPlotter(processer.temp_em, processer.em, processer.temp_mean, processer.em_mean, processer.em_std, analyzer.cool_fits, analyzer.hot_fits, dpi=dpi, format=format, fs=fontsize, figsize=figsize, alfs=0.65)
 #Build composite EM plot
 plotter.plot_em_curves(fit_lines=fit_lines, print_fig_filename=root_dir_figs + fn_temp + '_dem')
+#Shorten figure size for next two plots
+plotter.figsize=(plotter.figsize[0],plotter.figsize[1]/2)
 #Build composite slope plot
 plotter.plot_em_slopes(print_fig_filename=root_dir_figs + fn_temp + '_hs_compare')
 #Build derivatives plots
