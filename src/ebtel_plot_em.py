@@ -346,12 +346,8 @@ class EMHistoBuilder(object):
             self.histo_dict_hot[key] = np.fabs([x for x in self.histo_dict_hot[key] if x is not False])
             
                 
-    def histo_maker(self,temp_choice,**kwargs):
+    def histo_maker(self,temp_choice,histo_opts,**kwargs):
         """Build histograms from hot and cool dictionaries built up by self.loader()"""
-        
-        #Look for dictionary of histogram options
-        if 'histo_opts' not in kwargs:
-            raise ValueError("Missing histogram options for styling.")
         
         #Choose hot or cool
         if temp_choice is 'cool':
@@ -372,7 +368,7 @@ class EMHistoBuilder(object):
             if len(hist_dict[key]) < 10:
                 pass
             else:
-                ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step',**kwargs['histo_opts'][key])
+                ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step',**histo_opts[key])
                 ylims = ax.get_ylim()
                 if ylims[1] > ylims_final[1]:
                     ylims_final[1] = ylims[1]
@@ -381,7 +377,10 @@ class EMHistoBuilder(object):
             
         #Labels and styling
         ax.set_xlabel(r'$a$',fontsize=self.fs)
-        ax.set_ylabel(r'Frequency',fontsize=self.fs)
+        if 'normed' in histo_opts and histo_opts['normed'] is True:
+            ax.set_ylabel(r'Normalized Frequency',fontsize=self.fs)            
+        else:
+            ax.set_ylabel(r'Frequency',fontsize=self.fs)
         ax.set_ylim(ylims_final)
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
