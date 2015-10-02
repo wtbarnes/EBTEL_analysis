@@ -379,9 +379,9 @@ class EMHistoBuilder(object):
         ax.set_xlabel(r'$a$',fontsize=self.fs)
         #Check for normalization in just one set; assumed all or none are normed
         if 'normed' in list(histo_opts.values())[0] and list(histo_opts.values())[0]['normed'] is True:
-            ax.set_ylabel(r'Normalized Frequency',fontsize=self.fs)            
+            ax.set_ylabel(r'$\mathrm{Normalized}$ $\mathrm{Frequency}$',fontsize=self.fs)            
         else:
-            ax.set_ylabel(r'Frequency',fontsize=self.fs)
+            ax.set_ylabel(r'$\mathrm{Frequency}$',fontsize=self.fs)
         ax.set_ylim(ylims_final)
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
