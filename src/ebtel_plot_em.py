@@ -387,7 +387,7 @@ class EMHistoBuilder(object):
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         if 'x_limits' in kwargs:
             ax.set_xlim(kwargs['x_limits'])
-        if temp_choice is cool:
+        if temp_choice is 'cool':
             ax.axvline(x=2,color='k',linestyle=':',linewidth=2)
             ax.axvline(x=5,color='k',linestyle=':',linewidth=2)
         else:
