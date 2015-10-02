@@ -390,16 +390,17 @@ class EMHistoBuilder(object):
         ax.axvline(x=2,color='k',linestyle='--',linewidth=2)
         ax.axvline(x=3,color='k',linestyle='-',linewidth=2)
         ax.axvline(x=5,color='k',linestyle='-.',linewidth=2)
-        if 'leg_loc' in kwargs:
-            leg_loc = kwargs['leg_loc']
-        else:
-            leg_loc = 'best'
-        if self.group is 'by_alpha':
-            leg_title = r'$\alpha$'
-        elif self.group is 'by_t_wait':
-            leg_title = r'$T_N$ $\mathrm{(s)}$'
-        leg = ax.legend(fontsize=self.alfs*self.fs,loc=leg_loc,ncol=2,title=leg_title,bbox_to_anchor=(1.1,1.05))
-        plt.setp(leg.get_title(),fontsize=self.alfs*self.fs)
+        if 'leg_off' not in kwargs or kwargs['leg_off']is False:
+            if 'leg_loc' in kwargs:
+                leg_loc = kwargs['leg_loc']
+            else:
+                leg_loc = 'best'
+            if self.group is 'by_alpha':
+                leg_title = r'$\alpha$'
+            elif self.group is 'by_t_wait':
+                leg_title = r'$T_N$ $\mathrm{(s)}$'
+            leg = ax.legend(fontsize=self.alfs*self.fs,loc=leg_loc,ncol=2,title=leg_title,bbox_to_anchor=(1.1,1.05))
+            plt.setp(leg.get_title(),fontsize=self.alfs*self.fs)
         
         #Print or show figure
         if 'print_fig_filename' in kwargs:
