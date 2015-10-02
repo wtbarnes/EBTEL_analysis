@@ -388,10 +388,10 @@ class EMHistoBuilder(object):
         if 'x_limits' in kwargs:
             ax.set_xlim(kwargs['x_limits'])
         if temp_choice is 'cool':
-            ax.axvline(x=2,color='k',linestyle=':',linewidth=2)
-            ax.axvline(x=5,color='k',linestyle=':',linewidth=2)
+            ax.axvline(x=2,color='k',linestyle='-.',linewidth=2)
+            ax.axvline(x=5,color='k',linestyle='-.',linewidth=2)
         else:
-            ax.axvline(x=5.5,color='k',linestyle=':',linewidth=2)
+            ax.axvline(x=5.5,color='k',linestyle='-.',linewidth=2)
             
         if 'leg_off' not in kwargs or kwargs['leg_off']is False:
             if 'leg_loc' in kwargs:
