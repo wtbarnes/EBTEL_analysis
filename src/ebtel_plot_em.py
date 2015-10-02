@@ -402,7 +402,7 @@ class EMHistoBuilder(object):
                 leg_title = r'$\alpha$'
             elif self.group is 'by_t_wait':
                 leg_title = r'$T_N$ $\mathrm{(s)}$'
-            leg = ax.legend(fontsize=self.alfs*self.fs,loc=leg_loc,ncol=2,title=leg_title,bbox_to_anchor=(1.1,1.05))
+            leg = ax.legend(fontsize=self.alfs*self.fs,loc=leg_loc,ncol=1,title=leg_title)
             plt.setp(leg.get_title(),fontsize=self.alfs*self.fs)
         
         #Print or show figure
