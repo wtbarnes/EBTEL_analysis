@@ -18,7 +18,7 @@ class DEMPlotter(object):
 
     def __init__(self,temp_list,em_list,temp_mean,em_mean,em_sigma,cool_fits,hot_fits,**kwargs):
         #static parameters
-        self.linestyles = ('-','--','-.',':')
+        self.linestyles = (':','-.','--','-')
         self.colors = sns.xkcd_palette(4*['black'] + 4*['windows blue'] + 4*['medium green'] + 4*['fire engine red'] + 4*['barney purple'])
         #check for custom parameters
         if 'em_cutoff' in kwargs:
