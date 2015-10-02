@@ -68,9 +68,9 @@ histo_opts = {}
 for i in range(len(alpha_list)):
     histo_opts[''.join(alpha_list[i])] = {'color':colors_alpha[i],'label':labels_alpha[i],'linestyle':styles_alpha[i],'linewidth':linewidth,'normed':True,'stacked':True}
 #Build cool histogram
-histo_builder.histo_maker('cool',histo_opts=histo_opts,x_limits=[1.9,5.1],leg_loc=1,print_fig_filename=fn_temp+'.alpha.cool')
+histo_builder.histo_maker('cool',histo_opts,x_limits=[1.9,5.1],leg_loc=1,print_fig_filename=fn_temp+'.alpha.cool')
 #Build hot histogram
-histo_builder.histo_maker('hot',histo_opts=histo_opts,x_limits=[2.9,6.0],leg_loc=1,print_fig_filename=fn_temp+'.alpha.hot')
+histo_builder.histo_maker('hot',histo_opts,x_limits=[2.9,6.0],leg_loc=1,print_fig_filename=fn_temp+'.alpha.hot')
 
 #Instantiate the builder class for the by_t_wait
 histo_builder = ebpe.EMHistoBuilder(args.species, args.loop_length, args.tpulse, alpha_list, group='by_t_wait', fs=fontsize, figsize=figsize, format=format, dpi=dpi, root_dir=root_dir)
@@ -81,6 +81,6 @@ histo_opts = {}
 for i in range(len(styles_tn)):
     histo_opts[str(i)] = {'color':colors_tn[i],'label':labels_tn[i],'linestyle':styles_tn[i],'linewidth':linewidth,'normed':True,'stacked':True}
 #Build cool histogram
-histo_builder.histo_maker('cool',histo_opts=histo_opts,x_limits=[1.9,5.1],leg_loc=1,print_fig_filename=fn_temp+'.t_wait.cool')
+histo_builder.histo_maker('cool',histo_opts,x_limits=[1.9,5.1],leg_loc=1,print_fig_filename=fn_temp+'.t_wait.cool')
 #Build hot histogram
-histo_builder.histo_maker('hot',histo_opts=histo_opts,x_limits=[2.9,6.0],leg_loc=1,print_fig_filename=fn_temp+'.t_wait.hot')
+histo_builder.histo_maker('hot',histo_opts,x_limits=[2.9,6.0],leg_loc=1,print_fig_filename=fn_temp+'.t_wait.hot')

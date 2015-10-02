@@ -99,7 +99,7 @@ plotter = ebpe.DEMPlotter(processer.temp_em, processer.em, processer.temp_mean, 
 #Build composite EM plot
 plotter.plot_em_curves(fit_lines=fit_lines, print_fig_filename=root_dir_figs + fn_temp + '_dem')
 #Shorten figure size for next two plots
-plotter.figsize=(plotter.figsize[0],plotter.figsize[1]/2)
+plotter.figsize=(plotter.figsize[0],plotter.figsize[1]/2.0)
 #Build composite slope plot
 plotter.plot_em_slopes(print_fig_filename=root_dir_figs + fn_temp + '_hs_compare')
 #Build derivatives plots
