@@ -312,7 +312,7 @@ class EMHistoBuilder(object):
         self.histo_dict_hot = {}
         
             
-    def loader(self,**kwargs):
+    def loader(self,interval,**kwargs):
         """Load in data and create dictionaries with slope values grouped according to 'group' option"""
         
         #Loop over (alpha,b) values 
@@ -327,7 +327,7 @@ class EMHistoBuilder(object):
                 self.histo_dict_hot[''.join(ab)] = list(itertools.chain(*hot))
             #Group by Tn method
             elif self.group is 'by_t_wait':
-                for i in range(len(cool)):
+                for i in np.arange(0 + interval,20+interval,1+interval):
                     try:
                         self.histo_dict_cool[str(i)] = self.histo_dict_cool[str(i)] + cool[i]
                         self.histo_dict_hot[str(i)] = self.histo_dict_hot[str(i)] + hot[i]
@@ -387,9 +387,12 @@ class EMHistoBuilder(object):
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         if 'x_limits' in kwargs:
             ax.set_xlim(kwargs['x_limits'])
-        ax.axvline(x=2,color='k',linestyle='--',linewidth=2)
-        ax.axvline(x=3,color='k',linestyle='-',linewidth=2)
-        ax.axvline(x=5,color='k',linestyle='-.',linewidth=2)
+        if temp_choice is cool:
+            ax.axvline(x=2,color='k',linestyle=':',linewidth=2)
+            ax.axvline(x=5,color='k',linestyle=':',linewidth=2)
+        else:
+            ax.axvline(x=5.5,color='k',linestyle=':',linewidth=2)
+            
         if 'leg_off' not in kwargs or kwargs['leg_off']is False:
             if 'leg_loc' in kwargs:
                 leg_loc = kwargs['leg_loc']

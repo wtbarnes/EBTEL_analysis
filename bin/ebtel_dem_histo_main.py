@@ -25,8 +25,8 @@ else:
     root_dir = '/data/datadrive2/EBTEL-2fluid_figs/'
 
 #figure formatting parameters
-fontsize = 18
-figsize = (10,10*3/4)
+fontsize = 22
+figsize = (8,8)
 format = 'pdf'
 dpi = 1000
 linewidth = 3
@@ -60,7 +60,7 @@ alpha_list = [['uniform',''],
 ['2.5',''],['2.5','-b1.0'],['2.5','-b2.0']]
 
 #Instantiate the builder class for the by-alpha histogram
-histo_builder = ebpe.EMHistoBuilder(args.species, args.loop_length, args.tpulse, alpha_list, group='by_alpha', fs=fontsize, figsize=figsize, format=format, dpi=dpi, root_dir=root_dir)
+histo_builder = ebpe.EMHistoBuilder(args.species, args.loop_length, args.tpulse, alpha_list, group='by_alpha', fs=fontsize, figsize=figsize, format=format, alfs=0.65, dpi=dpi, root_dir=root_dir)
 #Load data
 histo_builder.loader()
 #Load histogram options
@@ -70,10 +70,10 @@ for i in range(len(alpha_list)):
 #Build cool histogram
 histo_builder.histo_maker('cool',histo_opts,x_limits=[1.9,5.1],leg_loc=1,print_fig_filename=fn_temp+'.alpha.cool')
 #Build hot histogram
-histo_builder.histo_maker('hot',histo_opts,x_limits=[2.9,6.0],leg_loc=1,print_fig_filename=fn_temp+'.alpha.hot')
+histo_builder.histo_maker('hot',histo_opts,x_limits=[2.9,10.0],leg_loc=1,print_fig_filename=fn_temp+'.alpha.hot')
 
 #Instantiate the builder class for the by_t_wait
-histo_builder = ebpe.EMHistoBuilder(args.species, args.loop_length, args.tpulse, alpha_list, group='by_t_wait', fs=fontsize, figsize=figsize, format=format, dpi=dpi, root_dir=root_dir)
+histo_builder = ebpe.EMHistoBuilder(args.species, args.loop_length, args.tpulse, alpha_list, group='by_t_wait', fs=fontsize, figsize=figsize, format=format, alfs=0.65, dpi=dpi, root_dir=root_dir)
 #Load data
 histo_builder.loader()
 #Load histogram options
@@ -81,6 +81,6 @@ histo_opts = {}
 for i in range(len(styles_tn)):
     histo_opts[str(i)] = {'color':colors_tn[i],'label':labels_tn[i],'linestyle':styles_tn[i],'linewidth':linewidth,'normed':True,'stacked':True}
 #Build cool histogram
-histo_builder.histo_maker('cool',histo_opts,x_limits=[1.9,5.1],leg_loc=1,print_fig_filename=fn_temp+'.t_wait.cool')
+histo_builder.histo_maker('cool',histo_opts,x_limits=[1.9,5.1],leg_loc=1,print_fig_filename=fn_temp+'.t_wait.cool',leg_off=True)
 #Build hot histogram
-histo_builder.histo_maker('hot',histo_opts,x_limits=[2.9,6.0],leg_loc=1,print_fig_filename=fn_temp+'.t_wait.hot')
+histo_builder.histo_maker('hot',histo_opts,x_limits=[2.9,10.0],leg_loc=1,print_fig_filename=fn_temp+'.t_wait.hot',leg_off=True)
