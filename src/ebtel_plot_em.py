@@ -71,7 +71,7 @@ class DEMPlotter(object):
 
         #print lines
         for i in range(len(self.em_mean)):
-            ax.plot(self.temp_mean[i], self.em_mean[i]+i*delta_em, linestyle=self.linestyles[i%len(self.linestyles)], color=self.colors[i], label='%d'%self.Tn[i] )
+            ax.plot(self.temp_mean[i], self.em_mean[i]+i*delta_em, linestyle=self.linestyles[i%len(self.linestyles)], color=self.colors[i], label=r'$%d$'%self.Tn[i] )
             if 'fit_lines' in kwargs:
                 try:
                     ax.plot(kwargs['fit_lines']['t_cool'][i], (self.cool_fits[i][0]*kwargs['fit_lines']['t_cool'][i] + self.cool_fits[i][1]) + i*delta_em, linewidth=2.0, color='blue')
@@ -90,7 +90,7 @@ class DEMPlotter(object):
         ax.set_ylim([27,33])
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         #legend
-        leg = ax.legend(loc=2,fontsize=self.alfs*self.fs,title=r'$T_N$ (s)',ncol=2,bbox_to_anchor=(-0.075,1.05))
+        leg = ax.legend(loc=2,fontsize=self.alfs*self.fs,title=r'$T_N$ $\mathrm{(s)}$',ncol=2,bbox_to_anchor=(-0.075,1.05))
         plt.setp(leg.get_title(),fontsize=self.alfs*self.fs)
         #avoid cutting off labels
         plt.tight_layout()
@@ -152,7 +152,7 @@ class DEMPlotter(object):
             ax_twin.errorbar(self.Tn[i],mean_em_max,yerr=std_em_max,fmt='*',color='black')
 
         #set labels
-        ax.set_xlabel(r'$T_N$ $(s)$',fontsize=self.fs)
+        ax.set_xlabel(r'$T_N$ $\mathrm{(s)}$',fontsize=self.fs)
         ax.set_ylabel(r'$\log{T_{max}}$ $\mathrm{(K)}$',fontsize=self.fs)
         ax.set_ylim([5.5,7.0])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
@@ -179,10 +179,10 @@ class DEMPlotter(object):
         marker_cool,marker_hot = [],[]
         for i in range(len(self.cool_fits)):
             if self.cool_fits[i][0] is not False and self.cool_fits[i][2] is not False:
-                marker_cool = ax.errorbar(self.Tn[i],self.cool_fits[i][0],yerr=self.cool_fits[i][2][0],fmt='o',color='blue',label=r'cool')
+                marker_cool = ax.errorbar(self.Tn[i],self.cool_fits[i][0],yerr=self.cool_fits[i][2][0],fmt='o',color='blue',label=r'$\mathrm{cool}$')
 
             if self.hot_fits[i][0] is not False and self.hot_fits[i][2] is not False:
-                marker_hot = ax.errorbar(self.Tn[i],np.fabs(self.hot_fits[i][0]),yerr=self.hot_fits[i][2][0],fmt='o',color='red',label=r'hot')
+                marker_hot = ax.errorbar(self.Tn[i],np.fabs(self.hot_fits[i][0]),yerr=self.hot_fits[i][2][0],fmt='o',color='red',label=r'$\mathrm{hot}$')
 
         #set labels
         ax.set_xlabel(r'$T_N$ $\mathrm{(s)}$',fontsize=self.fs)
@@ -197,7 +197,7 @@ class DEMPlotter(object):
         
         #legend
         if marker_cool and marker_hot:
-            ax.legend([marker_cool,marker_hot],[r'cool',r'hot'],loc=1,fontsize=self.alfs*self.fs,numpoints=1)
+            ax.legend([marker_cool,marker_hot],[r'$\mathrm{cool}$',r'$\mathrm{hot}$'],loc=1,fontsize=self.alfs*self.fs,numpoints=1)
             
         #avoid cutting off labels
         plt.tight_layout()
