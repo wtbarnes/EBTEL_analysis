@@ -26,7 +26,7 @@ else:
 
 #figure formatting parameters
 fontsize = 22
-figsize = (8,8)
+figsize = (8,5)
 format = 'pdf'
 dpi = 1000
 linewidth = 3
@@ -44,7 +44,7 @@ for c in cp:
     [colors_tn.append(c) for _ in range(4)]
 #Build styles
 styles_alpha = ['dotted'] + 3*['solid','dashdot','dashed']
-styles_tn = 5*['solid','dashed','dashdot','dotted'] 
+styles_tn = 5*['dotted','dashdot','dashed','solid'] 
 
 #Make alpha and tn labels
 labels_alpha = [r'$\mathrm{uniform}$',
