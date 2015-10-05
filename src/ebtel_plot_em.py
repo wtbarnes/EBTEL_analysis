@@ -220,7 +220,7 @@ class DEMPlotter(object):
         #Iterate over t_wait values
         for i in range(len(self.em_mean)):    
             #remove data below given threshold of mean EM and T
-            filter_inds = np.where(self.em_mean[i] > (self.em_cutoff+3))
+            filter_inds = np.where(self.em_mean[i] > (self.em_cutoff+4))
             em_filter = np.array(self.em_mean[i])[filter_inds[0]]
             temp_filter = np.array(self.temp_mean[i])[filter_inds[0]]
             #compute derivative 
