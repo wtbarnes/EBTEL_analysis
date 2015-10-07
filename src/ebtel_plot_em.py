@@ -186,7 +186,7 @@ class DEMPlotter(object):
 
         #set labels
         ax.set_xlabel(r'$T_N$ $\mathrm{(s)}$',fontsize=self.fs)
-        ax.set_ylabel(r'$a$',fontsize=self.fs)
+        ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{scaling}$',fontsize=self.fs)
         ax.axhline(y=2,color='k',linestyle='--')
         ax.axhline(y=3,color='k',linestyle='-')
         ax.axhline(y=5,color='k',linestyle='-.')
@@ -197,7 +197,7 @@ class DEMPlotter(object):
         
         #legend
         if marker_cool and marker_hot:
-            ax.legend([marker_cool,marker_hot],[r'$\mathrm{cool}$',r'$\mathrm{hot}$'],loc=1,fontsize=self.alfs*self.fs,numpoints=1)
+            ax.legend([marker_cool,marker_hot],[r'$a$, $\mathrm{cool}$',r'$b$, $\mathrm{hot}$'],loc=1,fontsize=self.alfs*self.fs,numpoints=1)
             
         #avoid cutting off labels
         plt.tight_layout()
@@ -376,7 +376,6 @@ class EMHistoBuilder(object):
                     ylims_final[0] = ylims[0]
             
         #Labels and styling
-        ax.set_xlabel(r'$a$',fontsize=self.fs)
         #Check for normalization in just one set; assumed all or none are normed
         if 'normed' in list(histo_opts.values())[0] and list(histo_opts.values())[0]['normed'] is True:
             ax.set_ylabel(r'$\mathrm{Normalized}$ $\mathrm{Frequency}$',fontsize=self.fs)            
@@ -388,9 +387,11 @@ class EMHistoBuilder(object):
         if 'x_limits' in kwargs:
             ax.set_xlim(kwargs['x_limits'])
         if temp_choice is 'cool':
+             ax.set_xlabel(r'$a$',fontsize=self.fs)
             ax.axvline(x=2,color='k',linestyle='-.',linewidth=2)
             ax.axvline(x=5,color='k',linestyle='-.',linewidth=2)
         else:
+            ax.set_xlabel(r'$b$',fontsize=self.fs)
             ax.axvline(x=5.5,color='k',linestyle='-.',linewidth=2)
             
         if 'leg_off' not in kwargs or kwargs['leg_off']is False:
