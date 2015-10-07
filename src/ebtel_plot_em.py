@@ -387,7 +387,7 @@ class EMHistoBuilder(object):
         if 'x_limits' in kwargs:
             ax.set_xlim(kwargs['x_limits'])
         if temp_choice is 'cool':
-             ax.set_xlabel(r'$a$',fontsize=self.fs)
+            ax.set_xlabel(r'$a$',fontsize=self.fs)
             ax.axvline(x=2,color='k',linestyle='-.',linewidth=2)
             ax.axvline(x=5,color='k',linestyle='-.',linewidth=2)
         else:
