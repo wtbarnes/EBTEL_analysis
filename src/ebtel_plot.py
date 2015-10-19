@@ -30,6 +30,10 @@ class Plotter(object):
             self.fs = kwargs['fs']
         else:
             self.fs = 18.0
+        if 'alfs' in kwargs:
+            self.alfs = kwargs['alfs']
+        else:
+            self.alfs = 0.65
         if 'figsize' in kwargs:
             self.figsize = kwargs['figsize']
         else:
@@ -92,6 +96,7 @@ class Plotter(object):
         ax[0].set_xlim([self.time[0],self.time[-1]])
         ax[0].locator_params(nbins=5)
         ax[0].ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
+        ax[0].tick_params(axis='both',labelsize=self.alfs*self.fs,pad=8)
         #plot average temperature and density
         line_te = ax[1].plot(self.time,self.temp_e/10**6,label=r'$T_e$')
         line_ti = ax[1].plot(self.time,self.temp_i/10**6,'r--',label=r'$T_i$')
@@ -99,11 +104,13 @@ class Plotter(object):
         ax[1].yaxis.set_major_locator(MaxNLocator(prune='lower'))
         ax[1].locator_params(nbins=5)
         ax[1].ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
+        ax[1].tick_params(axis='both',labelsize=self.alfs*self.fs,pad=8)
         line_n = ax_n.plot(self.time,self.dens/10**8,'k',label=r'$n$')
         ax_n.set_ylabel(r'$n$ (10$^8$ cm$^{-3}$)',fontsize=self.fs)
         ax_n.yaxis.set_major_locator(MaxNLocator(prune='lower'))
         ax_n.locator_params(nbins=5)
         ax_n.ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
+        ax_n.tick_params(axis='both',labelsize=self.alfs*self.fs,pad=8)
         ax[1].set_xlim([self.time[0],self.time[-1]])
         #plot apex temperature and density
         ax[2].plot(self.time,self.temp_apex_e/10**6)
@@ -112,11 +119,13 @@ class Plotter(object):
         ax[2].yaxis.set_major_locator(MaxNLocator(prune='lower'))
         ax[2].locator_params(nbins=5)
         ax[2].ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
+        ax[2].tick_params(axis='both',labelsize=self.alfs*self.fs,pad=8)
         ax_na.plot(self.time,self.dens_apex/10**8,'k')
         ax_na.set_ylabel(r'$n_a$ (10$^8$ cm$^{-3}$)',fontsize=self.fs)
         ax_na.yaxis.set_major_locator(MaxNLocator(prune='lower'))
         ax_na.locator_params(nbins=5)
         ax_na.ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
+        ax_na.tick_params(axis='both',labelsize=self.alfs*self.fs,pad=8)
         ax[2].set_xlim([self.time[0],self.time[-1]])
         ax[2].set_xlabel(r'$t$ (s)',fontsize=self.fs)
 
