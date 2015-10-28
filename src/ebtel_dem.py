@@ -32,6 +32,10 @@ class DEMProcess(object):
             self.em_cutoff = kwargs['em_cutoff']
         else:
             self.em_cutoff = 23.0
+        if 'aspect_ratio_factor' in kwargs:
+            self.aspect_ratio_factor = kwargs['aspect_ratio_factor']
+        else:
+            self.aspect_ratio_factor = 0.0
         #define variables to be used later
         self.em,self.em_max,self.em_mean,self.em_std = [],[],[],[]
         self.temp_em,self.temp_max,self.temp_mean = [],[],[]
@@ -55,7 +59,7 @@ class DEMProcess(object):
                 try:
                     temp = np.loadtxt(tn_path+'/'+self.file_path%Tn[i]+'_'+str(counter)+'_dem.txt')
                     temp[np.where(np.isnan(temp))] = -np.inf
-                    temp_em.append(temp[:,0])
+                    temp_em.append(temp[:,0] + self.aspect_ratio_factor)
                     em.append(temp[:,4])
                     #reset fail count after success
                     fail_count = 0
@@ -180,7 +184,8 @@ class DEMAnalyze(object):
         
     
     def interp_and_filter(self,**kwargs):
-        """Interpolate and filter mean and standard deviation for EM, T arrays; this step is mandatory for later slope calculations."""
+        """Interpolate and filter mean and standard deviation for EM, T arrays; this step is mandatory for later slope calculations.
+        """
         
         for i in range(len(self.em)):
             #find cutoff index
