@@ -59,8 +59,8 @@ class DEMProcess(object):
                 try:
                     temp = np.loadtxt(tn_path+'/'+self.file_path%Tn[i]+'_'+str(counter)+'_dem.txt')
                     temp[np.where(np.isnan(temp))] = -np.inf
-                    temp_em.append(temp[:,0] + self.aspect_ratio_factor)
-                    em.append(temp[:,4])
+                    temp_em.append(temp[:,0])
+                    em.append(temp[:,4]+ self.aspect_ratio_factor)
                     #reset fail count after success
                     fail_count = 0
                 except FileNotFoundError:
