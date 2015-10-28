@@ -87,7 +87,10 @@ class DEMPlotter(object):
         ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fs)
         ax.set_ylabel(r'$\log\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
-        ax.set_ylim([27,33])
+        if 'y_limits' in kwargs:
+            ax.set_ylim(kwargs['y_limits'])
+        else:
+            ax.set_ylim([27,33])
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
         #legend
         leg = ax.legend(loc=2,fontsize=self.alfs*self.fs,title=r'$T_N$ $\mathrm{(s)}$',ncol=2,bbox_to_anchor=(-0.07,1.05))
