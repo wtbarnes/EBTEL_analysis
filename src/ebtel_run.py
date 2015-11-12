@@ -5,6 +5,7 @@
 
 #Import needed modules
 import os
+import sys
 import subprocess
 import multiprocessing
 
@@ -16,10 +17,7 @@ class Runner(object):
     def __init__(self,exec_directory,config_directory,**kwargs):
         self.exec_directory = exec_directory
         self.config_directory = config_directory
-        if 'verbose' in kwargs:
-            self.verbose = kwargs['verbose']
-        else:
-            self.verbose = True
+        
             
     def run_ebtel_single(self,config_file,**kwargs):
         if 'quiet' in kwargs and kwargs['quiet'] is True:
@@ -27,10 +25,10 @@ class Runner(object):
         else:
             quiet_option = ''
             
-        output = subprocess.Popen([(self.exec_directory+'ebtel-2fl'),self.config_directory+config_file+quiet_option],stdout=subprocess.PIPE)
-        
-        if self.verbose is True:
-            print(output.communicate()[0].decode('ascii'))
+        output = subprocess.check_output([self.exec_directory+'ebtel-2fl ' + self.config_directory + config_file + quiet_option])
+                
+        if 'verbose' in kwargs and kwargs['verbose'] is True:
+            print(output.decode(sys.stdout.encoding))
         
         
     def run_ebtel_multi_serial(self,**kwargs):
