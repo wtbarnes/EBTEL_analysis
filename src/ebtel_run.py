@@ -24,7 +24,9 @@ class Runner(object):
             quiet_option = ''
             
         output = subprocess.Popen([(self.exec_directory+'ebtel-2fl'),self.config_directory+config_file+quiet_option],stdout=subprocess.PIPE)
-        print(output.communicate()[0].decode('ascii'))
+        
+        if 'verbose' in kwargs and kwargs['verbose'] is True:
+            print(output.communicate()[0].decode('ascii'))
         
         
     def run_ebtel_multi_serial(self,**kwargs):
