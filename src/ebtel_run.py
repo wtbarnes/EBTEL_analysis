@@ -16,6 +16,10 @@ class Runner(object):
     def __init__(self,exec_directory,config_directory,**kwargs):
         self.exec_directory = exec_directory
         self.config_directory = config_directory
+        if 'verbose' in kwargs:
+            self.verbose = kwargs['verbose']
+        else:
+            self.verbose = True
             
     def run_ebtel_single(self,config_file,**kwargs):
         if 'quiet' in kwargs and kwargs['quiet'] is True:
@@ -25,7 +29,7 @@ class Runner(object):
             
         output = subprocess.Popen([(self.exec_directory+'ebtel-2fl'),self.config_directory+config_file+quiet_option],stdout=subprocess.PIPE)
         
-        if 'verbose' in kwargs and kwargs['verbose'] is True:
+        if self.verbose is True:
             print(output.communicate()[0].decode('ascii'))
         
         
