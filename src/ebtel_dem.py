@@ -5,29 +5,27 @@
 
 #Import needed modules
 import numpy as np
+import logging
 from scipy.optimize import curve_fit
 
 class DEMProcess(object):
-    
+
     em_max_eps_percent = 0.999
-    
+
     def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs):
         #check for wait time scaling option
         if 't_wait_q_scaling' in kwargs:
             scaling_suffix = kwargs['t_wait_q_scaling']
         else:
             scaling_suffix = ''
-            
-            
+
         #set up paths
         child_path = root_dir+species+'_heating_runs/alpha'+str(alpha)+'/data/'
         self.file_path = 'ebtel_L'+str(loop_length)+'_tn%d'+scaling_suffix+'_tpulse'+str(tpulse)+'_'+solver
         self.root_path = child_path + self.file_path
+        #configure logger
+        self.logger = logging.getLogger(type(self).__name__)
         #configure keyword arguments
-        if 'verbose' in kwargs:
-            self.verbose = kwargs['verbose']
-        else:
-            self.verbose = True
         if 'em_cutoff' in kwargs:
             self.em_cutoff = kwargs['em_cutoff']
         else:
@@ -39,11 +37,11 @@ class DEMProcess(object):
         #define variables to be used later
         self.em,self.em_max,self.em_mean,self.em_std = [],[],[],[]
         self.temp_em,self.temp_max,self.temp_mean = [],[],[]
-        
-        
+
+
     def import_raw(self,Tn,**kwargs):
         """Import all runs for given Tn waiting time values; replace NaNs with -Inf if present. EM and T values are returned in nested lists."""
-        
+
         for i in range(len(Tn)):
             #initialize lists
             em = []
@@ -65,27 +63,25 @@ class DEMProcess(object):
                     fail_count = 0
                 except FileNotFoundError:
                     fail_count += 1
-                    if self.verbose:
-                        print("Unable to process file for Tn = "+str(Tn[i])+", run = "+str(counter))
-                        
+                    self.logger.debug("Unable to process file for Tn = %d, run = %d"%(Tn[i],counter))
                     if fail_count > MAX_FAIL:
-                        print("Reached end of list or too many missing files.")
-                        print("Estimated percentage of files read = %f %%"%(len(em)/(counter - MAX_FAIL)*100))
-                    
+                        self.logger.info("Reached end of list or too many missing files for Tn = %d."%Tn[i])
+                        self.logger.info("Estimated percentage of files read = %f %%"%(len(em)/(counter - MAX_FAIL)*100))
+
                     pass
                 #increment counter
                 counter += 1
-                    
+
             self.temp_em.append(temp_em)
             self.em.append(em)
-                
-                
+
+
     def calc_stats(self,**kwargs):
         """Calculate mean, standard deviation and max for EM and T."""
-        
+
         if not self.temp_em or not self.em:
             raise ValueError("Before computing EM statistics, run self.import_raw() to process EM,T data.")
-        
+
         for i in range(len(self.em)):
             #first calculate mean
             if len(np.shape(np.array(self.em[i]))) > 1:
@@ -100,10 +96,10 @@ class DEMProcess(object):
                 self.em_mean.append(np.array(self.em[i]))
                 self.em_std.append(np.zeros(len(self.em[i])))
                 self.temp_mean.append(np.array(self.temp_em[i]))
-            
+
             #declare temp lists for max quantities
             temp_max_temp = []
-            em_max_temp = []    
+            em_max_temp = []
             for j in range(len(self.em[i])):
                 i_max = np.argmax(self.em[i][j])
                 indices_em_max = np.where(np.array(self.em[i][j]) > self.em_max_eps_percent*self.em[i][j][i_max])[0]
@@ -115,12 +111,12 @@ class DEMProcess(object):
                     temp_interp = np.interp(em_interp,np.array(self.em[i][j][indices_em_max[0]:indices_em_max[-1]]),np.array(self.temp_em[i][j][indices_em_max[0]:indices_em_max[-1]]))
                     temp_max_temp.append(np.mean(temp_interp))
                     em_max_temp.append(np.mean(em_interp))
-                    
+
             #append max quantities for each i
             self.temp_max.append(temp_max_temp)
             self.em_max.append(em_max_temp)
-        
-        
+
+
     def inf_filter(self,nested_list,**kwargs):
         #preallocate space
         filtered_list = []
@@ -129,15 +125,15 @@ class DEMProcess(object):
             temp_array = np.array(i)
             temp_array[np.where(temp_array < self.em_cutoff)]=0.0
             filtered_list.append(temp_array)
-        
+
         return filtered_list
-        
-        
+
+
 class DEMAnalyze(object):
-    
+
     cool_diff = -0.6
     hot_diff = 0.4
-    
+
     def __init__(self,em,temp,em_mean,temp_mean,sigma,**kwargs):
         #get nested lists with EM and T values
         self.em = list(em)
@@ -145,11 +141,9 @@ class DEMAnalyze(object):
         self.em_mean = list(em_mean)
         self.temp_mean = list(temp_mean)
         self.sigma = list(sigma)
+        #configure logger
+        self.logger = logging.getLogger(type(self).__name__)
         #keyword arguments
-        if 'verbose' in kwargs:
-            self.verbose = kwargs['verbose']
-        else:
-            self.verbose = True
         if 'slope_limits' in kwargs:
             self.slope_limits = kwargs['slope_limits']
         else:
@@ -181,12 +175,12 @@ class DEMAnalyze(object):
         #define lists to store all list values
         self.cool_fits_all = []
         self.hot_fits_all = []
-        
-    
+
+
     def interp_and_filter(self,**kwargs):
         """Interpolate and filter mean and standard deviation for EM, T arrays; this step is mandatory for later slope calculations.
         """
-        
+
         for i in range(len(self.em)):
             #find cutoff index
             inf_index = np.where(self.em_mean[i] > self.em_cutoff)
@@ -204,11 +198,11 @@ class DEMAnalyze(object):
                 temp_new = np.linspace(self.temp[i][j][inf_index[0][0]],self.temp[i][j][inf_index[0][-1]],2000)
                 self.em[i][j] = np.interp(temp_new,self.temp[i][j][inf_index[0][0]:inf_index[0][-1]],self.em[i][j][inf_index[0][0]:inf_index[0][-1]])
                 self.temp[i][j] = temp_new
-        
-        
+
+
     def many_fits(self,**kwargs):
         """Calculate fits to hot and cool branches for all EM and T data sets"""
-        
+
         for i in range(len(self.em)):
             #calculate slopes and associated error bars depending on chosen method
             if self.fit_method is 'fit_all':
@@ -240,7 +234,7 @@ class DEMAnalyze(object):
                 #store all values
                 self.cool_fits_all.append([s[0] for s in cool_temp])
                 self.hot_fits_all.append([s[0] for s in hot_temp])
-                
+
             elif self.fit_method is 'fit_plus_minus':
                 #mean + sigma
                 bound_arrays = self.bounds(self.temp_mean[i], self.em_mean[i]+self.sigma[i], self.sigma[i])
@@ -262,19 +256,19 @@ class DEMAnalyze(object):
                 if fits['b_h'] and fits_minus['b_h'] and fits_plus['b_h']:
                     sbh = max(np.fabs(fits['b_h']-fits_minus['b_h']),np.fabs(fits['b_h']-fits_plus['b_h']))
                 self.cool_fits.append([fits['a_c'],fits['b_c'],[sac,sbc]]),self.hot_fits.append([fits['a_h'],fits['b_h'],[sah,sbh]])
-                
+
             elif self.fit_method is 'fit_mean_weighted':
                 bound_arrays = self.bounds(self.temp_mean[i],self.em_mean[i],self.sigma[i])
                 fits = self.branch_fit(bound_arrays['temp_cool'], bound_arrays['dem_cool'], bound_arrays['temp_hot'], bound_arrays['dem_hot'], sigma_cool=bound_arrays['sigma_cool'], sigma_hot=bound_arrays['sigma_hot'])
                 self.cool_fits.append([fits['a_c'],fits['b_c'],fits['s_c']]),self.hot_fits.append([fits['a_h'],fits['b_h'],fits['s_h']])
-                
+
             else:
                 raise ValueError("Unrecognized fit method option.")
-                        
-            
+
+
     def bounds(self,temp,dem,sigma,**kwargs):
         """Create bounded hot and cool branches from given hot and cool branch limits (or default values); interpolation over EM curves should be done before this step."""
-        
+
         #find limits over which temperature will be calculated
         slope_limits = self.fit_limits(temp,dem)
         #Construct hot and cool dem and temp arrays for given bounds
@@ -283,11 +277,10 @@ class DEMAnalyze(object):
         if len(i_cool_lower[0]) > 0 and len(i_cool_upper[0]) > 0:
             temp_cool = temp[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
             dem_cool = dem[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
-            sigma_cool = sigma[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]    
+            sigma_cool = sigma[(i_cool_lower[0][-1] + 1):(i_cool_upper[0][0] - 1)]
         else:
-            if self.verbose:
-                print("Cool bound out of range, T = %.2f > T_limit = %.2f"%(temp[0],slope_limits['cool_lower']))
-                print("or T_upper_limit = %.2f > T_max = %.2f"%(slope_limits['cool_upper'],slope_limits['hot_lower']))
+            self.logger.debug("Cool bound out of range, T = %.2f > T_limit = %.2f"%(temp[0],slope_limits['cool_lower']))
+            self.logger.debug("or T_upper_limit = %.2f > T_max = %.2f"%(slope_limits['cool_upper'],slope_limits['hot_lower']))
             temp_cool = False
             dem_cool = False
             sigma_cool = False
@@ -299,20 +292,19 @@ class DEMAnalyze(object):
             dem_hot = dem[(i_hot_lower[0][-1] + 1):(i_hot_upper[0][0] - 1)]
             sigma_hot = sigma[(i_hot_lower[0][-1] + 1):(i_hot_upper[0][0] - 1)]
         else:
-            if self.verbose:
-                print("Hot bound out of range, T = %.2f < T_limit = %.2f"%(temp[-1],slope_limits['hot_upper']))
-                print("or T_lower_limit = %.2f < T_max = %.2f"%(slope_limits['hot_lower'],slope_limits['cool_upper']))
+            self.logger.debug("Hot bound out of range, T = %.2f < T_limit = %.2f"%(temp[-1],slope_limits['hot_upper']))
+            self.logger.debug("or T_lower_limit = %.2f < T_max = %.2f"%(slope_limits['hot_lower'],slope_limits['cool_upper']))
             temp_hot = False
             dem_hot = False
             sigma_hot = False
-        
+
         #Return interpolated arrays and indices
         return {'temp_cool':temp_cool,'dem_cool':dem_cool,'sigma_cool':sigma_cool,'temp_hot':temp_hot,'dem_hot':dem_hot,'sigma_hot':sigma_hot}
-        
-        
+
+
     def branch_fit(self,temp_cool,dem_cool,temp_hot,dem_hot,**kwargs):
         """Linear fit to hot and cool branches of EM curve using hot and cool branches constructed according to hot and cool limits."""
-        
+
         #unpack uncertainties
         if 'sigma_cool' in kwargs:
             sigma_cool = kwargs['sigma_cool']
@@ -323,7 +315,7 @@ class DEMAnalyze(object):
             except TypeError:
                 pass
             absolute_sigma_cool = False
-            
+
         if 'sigma_hot' in kwargs:
             sigma_hot = kwargs['sigma_hot']
             absolute_sigma_hot = True
@@ -333,11 +325,11 @@ class DEMAnalyze(object):
             except TypeError:
                 pass
             absolute_sigma_hot = False
-        
+
         #Function for linear fit
         def linear_fit(x,a,b):
             return a*x + b
-            
+
         #perform linear fit
         #cool
         if temp_cool is False:
@@ -350,7 +342,7 @@ class DEMAnalyze(object):
             #compute residual variance
             res = 1#np.sum((linear_fit(bound_arrays['temp_cool'],*pars_cool) - bound_arrays['dem_cool'])**2)/(len(bound_arrays['dem_cool']) - len(pars_cool))
             sigma_coolward = np.sqrt(np.diag(covar_cool/res))
-            
+
         #hot
         if temp_hot is False:
             a_hotward = False
@@ -361,13 +353,13 @@ class DEMAnalyze(object):
             a_hotward,b_hotward = pars_hot[0],pars_hot[1]
             res = 1#np.sum((linear_fit(bound_arrays['temp_hot'],*pars_hot) - bound_arrays['dem_hot'])**2)/(len(bound_arrays['dem_hot']) - len(pars_hot))
             sigma_hotward = np.sqrt(np.diag(covar_hot/res))
-            
+
         return {'a_c':a_coolward,'b_c':b_coolward,'s_c':sigma_coolward,'a_h':a_hotward,'b_h':b_hotward,'s_h':sigma_hotward}
-        
-        
+
+
     def fit_limits(self,temp,em,**kwargs):
         """Calculate limits over which fit is calculated depending on input option."""
-        
+
         if self.lim_method is 'dynamic':
             #isolate hot branch
             i_hot = np.where(temp > temp[np.argmax(em)])[0]
@@ -389,12 +381,11 @@ class DEMAnalyze(object):
             tc_upper = self.slope_limits['cool_upper']
         else:
             raise ValueError("Unrecognized limit method calculation.")
-        
+
         if self.verbose and self.lim_method is not 'static':
             print("T_cool_upper = "+str(tc_upper)+" K")
             print("T_cool_lower = "+str(tc_lower)+" K")
             print("T_hot_upper = "+str(th_upper)+" K")
             print("T_hot_lower = "+str(th_lower)+" K")
-        
+
         return {'cool_upper':tc_upper,'cool_lower':tc_lower,'hot_upper':th_upper,'hot_lower':th_lower}
-          
