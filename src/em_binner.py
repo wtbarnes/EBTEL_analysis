@@ -86,8 +86,8 @@ class EM_Binner(object):
             iC = np.where((self.logT_EM >= logTa) & (self.logT_EM <= logTb))
             if len(iC) > 0:
                 #add entries to dem,em matrices
-                self.dem_mat[i,ic[0]] = self.differential_emission_measure_calc(self.density[i],logTa,logTb)
-                self.em_mat[i,ic[0]] = self.emission_measure_calc(self.density[i])
+                self.dem_mat[i,iC[0]] = self.differential_emission_measure_calc(self.density[i],logTa,logTb)
+                self.em_mat[i,iC[0]] = self.emission_measure_calc(self.density[i])
                 #append coronal temperatures to temperature list
                 self.logT_em_flat.extend(self.logT_EM[iC[0]])
                 #append emission measure weighted by timestep to emission measure list
