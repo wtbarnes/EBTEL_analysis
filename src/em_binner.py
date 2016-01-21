@@ -7,8 +7,6 @@
 #Import needed modules
 import logging
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
@@ -40,6 +38,16 @@ class EM_Binner(object):
         """Calculate emission measure distribution"""
 
         return self.loop_length*n**2
+        
+    def differential_emission_measure_calc(self,n,tmin,tmax):
+        """Calculate differential emission measure distribution"""
+        
+        em = self.emission_measure_calc(n)
+        #EBTEL method for calculating coronal DEM
+        jmax = (tmax - 4.0)*100.0
+        jmin = (tmin - 4.0)*100.0
+        delta_t = 1.0e+4*(10.0**((jmax + 0.5)/100.0) - 10.0**((jmin - 0.5)/100.0));
+        return em/delta_t
 
     def coronal_limits(self,T):
         """Find limits of corona in log temperature space."""
@@ -58,6 +66,10 @@ class EM_Binner(object):
         except AttributeError:
             self.logger.warning("Temperature bins not yet created. Building now with default values.")
             self.logT_bins()
+            
+        #allocate space for DEM, EM matrices
+        self.em_mat = np.zeros(len(self.time),len(self.logT_EM))
+        self.dem_mat = np.zeros(len(self.time),len(self.logT_EM))
 
         #Flattened EM and temp lists for easily building histograms
         self.em_flat = []
@@ -73,6 +85,9 @@ class EM_Binner(object):
             #find coronal indices in logT
             iC = np.where((self.logT_EM >= logTa) & (self.logT_EM <= logTb))
             if len(iC) > 0:
+                #add entries to dem,em matrices
+                self.dem_mat[i,ic[0]] = self.differential_emission_measure_calc(self.density[i],logTa,logTb)
+                self.em_mat[i,ic[0]] = self.emission_measure_calc(self.density[i])
                 #append coronal temperatures to temperature list
                 self.logT_em_flat.extend(self.logT_EM[iC[0]])
                 #append emission measure weighted by timestep to emission measure list
