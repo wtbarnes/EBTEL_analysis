@@ -68,8 +68,8 @@ class EM_Binner(object):
             self.logT_bins()
             
         #allocate space for DEM, EM matrices
-        self.em_mat = np.zeros(len(self.time),len(self.logT_EM))
-        self.dem_mat = np.zeros(len(self.time),len(self.logT_EM))
+        self.em_mat = np.zeros([len(self.time),len(self.logT_EM)])
+        self.dem_mat = np.zeros([len(self.time),len(self.logT_EM)])
 
         #Flattened EM and temp lists for easily building histograms
         self.em_flat = []
