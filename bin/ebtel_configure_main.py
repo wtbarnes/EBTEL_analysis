@@ -5,6 +5,7 @@
 
 #Import needed modules
 import argparse
+import logging
 import sys
 sys.path.append('../src/')
 from ebtel_configure import Configurer
@@ -27,13 +28,13 @@ args = parser.parse_args()
 if args.root_dir:
     root_dir = args.root_dir
 else:
-    root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'
+    root_dir = '/data/datadrive2/EBTEL_runs'
     
 #check for wait time scaling exponent
 if  args.t_wait_scaling:
     t_wait_scaling = args.t_wait_scaling
 else:
-    t_wait_scaling = []
+    t_wait_scaling = None
 
 #Set heating parameters--configure power-law bounds such that loop is maintained at an equilibrium temperature of T_peak
 tpeak = 4.0e+6 #peak temperature for time-averaged heating rate
@@ -41,7 +42,7 @@ Hn = 1.0e-6*tpeak**(3.5)/(args.loop_length*1.0e+8)**2 #time-averaged heating rat
 delta_q = 10.0 #range over which power-law distribution is constructed (typically one decade)
 
 #Configure all static dictionary options
-config_dict = {'usage_option':'dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':args.solver,'ic_mode':'st_eq','print_plasma_params':'False'}
+config_dict = {'usage_option':'dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':args.solver,'ic_mode':'st_eq','print_plasma_params':'True'}
 config_dict['total_time'] = 80000
 config_dict['tau'] = 1.0
 config_dict['rka_error'] = 1.0e-6
@@ -57,6 +58,7 @@ config_dict['t_start'] = 0.0
 config_dict['t_pulse_half'] = 0.5*args.t_pulse
 config_dict['mean_t_start'] = 1000
 config_dict['std_t_start'] = 1000
+config_dict['sample_rate'] = 10
 
 #Configure directory-level parameters
 config_dict['heat_species'] = args.species
@@ -66,9 +68,12 @@ config_dict['loop_length'] = args.loop_length
 
 #check whether we need to use MC option
 if config_dict['amp_switch'] == 'uniform':
-    mc = False
+    mc = None
 else:
     mc = 1.0e+4
+    
+#configure logging
+logging.basicConfig(stream=sys.stdout,level=logging.DEBUG)
 
 #instantiate configuration class and print configuration files as well as job configuration file
 config = Configurer(config_dict,root_dir,Hn=Hn,delta_q=delta_q,mc=mc,build_paths=True,t_wait_q_scaling=t_wait_scaling)

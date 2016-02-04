@@ -13,7 +13,7 @@ import xml.dom.minidom as xdm
 
 class Configurer(object):
     
-    def __init__(self, config_dictionary, root_dir, mc=None, t_wait_q_scaling = [], build_paths=False, Hn=None, delta_q=None, **kwargs):
+    def __init__(self, config_dictionary, root_dir, mc=None, t_wait_q_scaling = None, build_paths=False, Hn=None, delta_q=None, **kwargs):
         """Constructor for Configurer class used to print EBTEL configuration files."""
         
         self.config_dictionary = config_dictionary
