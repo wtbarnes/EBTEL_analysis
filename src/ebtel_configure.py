@@ -155,7 +155,8 @@ class Configurer(object):
         #preallocate space for start, end time arrays
         self.config_dictionary['start_time_array'], self.config_dictionary['end_time_array'] = np.empty([self.config_dictionary['num_events']]), np.empty([self.config_dictionary['num_events']])
         #calculate coefficient (xi^(1/b))
-        xi_1ob = (self.config_dictionary['amp_array']**(1.0/self.t_wait_q_scaling)).sum()/(self.config_dictionary['total_time'] - self.config_dictionary['num_events']*2.0*self.config_dictionary['t_pulse_half'])
+        if self.t_wait_q_scaling:
+            xi_1ob = (self.config_dictionary['amp_array']**(1.0/self.t_wait_q_scaling)).sum()/(self.config_dictionary['total_time'] - self.config_dictionary['num_events']*2.0*self.config_dictionary['t_pulse_half'])
         #initialize running wait time sum
         t_wait_sum = 0.0
         #configure start and end time for each event
