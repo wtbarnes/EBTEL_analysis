@@ -42,13 +42,13 @@ Hn = 1.0e-6*tpeak**(3.5)/(args.loop_length*1.0e+8)**2 #time-averaged heating rat
 delta_q = 10.0 #range over which power-law distribution is constructed (typically one decade)
 
 #Configure all static dictionary options
-config_dict = {'usage_option':'dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':args.solver,'ic_mode':'st_eq','print_plasma_params':'True'}
+config_dict = {'usage_option':'no_dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':args.solver,'ic_mode':'st_eq','print_plasma_params':'True'}
 config_dict['total_time'] = 80000
 config_dict['tau'] = 1.0
 config_dict['rka_error'] = 1.0e-6
 config_dict['index_dem'] = 451
-config_dict['sat_limit'] = 1.0
-config_dict['h_back'] = 3.4e-6
+config_dict['sat_limit'] = 1.0/6.0
+config_dict['h_back'] = 3.5e-5
 config_dict['heating_shape'] = 'triangle'
 config_dict['t_start_switch'] = 'file'
 config_dict['t_end_switch'] = 'file'

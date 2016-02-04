@@ -138,7 +138,7 @@ class Configurer(object):
                 #build start and end time arrays
                 self.time_arrays(self.t_wait_mean[i])
                 #set name of output file
-                self.config_dictionary['output_file'] = os.path.join(os.path.join(self.data_path+self.fn%self.t_wait_mean[i]), self.fn%self.t_wait_mean[i]+'_'+str(j))
+                self.config_dictionary['output_file'] = os.path.join(os.path.join(self.data_path,self.fn%self.t_wait_mean[i]), self.fn%self.t_wait_mean[i]+'_'+str(j))
                 #print configuration files
                 self.print_xml_config(config_file=os.path.join(os.path.join(self.config_path,self.fn%self.t_wait_mean[i]), self.fn%self.t_wait_mean[i] + '_' + str(j) + '.xml'))
                 
