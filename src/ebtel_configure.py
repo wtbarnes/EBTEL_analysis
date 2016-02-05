@@ -18,17 +18,14 @@ class Configurer(object):
         
         self.config_dictionary = config_dictionary
         self.root_dir = root_dir
-        self.nmc_list = []
-                        
+        self.nmc_list = []               
         #set optional variables
         self.Hn = Hn
         self.delta_q = delta_q
         self.mc = mc
         self.t_wait_q_scaling = t_wait_q_scaling
-        
         #configure logger
-        self.logger = logging.getLogger(type(self).__name__)
-            
+        self.logger = logging.getLogger(type(self).__name__) 
         #Set up paths
         if build_paths:
             self.path_builder()
@@ -52,8 +49,8 @@ class Configurer(object):
             scaling_suffix = ''
         
         #set data and config paths
-        self.data_path = os.path.join(os.path.join(self.root_dir, gen_path),'data')
-        self.config_path = os.path.join(os.path.join(self.root_dir, gen_path),'config')
+        self.data_path = os.path.join(self.root_dir, gen_path,'data')
+        self.config_path = os.path.join(self.root_dir, gen_path,'config')
         self.fn = 'ebtel_L' + str(self.config_dictionary['loop_length']) + '_tn%d' + scaling_suffix + '_tpulse' + str(2.0*self.config_dictionary['t_pulse_half']) + '_' + self.config_dictionary['solver']
 
 
@@ -138,9 +135,9 @@ class Configurer(object):
                 #build start and end time arrays
                 self.time_arrays(self.t_wait_mean[i])
                 #set name of output file
-                self.config_dictionary['output_file'] = os.path.join(os.path.join(self.data_path,self.fn%self.t_wait_mean[i]), self.fn%self.t_wait_mean[i]+'_'+str(j))
+                self.config_dictionary['output_file'] = os.path.join(self.data_path, self.fn%self.t_wait_mean[i], self.fn%self.t_wait_mean[i]+'_'+str(j))
                 #print configuration files
-                self.print_xml_config(config_file=os.path.join(os.path.join(self.config_path,self.fn%self.t_wait_mean[i]), self.fn%self.t_wait_mean[i] + '_' + str(j) + '.xml'))
+                self.print_xml_config(config_file=os.path.join(self.config_path, self.fn%self.t_wait_mean[i], self.fn%self.t_wait_mean[i] + '_' + str(j) + '.xml'))
                 
                 
     def _calc_nmc(self,**kwargs):
