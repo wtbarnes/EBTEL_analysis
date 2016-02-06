@@ -4,39 +4,35 @@
 #13 May 2015
 
 #Import needed modules
+import os
 import numpy as np
 import logging
+import em_binner as emb
 from scipy.optimize import curve_fit
 
 class DEMProcess(object):
 
     em_max_eps_percent = 0.999
 
-    def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs):
-        #check for wait time scaling option
-        if 't_wait_q_scaling' in kwargs:
-            scaling_suffix = kwargs['t_wait_q_scaling']
-        else:
-            scaling_suffix = ''
+    def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,scaling_suffix='',em_cutoff=23.0,aspect_ratio_factor=0.0,**kwargs):
 
         #set up paths
-        child_path = root_dir+species+'_heating_runs/alpha'+str(alpha)+'/data/'
+        child_path = os.path.join(root_dir, species+'_heating_runs', 'alpha'+str(alpha), 'data')
         self.file_path = 'ebtel_L'+str(loop_length)+'_tn%d'+scaling_suffix+'_tpulse'+str(tpulse)+'_'+solver
-        self.root_path = child_path + self.file_path
+        self.root_path = os.path.join(child_path, self.file_path)
         #configure logger
         self.logger = logging.getLogger(type(self).__name__)
         #configure keyword arguments
-        if 'em_cutoff' in kwargs:
-            self.em_cutoff = kwargs['em_cutoff']
-        else:
-            self.em_cutoff = 23.0
-        if 'aspect_ratio_factor' in kwargs:
-            self.aspect_ratio_factor = kwargs['aspect_ratio_factor']
-        else:
-            self.aspect_ratio_factor = 0.0
+        self.tpulse = tpulse
+        self.em_cutoff = em_cutoff
+        self.aspect_ratio_factor = aspect_ratio_factor
+        #instantiate binner class
+        self.binner = emb.EM_Binner(2.*loop_length*1.e+8)
         #define variables to be used later
-        self.em,self.em_max,self.em_mean,self.em_std = [],[],[],[]
-        self.temp_em,self.temp_max,self.temp_mean = [],[],[]
+        self.params,self.em = [],[]
+        #SOON TO BE DEPRECATED
+        self.em_max,self.em_mean,self.em_std = [],[],[],[]
+        self.temp_max,self.temp_mean = [],[],[]
 
 
     def import_raw(self,Tn,**kwargs):
@@ -44,36 +40,28 @@ class DEMProcess(object):
 
         for i in range(len(Tn)):
             #initialize lists
-            em = []
-            temp_em = []
+            tmp = []
             #initialize counter and flag
             counter=0
-            #failed read-in tolerance parameters
-            MAX_FAIL = 5
-            fail_count = 0
             #build wait-time specific path
             tn_path = self.root_path%Tn[i]
-            while fail_count <= MAX_FAIL:
-                try:
-                    temp = np.loadtxt(tn_path+'/'+self.file_path%Tn[i]+'_'+str(counter)+'_dem.txt')
-                    temp[np.where(np.isnan(temp))] = -np.inf
-                    temp_em.append(temp[:,0])
-                    em.append(temp[:,4]+ self.aspect_ratio_factor)
-                    #reset fail count after success
-                    fail_count = 0
-                except FileNotFoundError:
-                    fail_count += 1
-                    self.logger.debug("Unable to process file for Tn = %d, run = %d"%(Tn[i],counter))
-                    if fail_count > MAX_FAIL:
-                        self.logger.info("Reached end of list or too many missing files for Tn = %d."%Tn[i])
-                        self.logger.info("Estimated percentage of files read = %f %%"%(len(em)/(counter - MAX_FAIL)*100))
-
-                    pass
-                #increment counter
-                counter += 1
-
-            self.temp_em.append(temp_em)
-            self.em.append(em)
+            for pfile in os.listdir(tn_path):
+                if 'heat_amp' not in pfile and 'dem' not in pfile:
+                    data = np.loadtxt(os.path.join(tn_path,pfile))
+                    n_index = 2
+                    if 'electron' in tn_path: n_index += 1
+                    tmp.append({'t':data[:,0],'T':data[:,1],'n':data[:,n_index]})
+                    #TODO: add calculation of emission measure distribution
+                    #increment counter
+                    counter += 1
+                else:
+                    continue
+                    
+            #Estimate percentage of files read
+            self.logger.info("Tn = %d s finished, Estimated total # of events simulated: %.2f %%"%(Tn[i], counter*int(np.ceil(tmp[-1]['t'][-1]/(self.tpulse+Tn[i])))))
+            
+            #append to tope level list
+            self.params.append(tmp)
 
 
     def calc_stats(self,**kwargs):

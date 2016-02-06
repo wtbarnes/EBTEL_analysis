@@ -103,3 +103,7 @@ class EM_Binner(object):
                 self.T_em_flat.extend(self.T_EM[iC[0]])
                 #append emission measure weighted by timestep to emission measure list
                 self.em_flat.extend(len(iC[0])*[w_tau[i]*self._emission_measure_calc(self.density[i])])
+                
+        #cast as numpy arrays for convenience
+        self.T_em_flat = np.array(self.T_em_flat)
+        self.em_flat = np.array(self.em_flat)
