@@ -51,7 +51,7 @@ class DEMProcess(object):
                     self.binner.set_data(t,T,n)
                     self.binner.build_em_dist()
                     #save data
-                    tmp.append({'T':binner.T_em_flat,'em':binner.em_flat/self.aspect_ratio_factor,'bins':binner.T_em_histo_bins})
+                    tmp.append({'T':self.binner.T_em_flat, 'em':self.binner.em_flat/self.aspect_ratio_factor, 'bins':self.binner.T_em_histo_bins})
                     #increment counter
                     counter += 1
                 else:
