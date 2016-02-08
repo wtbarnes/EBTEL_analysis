@@ -46,7 +46,7 @@ class DEMProcess(object):
                     data = np.loadtxt(os.path.join(tn_path,pfile))
                     n_index = 2
                     if 'electron' in tn_path: n_index += 1
-                    t,n,T = data[:,0],data[:,1],data[:,n_index]
+                    t,T,n = data[:,0],data[:,1],data[:,n_index]
                     #calculate emission measure distribution
                     self.binner.set_data(t,T,n)
                     self.binner.build_em_dist()
