@@ -73,8 +73,8 @@ class DEMProcess(object):
 
         for em in self.em:
             #chain T and em values
-            em_chained = np.array(list(itertools.chain([e['em'] for e in em])))
-            t_chained = np.array(list(itertools.chain([e['T'] for e in em])))
+            em_chained = np.array(list(itertools.chain(*[e['em'] for e in em])))
+            t_chained = np.array(list(itertools.chain(*[e['T'] for e in em])))
             #get bins (same for all)
             bins = em[0]['bins']
             bin_centers = np.diff(bins)/2.0+bins[0:-1]
