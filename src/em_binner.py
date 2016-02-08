@@ -37,9 +37,9 @@ class EM_Binner(object):
         """Build temperature bins in log_10 for creating EM distribution"""
 
         self.delta_logT = delta_logT
-        self.T_EM = np.logspace(logT_a,logT_b,int((logT_b - logT_a)/self.delta_logT))
+        self.T_em = np.logspace(logT_a,logT_b,int((logT_b - logT_a)/self.delta_logT))
         #Add right edge for histogram bins
-        self.T_EM_histo_bins = np.append(self.T_EM,self.T_EM[-1]*10.**self.delta_logT)
+        self.T_em_histo_bins = np.append(self.T_em,self.T_em[-1]*10.**self.delta_logT)
 
     def _emission_measure_calc(self,n):
         """Calculate emission measure distribution"""
@@ -71,15 +71,15 @@ class EM_Binner(object):
         """Create EM distribution from temperature arrays. Build for both T and T_eff"""
 
         try:
-            self.T_EM
+            self.T_em
         except AttributeError:
             self.logger.info("Temperature bins not yet created. Building now with default values.")
             self.make_T_bins()
             
         #allocate space for DEM, EM matrices
         if build_mat:
-            self.em_mat = np.zeros([len(self.time),len(self.T_EM)])
-            self.dem_mat = np.zeros([len(self.time),len(self.T_EM)])
+            self.em_mat = np.zeros([len(self.time),len(self.T_em)])
+            self.dem_mat = np.zeros([len(self.time),len(self.T_em)])
 
         #Flattened EM and temp lists for easily building histograms
         self.em_flat = []
@@ -93,14 +93,14 @@ class EM_Binner(object):
             #calculate coronal temperature bounds at time i
             Ta,Tb = self._coronal_limits(self.temp[i])
             #find coronal indices in logT
-            iC = np.where((self.T_EM >= Ta) & (self.T_EM <= Tb))
+            iC = np.where((self.T_em >= Ta) & (self.T_em <= Tb))
             if len(iC) > 0:
                 if build_mat:
                     #add entries to dem,em matrices
                     self.dem_mat[i,iC[0]] = self._differential_emission_measure_calc(self.density[i],Ta,Tb)
                     self.em_mat[i,iC[0]] = self._emission_measure_calc(self.density[i])
                 #append coronal temperatures to temperature list
-                self.T_em_flat.extend(self.T_EM[iC[0]])
+                self.T_em_flat.extend(self.T_em[iC[0]])
                 #append emission measure weighted by timestep to emission measure list
                 self.em_flat.extend(len(iC[0])*[w_tau[i]*self._emission_measure_calc(self.density[i])])
                 

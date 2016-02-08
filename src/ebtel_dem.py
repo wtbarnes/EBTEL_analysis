@@ -9,12 +9,11 @@ import numpy as np
 import logging
 import em_binner as emb
 from scipy.optimize import curve_fit
+from scipy.stats import binned_statistic
 
 class DEMProcess(object):
 
-    em_max_eps_percent = 0.999
-
-    def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,scaling_suffix='',em_cutoff=23.0,aspect_ratio_factor=0.0,**kwargs):
+    def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, **kwargs):
 
         #set up paths
         child_path = os.path.join(root_dir, species+'_heating_runs', 'alpha'+str(alpha), 'data')
@@ -24,19 +23,15 @@ class DEMProcess(object):
         self.logger = logging.getLogger(type(self).__name__)
         #configure keyword arguments
         self.tpulse = tpulse
-        self.em_cutoff = em_cutoff
         self.aspect_ratio_factor = aspect_ratio_factor
         #instantiate binner class
         self.binner = emb.EM_Binner(2.*loop_length*1.e+8)
         #define variables to be used later
-        self.params,self.em = [],[]
-        #SOON TO BE DEPRECATED
-        self.em_max,self.em_mean,self.em_std = [],[],[],[]
-        self.temp_max,self.temp_mean = [],[],[]
+        self.em, self.em_stats = [],[]
 
 
     def import_raw(self,Tn,**kwargs):
-        """Import all runs for given Tn waiting time values; replace NaNs with -Inf if present. EM and T values are returned in nested lists."""
+        """Import all runs for given Tn waiting time values; calculate EM distributions from t,T,n."""
 
         for i in range(len(Tn)):
             #initialize lists
@@ -47,11 +42,16 @@ class DEMProcess(object):
             tn_path = self.root_path%Tn[i]
             for pfile in os.listdir(tn_path):
                 if 'heat_amp' not in pfile and 'dem' not in pfile:
+                    self.logger.debug("Reading %s"%pfile)
                     data = np.loadtxt(os.path.join(tn_path,pfile))
                     n_index = 2
                     if 'electron' in tn_path: n_index += 1
-                    tmp.append({'t':data[:,0],'T':data[:,1],'n':data[:,n_index]})
-                    #TODO: add calculation of emission measure distribution
+                    t,n,T = data[:,0],data[:,1],data[:,n_index]
+                    #calculate emission measure distribution
+                    binner.set_data(t,T,n)
+                    binner.build_em_dist()
+                    #save data
+                    tmp.append({'T':binner.T_em_flat,'em':binner.em_flat/self.aspect_ratio_factor,'bins':binner.T_em_histo_bins})
                     #increment counter
                     counter += 1
                 else:
@@ -61,60 +61,28 @@ class DEMProcess(object):
             self.logger.info("Tn = %d s finished, Estimated total # of events simulated: %.2f %%"%(Tn[i], counter*int(np.ceil(tmp[-1]['t'][-1]/(self.tpulse+Tn[i])))))
             
             #append to tope level list
-            self.params.append(tmp)
+            self.em.append(tmp)
 
 
     def calc_stats(self,**kwargs):
         """Calculate mean, standard deviation and max for EM and T."""
 
-        if not self.temp_em or not self.em:
-            raise ValueError("Before computing EM statistics, run self.import_raw() to process EM,T data.")
+        if not self.em:
+            raise ValueError("Before computing EM statistics, run self.import_raw() to calculate EM data.")
 
-        for i in range(len(self.em)):
-            #first calculate mean
-            if len(np.shape(np.array(self.em[i]))) > 1:
-                temporary_mean_em = np.array(np.mean(self.inf_filter(self.em[i]),axis=0))
-                temporary_std_em = np.array(np.std(self.inf_filter(self.em[i]),axis=0))
-                temporary_mean_em[np.where(temporary_mean_em<self.em_cutoff)]=-np.float('Inf')
-                temporary_std_em[np.where(temporary_mean_em<self.em_cutoff)]=-np.float('Inf')
-                self.em_mean.append(temporary_mean_em)
-                self.em_std.append(temporary_std_em)
-                self.temp_mean.append(np.mean(self.temp_em[i],axis=0))
-            else:
-                self.em_mean.append(np.array(self.em[i]))
-                self.em_std.append(np.zeros(len(self.em[i])))
-                self.temp_mean.append(np.array(self.temp_em[i]))
+        for em in self.em:
+            #chain T and em values
+            em_chained = np.array(list(itertools.chain([e['em'] for e in em])))
+            t_chained = np.array(list(itertools.chain([e['T'] for e in em])))
+            #get bins (same for all)
+            bins = em[0]['bins']
+            bin_centers = np.diff(bins)/2.0+bins[0:-1]
+            #compute statistics
+            em_mean,_,_ = binned_statistic(t_chained,em_chained,statistic='mean',bins=bins)
+            em_std,_,_ = binned_statistic(t_chained,em_chained,statistic=np.std,bins=bins)
+            #save
+            self.em_stats.append({'em_mean':em_mean, 'em_std':em_std, 'em_max':np.max(em_mean), 'T_max':bin_centers[np.argmax(em_mean)], 'T_mean':bin_centers})
 
-            #declare temp lists for max quantities
-            temp_max_temp = []
-            em_max_temp = []
-            for j in range(len(self.em[i])):
-                i_max = np.argmax(self.em[i][j])
-                indices_em_max = np.where(np.array(self.em[i][j]) > self.em_max_eps_percent*self.em[i][j][i_max])[0]
-                if len(indices_em_max) <= 1:
-                    temp_max_temp.append(self.temp_em[i][j][i_max])
-                    em_max_temp.append(self.em[i][j][i_max])
-                else:
-                    em_interp = np.linspace(self.em[i][j][indices_em_max[0]],self.em[i][j][indices_em_max[-1]],100)
-                    temp_interp = np.interp(em_interp,np.array(self.em[i][j][indices_em_max[0]:indices_em_max[-1]]),np.array(self.temp_em[i][j][indices_em_max[0]:indices_em_max[-1]]))
-                    temp_max_temp.append(np.mean(temp_interp))
-                    em_max_temp.append(np.mean(em_interp))
-
-            #append max quantities for each i
-            self.temp_max.append(temp_max_temp)
-            self.em_max.append(em_max_temp)
-
-
-    def inf_filter(self,nested_list,**kwargs):
-        #preallocate space
-        filtered_list = []
-        #filter out infs in list and set to zero for averaging
-        for i in nested_list:
-            temp_array = np.array(i)
-            temp_array[np.where(temp_array < self.em_cutoff)]=0.0
-            filtered_list.append(temp_array)
-
-        return filtered_list
 
 
 class DEMAnalyze(object):
