@@ -48,8 +48,8 @@ class DEMProcess(object):
                     if 'electron' in tn_path: n_index += 1
                     t,n,T = data[:,0],data[:,1],data[:,n_index]
                     #calculate emission measure distribution
-                    binner.set_data(t,T,n)
-                    binner.build_em_dist()
+                    self.binner.set_data(t,T,n)
+                    self.binner.build_em_dist()
                     #save data
                     tmp.append({'T':binner.T_em_flat,'em':binner.em_flat/self.aspect_ratio_factor,'bins':binner.T_em_histo_bins})
                     #increment counter
