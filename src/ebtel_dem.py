@@ -7,6 +7,7 @@
 import os
 import numpy as np
 import logging
+import itertools
 import em_binner as emb
 from scipy.optimize import curve_fit
 from scipy.stats import binned_statistic
@@ -14,7 +15,7 @@ from scipy.stats import binned_statistic
 class DEMProcess(object):
 
     def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, **kwargs):
-
+        """Constructor for process class"""
         #set up paths
         child_path = os.path.join(root_dir, species+'_heating_runs', 'alpha'+str(alpha), 'data')
         self.file_path = 'ebtel_L'+str(loop_length)+'_tn%d'+scaling_suffix+'_tpulse'+str(tpulse)+'_'+solver
