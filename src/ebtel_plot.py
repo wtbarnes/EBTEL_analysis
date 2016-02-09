@@ -178,7 +178,7 @@ class Plotter(object):
         bin_centers = np.log10(np.diff(bins)/2.0+bins[0:-1])
 
         #check for bins with no entries in them; below these entries (if they exist), don't calculate fit
-        noise = np.where(n <= 1)
+        noise = np.where(n <= int(np.max(n)*0.01))
         if len(noise[0]) > 0:
             n = n[0:noise[0][0]]
             bin_centers = bin_centers[0:noise[0][0]]
