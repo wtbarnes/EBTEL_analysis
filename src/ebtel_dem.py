@@ -28,7 +28,7 @@ class DEMProcess(object):
         #instantiate binner class
         self.binner = emb.EM_Binner(2.*loop_length*1.e+8)
         #define variables to be used later
-        self.em, self.em_stats = [],[]
+        self.em, self.em_stats, self.em_binned = [],[],[]
 
 
     def import_raw(self,Tn,**kwargs):
@@ -72,20 +72,27 @@ class DEMProcess(object):
             raise ValueError("Before computing EM statistics, run self.import_raw() to calculate EM data.")
 
         for em in self.em:
-            #chain T and em values
-            em_chained = np.array(list(itertools.chain(*[e['em'] for e in em])))
-            t_chained = np.array(list(itertools.chain(*[e['T'] for e in em])))
-            #get bins (same for all)
-            bins = em[0]['bins']
-            bin_centers = np.diff(bins)/2.0+bins[0:-1]
-            #compute statistics
-            em_mean,_,_ = binned_statistic(t_chained,em_chained,statistic='mean',bins=bins)
-            em_std,_,_ = binned_statistic(t_chained,em_chained,statistic=np.std,bins=bins)
-            #save
-            self.em_stats.append({'em_mean':em_mean, 'em_std':em_std, 'em_max':np.max(em_mean), 'T_max':bin_centers[np.argmax(em_mean)], 'T_mean':bin_centers})
+            #initialize list
+            tmp = []
+            #preallocate memory in matrix
+            tmp_mat = np.zeros([len(em),len(em[0]['bins'])-1])
+            #loop over all mc runs
+            i = 0
+            for i in range(len(em)):
+                h,_ = np.histogram(em[i]['T'],bins=em[i]['bins'],weights=em[i]['em'])
+                tmp_mat[i,:] = h
+                tmp.append({'hist':h,'bin_centers':np.diff(em[i]['bins'])/2. + em[i]['bins'][0:-1]})
+            #compute statistics and bin centers (i.e. the temperature array)
+            mean_tmp,std_tmp = np.mean(tmp_mat,axis=0),np.std(tmp_mat,axis=0)
+            bin_centers = np.diff(em[0]['bins'])/2. + em[0]['bins'][0:-1]
+            #save stats
+            self.em_stats.append({'em_mean':mean_tmp, 'em_std':std_tmp, 'em_max':np.max(em_mean), 'T_max':bin_centers[np.argmax(mean_tmp)], 'T_mean':bin_centers})
+            #save binned em
+            self.em_binned.append(tmp)
 
 
 
+#TODO:combine analyze and process classes, slim down fitting routines
 class DEMAnalyze(object):
 
     cool_diff = -0.6
