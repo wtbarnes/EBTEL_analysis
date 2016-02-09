@@ -86,7 +86,7 @@ class DEMProcess(object):
             mean_tmp,std_tmp = np.mean(tmp_mat,axis=0),np.std(tmp_mat,axis=0)
             bin_centers = np.diff(em[0]['bins'])/2. + em[0]['bins'][0:-1]
             #save stats
-            self.em_stats.append({'em_mean':mean_tmp, 'em_std':std_tmp, 'em_max':np.max(em_mean), 'T_max':bin_centers[np.argmax(mean_tmp)], 'T_mean':bin_centers})
+            self.em_stats.append({'em_mean':mean_tmp, 'em_std':std_tmp, 'em_max':np.max(mean_tmp), 'T_max':bin_centers[np.argmax(mean_tmp)], 'T_mean':bin_centers})
             #save binned em
             self.em_binned.append(tmp)
 
