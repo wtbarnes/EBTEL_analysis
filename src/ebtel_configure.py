@@ -216,9 +216,11 @@ class Configurer(object):
             chi = self.config_dictionary['h_nano']*self.config_dictionary['num_events']/pl_sum
             a0 = chi*a0
             a1 = self.delta_q*a0
-            err = np.fabs(1.-chi)
+            err = np.fabs(1.-1./chi)
             tries += 1
-            
+        
+        self.logger.debug("chi = %f, # of tries = %d, error = %f"%(chi,tries,err))
+
         if tries >= max_tries:
             self.logger.warning("Power-law constrainer reached max # of tries, exiting with error = %.4f"%(err))
             
