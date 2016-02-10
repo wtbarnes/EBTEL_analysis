@@ -206,7 +206,7 @@ class Configurer(object):
         tries = 0
         err = 1.e+300
         #initial guess of bounds
-        a0 = 0.5*self.config_dictionary['h_nano']
+        a0 = 1e-2*self.config_dictionary['h_nano']
         a1 = self.delta_q*self.config_dictionary['amp0']
         #begin iteration
         while tries < max_tries and err > self.tol:
