@@ -208,6 +208,8 @@ class Configurer(object):
         #initial guess of bounds
         a0 = 1e-2*self.config_dictionary['h_nano']
         a1 = self.delta_q*self.config_dictionary['amp0']
+        #save best guesses (helps if routine fails)
+        best_err = err
         #begin iteration
         while tries < max_tries and err > self.tol:
             x = np.random.rand(self.config_dictionary['num_events'])
@@ -217,16 +219,19 @@ class Configurer(object):
             a0 = chi*a0
             a1 = self.delta_q*a0
             err = np.fabs(1.-1./chi)
+            if err < best_err:
+                best = [a0,a1,h]
+                best_err = err
             tries += 1
         
         self.logger.debug("chi = %f, # of tries = %d, error = %f"%(chi,tries,err))
 
         if tries >= max_tries:
-            self.logger.warning("Power-law constrainer reached max # of tries, exiting with error = %.4f"%(err))
+            self.logger.warning("Power-law constrainer reached max # of tries, using best guess with error = %f"%best_err)
             
-        self.config_dictionary['amp0'] = a0
-        self.config_dictionary['amp1'] = a1
-        self.config_dictionary['amp_array'] = h
+        self.config_dictionary['amp0'] = best[0]
+        self.config_dictionary['amp1'] = best[1]
+        self.config_dictionary['amp_array'] = best[2]
 
 
     def _power_law_dist(self,x,a0,a1,alpha):
