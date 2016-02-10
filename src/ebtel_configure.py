@@ -13,7 +13,7 @@ import xml.dom.minidom as xdm
 
 class Configurer(object):
     
-    def __init__(self, config_dictionary, root_dir, mc=None, t_wait_q_scaling = None, build_paths=False, Hn=None, delta_q=None, **kwargs):
+    def __init__(self, config_dictionary, root_dir, mc=None, t_wait_q_scaling = None, build_paths=False, Hn=None, delta_q=None, constraint_tol = 1e-3, **kwargs):
         """Constructor for Configurer class used to print EBTEL configuration files."""
         
         self.config_dictionary = config_dictionary
@@ -24,6 +24,7 @@ class Configurer(object):
         self.delta_q = delta_q
         self.mc = mc
         self.t_wait_q_scaling = t_wait_q_scaling
+        self.tol =  constraint_tol
         #configure logger
         self.logger = logging.getLogger(type(self).__name__) 
         #Set up paths
@@ -201,7 +202,6 @@ class Configurer(object):
         """Choose events from power-law distribution such that total desired energy input is conserved."""
         
         #set parameters
-        tol = 1e-3
         max_tries = 2000
         tries = 0
         err = 1.e+300
@@ -209,7 +209,7 @@ class Configurer(object):
         a0 = 0.5*self.config_dictionary['h_nano']
         a1 = self.delta_q*self.config_dictionary['amp0']
         #begin iteration
-        while tries < max_tries and err > tol:
+        while tries < max_tries and err > self.tol:
             x = np.random.rand(self.config_dictionary['num_events'])
             h = self._power_law_dist(x,a0,a1,self.config_dictionary['alpha'])
             pl_sum = np.sum(h)
