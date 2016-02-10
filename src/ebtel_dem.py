@@ -61,7 +61,7 @@ class DEMProcess(object):
             #Estimate percentage of files read
             self.logger.info("Tn = %d s finished, Estimated total # of events simulated: %.2f %%"%(Tn[i], counter*int(np.ceil(t[-1]/(self.tpulse+Tn[i])))))
             
-            #append to tope level list
+            #append to top level list
             self.em.append(tmp)
 
 
