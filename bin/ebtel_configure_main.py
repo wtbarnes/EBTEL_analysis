@@ -39,7 +39,7 @@ else:
 #Set heating parameters--configure power-law bounds such that loop is maintained at an equilibrium temperature of T_peak
 tpeak = 4.0e+6 #peak temperature for time-averaged heating rate
 Hn = 1.0e-6*tpeak**(3.5)/(args.loop_length*1.0e+8)**2 #time-averaged heating rate needed to maintain peak temperature of 4 MK
-delta_q = 100.0 #range over which power-law distribution is constructed (typically one decade)
+delta_q = 1000.0 #range over which power-law distribution is constructed (typically one decade)
 
 #Configure all static dictionary options
 config_dict = {'usage_option':'no_dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':args.solver,'ic_mode':'st_eq','print_plasma_params':'True'}
