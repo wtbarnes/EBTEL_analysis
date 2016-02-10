@@ -201,7 +201,7 @@ class Configurer(object):
         """Choose events from power-law distribution such that total desired energy input is conserved."""
         
         #set parameters
-        tol = 1e-4
+        tol = 1e-3
         max_tries = 2000
         tries = 0
         err = 1.e+300
