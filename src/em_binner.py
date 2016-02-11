@@ -22,7 +22,7 @@ class EM_Binner(object):
             self.logger.warning("TODO: import abundances")
             pass
         #set data
-        if time and temp and density:
+        if time is not None and temp is not None and density is not None:
             self.set_data(time,temp,density)
         else:
             self.logger.warning("Parameters not yet set. Run self.set_data(t,T,n)")
