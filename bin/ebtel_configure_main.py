@@ -38,7 +38,7 @@ else:
 
 #Set heating parameters--configure power-law bounds such that loop is maintained at an equilibrium temperature of T_peak
 tpeak = 4.0e+6 #peak temperature for time-averaged heating rate
-Hn = 1.0e-6*tpeak**(3.5)/(args.loop_length*1.0e+8)**2 #time-averaged heating rate needed to maintain peak temperature of 4 MK
+Hn = 4.5e-3#1.0e-6*tpeak**(3.5)/(args.loop_length*1.0e+8)**2 #time-averaged heating rate needed to maintain peak temperature of 4 MK
 delta_q = 10.0 #range over which power-law distribution is constructed (typically one decade)
 
 #Configure all static dictionary options
