@@ -5,16 +5,17 @@
 
 #Import needed modules
 import os
+import pickle
 import numpy as np
 import logging
 import itertools
 import em_binner as emb
 from scipy.optimize import curve_fit
-from scipy.stats import binned_statistic
+
 
 class DEMProcess(object):
 
-    def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, **kwargs):
+    def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, t_fit_max=10.**7.2, t_fit_min=10.**6., **kwargs):
         """Constructor for process class"""
         #set up paths
         child_path = os.path.join(root_dir, species+'_heating_runs', 'alpha'+str(alpha), 'data')
@@ -25,13 +26,15 @@ class DEMProcess(object):
         #configure keyword arguments
         self.tpulse = tpulse
         self.aspect_ratio_factor = aspect_ratio_factor
+        self.t_fit_min = t_fit_min
+        self.t_fit_max = t_fit_max
         #instantiate binner class
         self.binner = emb.EM_Binner(2.*loop_length*1.e+8)
         #define variables to be used later
-        self.em, self.em_stats, self.em_binned = [],[],[]
+        self.em, self.em_stats, self.em_binned, self.fits, self.fits_stats = [],[],[],[],[]
 
 
-    def import_raw(self,Tn,**kwargs):
+    def import_raw(self,Tn,save_to_file=None,**kwargs):
         """Import all runs for given Tn waiting time values; calculate EM distributions from t,T,n."""
 
         for i in range(len(Tn)):
@@ -63,6 +66,16 @@ class DEMProcess(object):
             
             #append to top level list
             self.em.append(tmp)
+            
+        if save_to_file is not None:
+            with open(save_to_file,'wb') as f:
+                pickle.dump(self.em,f)
+                
+                
+    def import_from_file(self,pickled_file):
+        """Import level 1 pickled results"""
+        with open(pickled_file,'rb') as f:
+            self.em = pickle.load(f)
 
 
     def calc_stats(self,**kwargs):
@@ -89,6 +102,107 @@ class DEMProcess(object):
             self.em_stats.append({'em_mean':mean_tmp, 'em_std':std_tmp, 'em_max':np.max(mean_tmp), 'T_max':bin_centers[np.argmax(mean_tmp)], 'T_mean':bin_centers})
             #save binned em
             self.em_binned.append(tmp)
+            
+    
+    def fit_em(self,cool_lims=[10.**6.,10.**6.6],hot_lims=None):
+        """Fit binned emission measure histograms on hot and cool sides"""
+        
+        if not self.em_binned:
+            raise ValueError("EM histograms not yet binned. Run self.calc_stats() before fitting EMs.")
+    
+        for upper in self.em_binned:
+            tmp = []
+            for lower in upper:
+                #split the curve
+                t_cool,em_cool,t_hot,em_hot = self._split_branch(lower['bin_centers'],lower['hist'])
+                #calculate limits if necessary
+                if not cool_lims:
+                    cool_lims = self._find_fit_limits(t_cool,em_cool)
+                if not hot_lims:
+                    hot_lims = self._find_fit_limits(t_hot,em_hot)
+                #compute fit values
+                dc = self._fit_to_power_law(t_cool,em_cool,cool_lims)
+                dh = self._fit_to_power_law(t_hot,em_hot,hot_lims)
+                #store
+                tmp.append({'cool':dc,'hot':dh})
+            self.fits.append(tmp)
+            
+            
+    def calc_fit_stats(self,mc_threshold=0.9,**kwargs):
+        """Calculate fit statistics"""
+        
+        if not self.fits:
+            raise ValueError("Before computing fit statistics, run self.fit_em() to calculate fits to EM distributions.")
+                    
+        for upper in self.fits:
+            tmp_cool,tmp_hot,tmp_lim_cool,tmp_lim_hot = [],[],[],[]
+            for lower in upper:
+                if lower['cool'] is not None:
+                    tmp_cool.append([lower['cool']['a'],lower['cool']['b']])
+                    tmp_lim_cool.append(lower['cool']['limits'])
+                if lower['hot'] is not None:
+                    tmp_hot.append([lower['hot']['a'],lower['hot']['b']])
+                    tmp_lim_hot.append(lower['hot']['limits'])
+                    
+            #reject small number statistics
+            if float(len(tmp_cool))/float(len(upper)) >= mc_threshold:
+                dc = {'a':np.mean(np.array(tmp_cool),axis=0)[0], 'b':np.mean(np.array(tmp_cool),axis=0)[1], 'sigma_a':np.std(np.array(tmp_cool),axis=0)[0],'limits':np.mean(np.array(tmp_lim_cool),axis=0)}
+            else:
+                dc = None
+            if float(len(tmp_hot))/float(len(upper)) >= mc_threshold:
+                dh = {'a':np.mean(np.array(tmp_hot),axis=0)[0], 'b':np.mean(np.array(tmp_hot),axis=0)[1], 'sigma_a':np.std(np.array(tmp_hot),axis=0)[0],'limits':np.mean(np.array(tmp_lim_hot),axis=0)}
+            else:
+                dh = None
+                
+            self.fits_stats.append({'cool':dc,'hot':dh})
+            
+    
+    def _find_fit_limits(self,t,em):
+        """Trim temperature and EM for fitting"""
+        
+        #just off the peak temperature
+        t1 = 0.98*t[np.argmax(em)]
+        #get the last entry for the cool side and the first entry on the hot side
+        hc_var = int((np.gradient(em,np.gradient(t))/np.fabs(np.gradient(em,np.gradient(t))))[int(len(t)/2)])
+        indices = np.where(em < np.max(em)/(1e+2))[0]
+        if indices == 0:
+            self.logger.warning("Cannot find temperature limits in custom fitting. Setting to None.")
+            return None
+        t2 = t[indices[-int((hc_var+1)/2)]+hc_var]
+        if t2 < self.t_fit_min or t2 > self.t_fit_max:
+            self.logger.warning("Fitting branch limits outside of acceptable range logT=(%.3f,%.3f)"%(np.log10(self.t_fit_min),np.log10(self.t_fit_max)))
+            return None
+
+        return sorted([t1,t2])
+    
+    
+    def _split_branch(self,t,em):
+        """Split EM into hot and cool branch for fitting"""
+        
+        max_t = t[np.argmax(em)]
+        return t[t<=max_t],em[t<=max_t],t[t>max_t],em[t>max_t]
+    
+    
+    def _fit_to_power_law(self,t,em,limits):
+        """Fit EM branch to power-law function for given bounds"""
+        
+        #Check for invalid fitting limits
+        if not limits:
+            self.logger.warning("Returning None fit parameters for None fitting limits.")
+            return None
+        
+        #Clip temperature and emission measure
+        t_fit = t[(t>=limits[0]) & (t<=limits[1])]
+        em_fit = em[(t>=limits[0]) & (t<=limits[1])]
+        #Fitting
+        pars,covar = curve_fit(self._power_law,t_fit,em_fit)
+        
+        return {'a':pars[0],'b':pars[1],'sigma_a':np.sqrt(np.diag(covar))[0],'limits':limits}
+    
+    
+    def _power_law(self,x,a,b):
+        """Function to use for fitting branches of emission measure distribution"""
+        return b*x**a
 
 
 
