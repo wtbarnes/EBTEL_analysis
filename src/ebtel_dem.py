@@ -217,7 +217,7 @@ class DEMProcess(object):
         #Fitting
         pars,covar = curve_fit(self._fit_function,np.log10(t_fit),np.log10(em_fit))
         
-        return {'a':pars[0],'b':10.**pars[1],'sigma_a':np.sqrt(np.diag(covar))[0],'limits':limits}
+        return {'a':pars[0],'b':pars[1],'sigma_a':np.sqrt(np.diag(covar))[0],'limits':limits}
     
     
     def _fit_function(self,x,a,b):
