@@ -15,7 +15,7 @@ from scipy.optimize import curve_fit
 
 class DEMProcess(object):
 
-    def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, t_fit_max=10.**7.2, t_fit_min=10.**6., **kwargs):
+    def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, t_fit_max=10.**7.2, t_fit_min=10.**6., em_cutoff=10.**23. **kwargs):
         """Constructor for process class"""
         #set up paths
         child_path = os.path.join(root_dir, species+'_heating_runs', 'alpha'+str(alpha), 'data')
@@ -28,6 +28,7 @@ class DEMProcess(object):
         self.aspect_ratio_factor = aspect_ratio_factor
         self.t_fit_min = t_fit_min
         self.t_fit_max = t_fit_max
+        self.em_cutoff = em_cutoff
         #instantiate binner class
         self.binner = emb.EM_Binner(2.*loop_length*1.e+8)
         #define variables to be used later
@@ -163,7 +164,7 @@ class DEMProcess(object):
         #just off the peak temperature
         t1 = 0.98*t[np.argmax(em)]
         #get the last entry for the cool side and the first entry on the hot side
-        dEmdT_mp = np.gradient(em)[int(len(t)/2)]
+        dEmdT_mp = np.gradient(em[em>self.em_cutoff],np.gradient(t[em>self.em_cutoff]))[int(len(em[em>self.em_cutoff])/2)]
         hc_var = int(dEmdT_mp/np.fabs(dEmdT_mp))
         indices = np.where(em < np.max(em)/(1e+2))[0]
         if indices == 0:
