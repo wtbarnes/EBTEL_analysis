@@ -167,7 +167,7 @@ class DEMProcess(object):
         dEmdT_mp = np.gradient(em[em>self.em_cutoff],np.gradient(t[em>self.em_cutoff]))[int(len(em[em>self.em_cutoff])/2)]
         hc_var = int(dEmdT_mp/np.fabs(dEmdT_mp))
         indices = np.where(em < np.max(em)/(1e+2))[0]
-        if indices == 0:
+        if len(indices) == 0:
             self.logger.warning("Cannot find temperature limits in custom fitting. Setting to None.")
             return None
         t2 = t[indices[-int((hc_var+1)/2)]+hc_var]
