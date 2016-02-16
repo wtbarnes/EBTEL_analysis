@@ -4,6 +4,7 @@
 #14 May 2015
 
 #Import needed modules
+import logging
 import dill as pickle
 import itertools
 import numpy as np
@@ -16,91 +17,58 @@ from scipy.optimize import curve_fit
 
 class DEMPlotter(object):
 
-    def __init__(self,temp_list,em_list,temp_mean,em_mean,em_sigma,cool_fits,hot_fits,**kwargs):
-        #static parameters
-        self.linestyles = (':','-.','--','-')
-        self.colors = sns.xkcd_palette(4*['black'] + 4*['windows blue'] + 4*['medium green'] + 4*['fire engine red'] + 4*['barney purple'])
-        #check for custom parameters
-        if 'em_cutoff' in kwargs:
-            self.em_cutoff = kwargs['em_cutoff']
-        else:
-            self.em_cutoff = 23.0
-        if 'dpi' in kwargs:
-            self.dpi = kwargs['dpi']
-        else:
-            self.dpi = 1000
-        if 'format' in kwargs:
-            self.format = kwargs['format']
-        else:
-            self.format = 'eps'
-        if 'fs' in kwargs:
-            self.fs = kwargs['fs']
-        else:
-            self.fs = 18.0
-        if 'alfs' in kwargs:
-            self.alfs = kwargs['alfs']
-        else:
-            self.alfs = 0.75
-        if 'figsize' in kwargs:
-            self.figsize = kwargs['figsize']
-        else:
-            self.figsize = (12,12)
+    def __init__(self,em,em_stats,fits,fits_stats,Tn = np.arange(250,5250,250),dpi=1000,fontsize=18.,figsize=(8,8),alfs=0.75,fformat='eps',**kwargs):
+        #set up logger
+        self.logger = logging.getLogger(type(self).__name__)
         #arguments
-        self.temp_list = temp_list
-        self.em_list = em_list
-        self.temp_mean = np.array(temp_mean)
-        self.em_mean = np.array(em_mean)
-        self.em_sigma = np.array(em_sigma)
-        self.cool_fits = cool_fits
-        self.hot_fits = hot_fits
+        self.em = em
+        self.em_stats = em_stats
+        self.fits = fits
+        self.fits_stats = fits_stats
         #keyword arguments
-        if 'Tn' in kwargs:
-            self.Tn = kwargs['Tn']
-        else:
-            self.Tn = np.arange(250,5250,250)
+        self.dpi,self.fontsize,self.figsize,self.alfs,self.fformat = dpi,fontsize,figsize,alfs,fformat
+        self.Tn = Tn
         self.Tndelta = self.Tn[1] - self.Tn[0]
+        #static parameters for plot styling
+        self.linestyles = (':','-.','--','-')
+        self.colors = []
+        [self.colors.extend(len(linestyles)*[sns.color_palette('deep')[i]]) for i in range(int(len(Tn)/len(self.linestyles)))]
+        if len(self.colors) != len(self.Tn):
+            self.logger.warning("Number of colors does not match number of wait-time values. Reconfigure one or the other before plotting.")
 
 
-    def plot_em_curves(self,**kwargs):
-        #spacing between tn curves (artificial)
-        delta_em = 0.2
-
-        #set up figure
+    def plot_em_curves(self,delta_em = 0.2,y_limits=[26,32],print_fig_filename=None,**kwargs):
+        """Plot mean EM distributions for each Tn with superimposed fit lines"""
+        
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
 
-        #print lines
-        for i in range(len(self.em_mean)):
-            ax.plot(self.temp_mean[i], self.em_mean[i]+i*delta_em, linestyle=self.linestyles[i%len(self.linestyles)], color=self.colors[i], label=r'$%d$'%self.Tn[i] )
-            if 'fit_lines' in kwargs:
-                try:
-                    ax.plot(kwargs['fit_lines']['t_cool'][i], (self.cool_fits[i][0]*kwargs['fit_lines']['t_cool'][i] + self.cool_fits[i][1]) + i*delta_em, linewidth=2.0, color='blue')
-                except:
-                    pass
-                    
-                try:
-                    ax.plot(kwargs['fit_lines']['t_hot'][i], (self.hot_fits[i][0]*kwargs['fit_lines']['t_hot'][i] + self.hot_fits[i][1]) + i*delta_em, linewidth=2.0, color='red')
-                except:
-                    pass
+        for i in range(len(self.em_stats)):
+            #em
+            ax.plot(self.em_stats[i]['T_mean'], 10.**(i*delta_em)*self.em_stats[i]['em_mean'], linestyle=self.linestyles[i%len(self.linestyles)], color=self.colors[i], label=r'$%d$'%self.Tn[i] )
+            #fit lines
+            if self.fits_stats[i]['cool'] is not None:
+                t = np.array([self.fits_stats[i]['cool']['limits'][0],self.fits_stats[i]['cool']['limits'][1]])
+                ax.plot(t,10.**(i*delta_em)*10.**self.fits_stats[i]['cool']['b']*t**self.fits_stats[i]['cool']['a'],color=sns.color_palette('bright')[0], linewidth=2, linestyle='solid')
+            if self.fits_stats[i]['hot'] is not None:
+                t = np.array([self.fits_stats[i]['hot']['limits'][0],self.fits_stats[i]['hot']['limits'][1]])
+                ax.plot(t,10.**(i*delta_em)*10.**self.fits_stats[i]['hot']['b']*t**self.fits_stats[i]['hot']['a'],color=sns.color_palette('bright')[2], linewidth=2, linestyle='solid')
 
         #set labels
-        ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fs)
-        ax.set_ylabel(r'$\log\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
+        ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fontsize)
+        ax.set_ylabel(r'$\log\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
         ax.set_xlim([5.5,7.5])
-        if 'y_limits' in kwargs:
-            ax.set_ylim(kwargs['y_limits'])
-        else:
-            ax.set_ylim([27,33])
-        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
+        ax.set_ylim(y_limits)
+        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         #legend
-        leg = ax.legend(loc=2,fontsize=self.alfs*self.fs,title=r'$T_N$ $\mathrm{(s)}$',ncol=2,bbox_to_anchor=(-0.07,1.05))
-        plt.setp(leg.get_title(),fontsize=self.alfs*self.fs)
+        leg = ax.legend(loc=2,fontsize=self.alfs*self.fontsize,title=r'$T_N$ $\mathrm{(s)}$',ncol=2,bbox_to_anchor=(-0.07,1.05))
+        plt.setp(leg.get_title(),fontsize=self.alfs*self.fontsize)
         #avoid cutting off labels
         plt.tight_layout()
 
         #save or show the figure
-        if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi,bbox_extra_artists=[leg],bbox_inches='tight')
+        if 'print_fig_filename' is not None:
+            plt.savefig(print_fig_filename+'.'+self.format,format=self.format,dpi=self.dpi,bbox_extra_artists=[leg],bbox_inches='tight')
         else:
             plt.show()
 
