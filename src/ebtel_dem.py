@@ -16,7 +16,7 @@ from scipy.interpolate import interp1d
 
 class DEMProcess(object):
 
-    def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, t_fit_max=10.**7.2, t_fit_min=10.**6., em_cutoff=10.**23., **kwargs):
+    def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, em_cutoff=1.e+25., **kwargs):
         """Constructor for process class"""
         #set up paths
         child_path = os.path.join(root_dir, species+'_heating_runs', 'alpha'+str(alpha), 'data')
@@ -27,8 +27,6 @@ class DEMProcess(object):
         #configure keyword arguments
         self.tpulse = tpulse
         self.aspect_ratio_factor = aspect_ratio_factor
-        self.t_fit_min = t_fit_min
-        self.t_fit_max = t_fit_max
         self.em_cutoff = em_cutoff
         #instantiate binner class
         self.binner = emb.EM_Binner(2.*loop_length*1.e+8)
@@ -204,7 +202,7 @@ class DEMProcess(object):
         
         #Check for invalid fitting limits
         if not limits:
-            self.logger.warning("Returning None fit parameters for None fitting limits.")
+            self.logger.debug("Returning None fit parameters for None fitting limits.")
             return None
         
         #Clip temperature and emission measure
