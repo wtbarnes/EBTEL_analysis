@@ -11,6 +11,7 @@ import logging
 import itertools
 import em_binner as emb
 from scipy.optimize import curve_fit
+from scipy.interpolate import interp1d
 
 
 class DEMProcess(object):
@@ -105,7 +106,7 @@ class DEMProcess(object):
             self.em_binned.append(tmp)
             
     
-    def fit_em(self,cool_lims=[10.**6.,10.**6.6],hot_lims=None):
+    def fit_em(self,cool_lims=[10.**6.,10.**6.5],hot_lims=None):
         """Fit binned emission measure histograms on hot and cool sides"""
         
         if not self.em_binned:
@@ -121,6 +122,9 @@ class DEMProcess(object):
                     cool_lims = self._find_fit_limits(t_cool,em_cool)
                 if not hot_lims:
                     hot_lims = self._find_fit_limits(t_hot,em_hot)
+                #check limits
+                cool_lims = self._check_fit_limits(t_cool,em_cool,cool_lims)
+                hot_lims = self._check_fit_limits(t_hot,em_hot,hot_lims)
                 #compute fit values
                 dc = self._fit_to_power_law(t_cool,em_cool,cool_lims)
                 dh = self._fit_to_power_law(t_hot,em_hot,hot_lims)
@@ -167,15 +171,25 @@ class DEMProcess(object):
         dEmdT_mp = np.gradient(em[em>self.em_cutoff],np.gradient(t[em>self.em_cutoff]))[int(len(em[em>self.em_cutoff])/2)]
         hc_var = int(dEmdT_mp/np.fabs(dEmdT_mp))
         indices = np.where(em < np.max(em)/(1e+2))[0]
-        if len(indices) == 0:
-            self.logger.warning("Cannot find temperature limits in custom fitting. Setting to None.")
-            return None
         t2 = t[indices[-int((hc_var+1)/2)]+hc_var]
-        if t2 < self.t_fit_min or t2 > self.t_fit_max:
-            self.logger.warning("Fitting branch limits outside of acceptable range logT=(%.3f,%.3f)"%(np.log10(self.t_fit_min),np.log10(self.t_fit_max)))
-            return None
 
         return sorted([t1,t2])
+        
+        
+    def _check_fit_limits(self,t,em,limits):
+        """Check validity of fit limits"""
+        
+        if limits[0] < t[0] or limits[1] > t[-1]:
+            self.logger.warning("Fit limits outside of temperature range. Returning None.")
+            return None
+            
+        f = interp1d(t,em,kind='cubic')
+        emnew = f(np.linspace(limits[0],limits[1],num=100,endpoint=True))
+        if emnew[0] < self.em_cutoff or emnew[1] < self.em_cutoff:
+            self.logger.warning("Fit limits below EM threshold. Returning None.")
+            return None
+        
+        return limits
     
     
     def _split_branch(self,t,em):
