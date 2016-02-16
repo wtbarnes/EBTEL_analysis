@@ -21,6 +21,7 @@ parser.add_argument("-t","--t_pulse",type=float,help="Width of the heating pulse
 parser.add_argument("-S","--solver",help="Solver used to compute solutions.")
 parser.add_argument("--root_dir",help="Optional root directory for config files")
 parser.add_argument("--t_wait_scaling",type=float,help="Optional parameter to force scaling between wait time and event amplitude, Q\propto T_N^b; b in Cargill(2014)")
+parser.add_argument("--quiet_logger",type=bool,help="Optional parameter to set logging level to warning.")
 #Declare the parser dictionary
 args = parser.parse_args()
 
@@ -75,7 +76,10 @@ else:
     mc = 1.0e+4
     
 #configure logging
-logging.basicConfig(stream=sys.stdout,level=logging.DEBUG)
+if args.quiet_logger:
+    logging.basicConfig(stream=sys.stdout,level=logging.WARNING)
+else:
+    logging.basicConfig(stream=sys.stdout,level=logging.DEBUG)
 
 #instantiate configuration class and print configuration files as well as job configuration file
 config = Configurer(config_dict, root_dir, Hn=Hn, delta_q=delta_q, mc=mc, build_paths=True, t_wait_q_scaling=t_wait_scaling, constraint_tol=1e-3)
