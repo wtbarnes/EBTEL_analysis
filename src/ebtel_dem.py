@@ -167,13 +167,14 @@ class DEMProcess(object):
         """Trim temperature and EM for fitting"""
         
         if limits is None:
-            #just off the peak temperature
-            t1 = self.em_peak_falloff*t[np.argmax(em)]
             #get the last entry for the cool side and the first entry on the hot side
             dEmdT_mp = np.gradient(em[em>self.em_cutoff],np.gradient(t[em>self.em_cutoff]))[int(len(em[em>self.em_cutoff])/2)]
             hc_var = int(dEmdT_mp/np.fabs(dEmdT_mp))
-            indices = np.where(em < np.max(em)/(1e+2))[0]
+            indices = np.where(em < self.em_cutoff)[0]
             t2 = t[indices[-int((hc_var+1)/2)]+hc_var]
+            #get temperature corresponding to just off peak EM
+            indices = np.where(em<self.em_peak_falloff*np.max(em))[0]
+            t1 = t[indices[-int((hc_var+1)/2)]]
             limits = sorted([t1,t2])
 
         return self._check_fit_limits(t,em,limits)
