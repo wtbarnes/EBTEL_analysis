@@ -120,8 +120,8 @@ class DEMProcess(object):
                 cool_lims = self._find_fit_limits(t_cool,em_cool,cool_lims)
                 hot_lims = self._find_fit_limits(t_hot,em_hot,hot_lims)
                 #compute fit values
-                dc = self._fit_to_power_law(t_cool,em_cool,cool_lims)
-                dh = self._fit_to_power_law(t_hot,em_hot,hot_lims)
+                dc = self._fit_em_branch(t_cool,em_cool,cool_lims)
+                dh = self._fit_em_branch(t_hot,em_hot,hot_lims)
                 #store
                 tmp.append({'cool':dc,'hot':dh})
             self.fits.append(tmp)
@@ -180,7 +180,7 @@ class DEMProcess(object):
             return None
             
         f = interp1d(t,em,kind='cubic')
-        emnew = f(np.linspace(limits[0],limits[1],num=100,endpoint=True))
+        emnew = f(np.array([limits[0],limits[1]]))
         if emnew[0] < self.em_cutoff or emnew[1] < self.em_cutoff:
             self.logger.warning("Fit limits below EM threshold. Returning None.")
             return None
@@ -195,7 +195,7 @@ class DEMProcess(object):
         return t[t<=max_t],em[t<=max_t],t[t>max_t],em[t>max_t]
     
     
-    def _fit_to_power_law(self,t,em,limits):
+    def _fit_em_branch(self,t,em,limits):
         """Fit EM branch to power-law function for given bounds"""
         
         #Check for invalid fitting limits
@@ -207,14 +207,14 @@ class DEMProcess(object):
         t_fit = t[(t>=limits[0]) & (t<=limits[1])]
         em_fit = em[(t>=limits[0]) & (t<=limits[1])]
         #Fitting
-        pars,covar = curve_fit(self._power_law,t_fit,em_fit)
+        pars,covar = curve_fit(self._fit_function,np.log10(t_fit),np.log10(em_fit))
         
-        return {'a':pars[0],'b':pars[1],'sigma_a':np.sqrt(np.diag(covar))[0],'limits':limits}
+        return {'a':pars[0],'b':10.**pars[1],'sigma_a':np.sqrt(np.diag(covar))[0],'limits':limits}
     
     
-    def _power_law(self,x,a,b):
+    def _fit_function(self,x,a,b):
         """Function to use for fitting branches of emission measure distribution"""
-        return b*x**a
+        return b + a*x
 
 
 
