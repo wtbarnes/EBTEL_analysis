@@ -15,7 +15,7 @@ from scipy.optimize import curve_fit
 
 class DEMProcess(object):
 
-    def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, t_fit_max=10.**7.2, t_fit_min=10.**6., em_cutoff=10.**23. **kwargs):
+    def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, t_fit_max=10.**7.2, t_fit_min=10.**6., em_cutoff=10.**23., **kwargs):
         """Constructor for process class"""
         #set up paths
         child_path = os.path.join(root_dir, species+'_heating_runs', 'alpha'+str(alpha), 'data')
