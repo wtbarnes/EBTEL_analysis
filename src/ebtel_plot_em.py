@@ -54,11 +54,13 @@ class DEMPlotter(object):
                 t = np.array([self.fits_stats[i]['hot']['limits'][0],self.fits_stats[i]['hot']['limits'][1]])
                 ax.plot(t,10.**(i*delta_em)*10.**self.fits_stats[i]['hot']['b']*t**self.fits_stats[i]['hot']['a'],color=sns.color_palette('bright')[2], linewidth=2, linestyle='solid')
 
-        #set labels
+        #plot options
         ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fontsize)
         ax.set_ylabel(r'$\log\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
         ax.set_xlim([10**5.5,10**7.5])
         ax.set_ylim(y_limits)
+        ax.set_xscale('log')
+        ax.set_yscale('log')
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         #legend
         leg = ax.legend(loc=2,fontsize=self.alfs*self.fontsize,title=r'$T_N$ $\mathrm{(s)}$',ncol=2,bbox_to_anchor=(-0.07,1.05))
