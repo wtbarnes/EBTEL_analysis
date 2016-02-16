@@ -28,6 +28,7 @@ class DEMProcess(object):
         self.tpulse = tpulse
         self.aspect_ratio_factor = aspect_ratio_factor
         self.em_cutoff = em_cutoff
+        self.em_peak_falloff = em_peak_falloff
         #instantiate binner class
         self.binner = emb.EM_Binner(2.*loop_length*1.e+8)
         #define variables to be used later
@@ -161,7 +162,7 @@ class DEMProcess(object):
         
         if limits is None:
             #just off the peak temperature
-            t1 = 0.98*t[np.argmax(em)]
+            t1 = self.em_peak_falloff*t[np.argmax(em)]
             #get the last entry for the cool side and the first entry on the hot side
             dEmdT_mp = np.gradient(em[em>self.em_cutoff],np.gradient(t[em>self.em_cutoff]))[int(len(em[em>self.em_cutoff])/2)]
             hc_var = int(dEmdT_mp/np.fabs(dEmdT_mp))
@@ -176,13 +177,13 @@ class DEMProcess(object):
         """Check validity of fit limits"""
         
         if limits[0] < t[0] or limits[1] > t[-1]:
-            self.logger.warning("Fit limits outside of temperature range. Returning None.")
+            self.logger.warning("Fit limits outside of temperature range. %.2f < %.2f MK or %.2f > %.2f MK. Returning None."%(limits[0]/1e+6,t[0]/1e+6,limits[1]/1e+6,t[-1]/1e+6))
             return None
             
         f = interp1d(t,em,kind='cubic')
         emnew = f(np.array([limits[0],limits[1]]))
         if emnew[0] < self.em_cutoff or emnew[1] < self.em_cutoff:
-            self.logger.warning("Fit limits below EM threshold. Returning None.")
+            self.logger.warning("Fit limits below EM threshold. logEM0,logEM1 = (%.2f,%.2f). Returning None."%(np.log10(emnew[0],np.log10(emnew[1]))))
             return None
         
         return limits
