@@ -189,7 +189,7 @@ class DEMProcess(object):
         f = interp1d(t,em,kind='cubic')
         emnew = f(np.array([limits[0],limits[1]]))
         if emnew[0] < self.em_cutoff or emnew[1] < self.em_cutoff:
-            self.logger.warning("Fit limits below EM threshold. logEM0,logEM1 = (%.2f,%.2f). Returning None."%(np.log10(emnew[0],np.log10(emnew[1]))))
+            self.logger.warning("Fit limits below EM threshold, logEM_thresh=%.2f. logEM0,logEM1 = (%.2f,%.2f). Returning None."%(np.log10(self.em_cutoff),np.log10(emnew[0]),np.log10(emnew[1])))
             return None
         
         return limits
