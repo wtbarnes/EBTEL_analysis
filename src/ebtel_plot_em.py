@@ -37,7 +37,7 @@ class DEMPlotter(object):
             self.logger.warning("Number of colors does not match number of wait-time values. Reconfigure one or the other before plotting.")
 
 
-    def plot_em_curves(self,delta_em = 0.2,y_limits=[26,32],print_fig_filename=None,**kwargs):
+    def plot_em_curves(self,delta_em = 0.2,y_limits=[10**26.,10**32.],print_fig_filename=None,**kwargs):
         """Plot mean EM distributions for each Tn with superimposed fit lines"""
         
         fig = plt.figure(figsize=self.figsize)
@@ -57,7 +57,7 @@ class DEMPlotter(object):
         #set labels
         ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fontsize)
         ax.set_ylabel(r'$\log\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
-        ax.set_xlim([5.5,7.5])
+        ax.set_xlim([10**5.5,10**7.5])
         ax.set_ylim(y_limits)
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         #legend
@@ -67,7 +67,7 @@ class DEMPlotter(object):
         plt.tight_layout()
 
         #save or show the figure
-        if 'print_fig_filename' is not None:
+        if print_fig_filename is not None:
             plt.savefig(print_fig_filename+'.'+self.format,format=self.format,dpi=self.dpi,bbox_extra_artists=[leg],bbox_inches='tight')
         else:
             plt.show()
