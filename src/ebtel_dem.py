@@ -31,13 +31,13 @@ class DEMProcess(object):
         self.em_peak_falloff = em_peak_falloff
         #instantiate binner class
         self.binner = emb.EM_Binner(2.*loop_length*1.e+8)
-        #define variables to be used later
-        self.em, self.em_stats, self.em_binned, self.fits, self.fits_stats = [],[],[],[],[]
 
 
     def import_raw(self,Tn,save_to_file=None,**kwargs):
         """Import all runs for given Tn waiting time values; calculate EM distributions from t,T,n."""
 
+        self.em = []
+        
         for i in range(len(Tn)):
             #initialize lists
             tmp = []
@@ -82,9 +82,11 @@ class DEMProcess(object):
     def calc_stats(self,**kwargs):
         """Calculate mean, standard deviation and max for EM and T."""
 
-        if not self.em:
-            raise ValueError("Before computing EM statistics, run self.import_raw() to calculate EM data.")
+        if not hasattr(self,'em'):
+            raise AttributeError("Before computing EM statistics, run self.import_raw() to calculate EM data.")
 
+        self.em_stats, self.em_binned = [],[]
+        
         for em in self.em:
             #initialize list
             tmp = []
@@ -108,9 +110,11 @@ class DEMProcess(object):
     def fit_em(self,cool_limits=None,hot_limits=None):
         """Fit binned emission measure histograms on hot and cool sides"""
         
-        if not self.em_binned:
-            raise ValueError("EM histograms not yet binned. Run self.calc_stats() before fitting EMs.")
+        if not hasattr(self,'em_binned'):
+            raise AttributeError("EM histograms not yet binned. Run self.calc_stats() before fitting EMs.")
     
+        self.fits = []
+        
         for upper in self.em_binned:
             tmp = []
             for lower in upper:
@@ -131,9 +135,11 @@ class DEMProcess(object):
     def calc_fit_stats(self,mc_threshold=0.9,**kwargs):
         """Calculate fit statistics"""
         
-        if not self.fits:
-            raise ValueError("Before computing fit statistics, run self.fit_em() to calculate fits to EM distributions.")
+        if not hasattr(self,'fits'):
+            raise AttributeError("Before computing fit statistics, run self.fit_em() to calculate fits to EM distributions.")
                     
+        self.fits_stats = []
+        
         for upper in self.fits:
             tmp_cool,tmp_hot,tmp_lim_cool,tmp_lim_hot = [],[],[],[]
             for lower in upper:
