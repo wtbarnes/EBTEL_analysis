@@ -32,7 +32,7 @@ class DEMPlotter(object):
         #static parameters for plot styling
         self.linestyles = (':','-.','--','-')
         self.colors = []
-        [self.colors.extend(len(linestyles)*[sns.color_palette('deep')[i]]) for i in range(int(len(Tn)/len(self.linestyles)))]
+        [self.colors.extend(len(self.linestyles)*[sns.color_palette('deep')[i]]) for i in range(int(len(self.Tn)/len(self.linestyles)))]
         if len(self.colors) != len(self.Tn):
             self.logger.warning("Number of colors does not match number of wait-time values. Reconfigure one or the other before plotting.")
 
