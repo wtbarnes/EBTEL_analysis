@@ -104,7 +104,7 @@ class DEMProcess(object):
             self.em_binned.append(tmp)
             
     
-    def fit_em(self,cool_lims=None,hot_lims=None):
+    def fit_em(self,cool_limits=None,hot_limits=None):
         """Fit binned emission measure histograms on hot and cool sides"""
         
         if not self.em_binned:
@@ -116,6 +116,7 @@ class DEMProcess(object):
                 #split the curve
                 t_cool,em_cool,t_hot,em_hot = self._split_branch(lower['bin_centers'],lower['hist'])
                 #calculate limits if necessary
+                cool_lims,hot_lims = cool_limits,hot_limits
                 cool_lims = self._find_fit_limits(t_cool,em_cool,cool_lims)
                 hot_lims = self._find_fit_limits(t_hot,em_hot,hot_lims)
                 #compute fit values
