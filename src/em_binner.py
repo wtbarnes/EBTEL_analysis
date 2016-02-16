@@ -7,7 +7,6 @@
 #Import needed modules
 import logging
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 class EM_Binner(object):
