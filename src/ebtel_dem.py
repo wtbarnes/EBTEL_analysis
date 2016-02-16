@@ -158,7 +158,7 @@ class DEMProcess(object):
     def _find_fit_limits(self,t,em,limits):
         """Trim temperature and EM for fitting"""
         
-         if limits is None:
+        if limits is None:
             #just off the peak temperature
             t1 = 0.98*t[np.argmax(em)]
             #get the last entry for the cool side and the first entry on the hot side
