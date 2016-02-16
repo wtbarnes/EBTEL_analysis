@@ -104,7 +104,7 @@ class DEMProcess(object):
             self.em_binned.append(tmp)
             
     
-    def fit_em(self,cool_lims=[10.**6.,10.**6.5],hot_lims=None):
+    def fit_em(self,cool_lims=None,hot_lims=None):
         """Fit binned emission measure histograms on hot and cool sides"""
         
         if not self.em_binned:
@@ -116,13 +116,8 @@ class DEMProcess(object):
                 #split the curve
                 t_cool,em_cool,t_hot,em_hot = self._split_branch(lower['bin_centers'],lower['hist'])
                 #calculate limits if necessary
-                if not cool_lims:
-                    cool_lims = self._find_fit_limits(t_cool,em_cool)
-                if not hot_lims:
-                    hot_lims = self._find_fit_limits(t_hot,em_hot)
-                #check limits
-                cool_lims = self._check_fit_limits(t_cool,em_cool,cool_lims)
-                hot_lims = self._check_fit_limits(t_hot,em_hot,hot_lims)
+                cool_lims = self._find_fit_limits(t_cool,em_cool,cool_lims)
+                hot_lims = self._find_fit_limits(t_hot,em_hot,hot_lims)
                 #compute fit values
                 dc = self._fit_to_power_law(t_cool,em_cool,cool_lims)
                 dh = self._fit_to_power_law(t_hot,em_hot,hot_lims)
@@ -160,18 +155,20 @@ class DEMProcess(object):
             self.fits_stats.append({'cool':dc,'hot':dh})
             
     
-    def _find_fit_limits(self,t,em):
+    def _find_fit_limits(self,t,em,limits):
         """Trim temperature and EM for fitting"""
         
-        #just off the peak temperature
-        t1 = 0.98*t[np.argmax(em)]
-        #get the last entry for the cool side and the first entry on the hot side
-        dEmdT_mp = np.gradient(em[em>self.em_cutoff],np.gradient(t[em>self.em_cutoff]))[int(len(em[em>self.em_cutoff])/2)]
-        hc_var = int(dEmdT_mp/np.fabs(dEmdT_mp))
-        indices = np.where(em < np.max(em)/(1e+2))[0]
-        t2 = t[indices[-int((hc_var+1)/2)]+hc_var]
+         if limits is None:
+            #just off the peak temperature
+            t1 = 0.98*t[np.argmax(em)]
+            #get the last entry for the cool side and the first entry on the hot side
+            dEmdT_mp = np.gradient(em[em>self.em_cutoff],np.gradient(t[em>self.em_cutoff]))[int(len(em[em>self.em_cutoff])/2)]
+            hc_var = int(dEmdT_mp/np.fabs(dEmdT_mp))
+            indices = np.where(em < np.max(em)/(1e+2))[0]
+            t2 = t[indices[-int((hc_var+1)/2)]+hc_var]
+            limits = sorted([t1,t2])
 
-        return sorted([t1,t2])
+        return self._check_fit_limits(t,em,limits)
         
         
     def _check_fit_limits(self,t,em,limits):
