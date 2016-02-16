@@ -163,7 +163,8 @@ class DEMProcess(object):
         #just off the peak temperature
         t1 = 0.98*t[np.argmax(em)]
         #get the last entry for the cool side and the first entry on the hot side
-        hc_var = int((np.gradient(em,np.gradient(t))/np.fabs(np.gradient(em,np.gradient(t))))[int(len(t)/2)])
+        dEmdT_mp = np.gradient(em,np.gradient(t))[int(len(t)/2)]
+        hc_var = int(dEmdT_mp/np.fabs(dEmdT_mp))
         indices = np.where(em < np.max(em)/(1e+2))[0]
         if indices == 0:
             self.logger.warning("Cannot find temperature limits in custom fitting. Setting to None.")
