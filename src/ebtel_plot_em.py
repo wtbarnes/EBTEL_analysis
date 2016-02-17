@@ -75,7 +75,7 @@ class DEMPlotter(object):
             plt.show()
 
 
-    def plot_em_curve(self,tn_val,**kwargs):
+    def plot_em_curve(self,tn_val,y_limits=[10**25.,10**28.],**kwargs):
         """Plot MC and mean EM curves for single value of Tn"""
         
         tn_index = np.where(self.Tn==tn_val)[0]
@@ -100,7 +100,7 @@ class DEMPlotter(object):
         ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fontsize)
         ax.set_ylabel(r'$\log{\mathrm{EM}}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
         ax.set_xlim([10**5.5,10**7.5])
-        ax.set_ylim([25,28])
+        ax.set_ylim(y_limits)
         ax.set_xscale('log')
         ax.set_yscale('log')
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
