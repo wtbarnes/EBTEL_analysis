@@ -63,7 +63,7 @@ class DEMPlotter(object):
         ax.set_yscale('log')
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         #legend
-        leg = ax.legend(loc=2,fontsize=self.alfs*self.fontsize,title=r'$T_N$ $\mathrm{(s)}$',ncol=2,bbox_to_anchor=(-0.07,1.05))
+        leg = ax.legend(loc=2,fontsize=self.alfs*self.fontsize,title=r'$T_N$ $\mathrm{(s)}$',ncol=2,bbox_to_anchor=(-0.09,1.07))
         plt.setp(leg.get_title(),fontsize=self.alfs*self.fontsize)
         #avoid cutting off labels
         plt.tight_layout()
@@ -75,28 +75,35 @@ class DEMPlotter(object):
             plt.show()
 
 
-    def plot_em_curve(self,tn_index,**kwargs):
-        #get single list
-        em_list = self.em_list[tn_index]
-        temp_list = self.temp_list[tn_index]
+    def plot_em_curve(self,tn_val,**kwargs):
+        """Plot MC and mean EM curves for single value of Tn"""
+        
+        tn_index = np.where(self.Tn==tn_val)[0]
+        if len(tn_index) != 1:
+            raise ValueError("Invalid wait time %f. Use a valid value from self.Tn"%(tn_val))
+        else:
+            tn_index = tn_index[0]
         
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
 
-        #print lines
-        ax.fill_between(self.temp_mean[tn_index], self.em_mean[tn_index]-self.em_sigma[tn_index], self.em_mean[tn_index]+self.em_sigma[tn_index], facecolor='red', edgecolor='red', alpha=0.45)
-        for i in range(len(temp_list)):
-            ax.plot(temp_list[i],em_list[i],color='black',linestyle=self.linestyles[-1],alpha=0.25)
-        ax.plot(self.temp_mean[tn_index],self.em_mean[tn_index],color='black')
+        #standard deviation
+        ax.fill_between(self.em_stats[tn_index]['T_mean'], self.em_stats[tn_index]['em_mean']/self.em_stats[tn_index]['em_std'], self.em_stats[tn_index]['em_mean']*self.em_stats[tn_index]['em_std'], facecolor=sns.color_palette('deep')[2], edgecolor=sns.color_palette('deep')[2], alpha=0.45)
+        #MC histograms
+        for h in self.em[tn_index]:
+            ax.hist(h['T'],bins=h['bins'],weights=h['em'],histtype='step',color=sns.color_palette('deep')[0],linestyle=self.linestyles[-1],alpha=0.1)
+        #mean
+        ax.plot(self.em_stats[tn_index]['T_mean'],self.em_stats[tn_index]['em_mean'],color='black',linestyle=self.linestyles[-1],linewidth=2)
 
         #set labels
-        ax.set_title(r"EBTEL EM, $\langle T_n\rangle$ = "+str(self.Tn[tn_index])+" s",fontsize=self.fs)
-        ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fs)
-        ax.set_ylabel(r'$\log{\mathrm{EM}}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
-        ax.set_xlim([5.5,7.5])
-        #ax.set_ylim([27,30])
-        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
+        ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fontsize)
+        ax.set_ylabel(r'$\log{\mathrm{EM}}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
+        ax.set_xlim([10**5.5,10**7.5])
+        ax.set_ylim([25,28])
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         #avoid cutting off labels
         plt.tight_layout()
 
