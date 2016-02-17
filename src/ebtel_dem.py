@@ -94,14 +94,13 @@ class DEMProcess(object):
             #loop over all mc runs
             i = 0
             for i in range(len(em)):
-                h,_ = np.histogram(em[i]['T'],bins=em[i]['bins'],weights=em[i]['em'])
+                h,b = np.histogram(em[i]['T'],bins=em[i]['bins'],weights=em[i]['em'])
                 tmp_mat[i,:] = h
-                tmp.append({'hist':h,'bin_centers':np.diff(em[i]['bins'])/2. + em[i]['bins'][0:-1]})
-            #compute statistics and bin centers (i.e. the temperature array)
-            mean_tmp,std_tmp = np.mean(tmp_mat,axis=0),np.std(tmp_mat,axis=0)
+                tmp.append({'hist':h,'bin_centers':np.diff(b)/2. + b[0:-1]})
+            #NOTE:Assuming all temperature arrays are the same!
             bin_centers = np.diff(em[0]['bins'])/2. + em[0]['bins'][0:-1]
-            #save stats
-            self.em_stats.append({'em_mean':mean_tmp, 'em_std':std_tmp, 'em_max':np.max(mean_tmp), 'T_max':bin_centers[np.argmax(mean_tmp)], 'T_mean':bin_centers})
+            #calculate and save stats
+            self.em_stats.append({'T_mean':bin_centers, 'em_mean':np.mean(tmp_mat,axis=0), 'em_std':np.std(tmp_mat,axis=0), 'em_max_mean':np.mean(np.max(tmp_mat,axis=1)), 'em_max_std':np.std(np.max(tmp_mat,axis=1)), 'T_max_mean':np.mean(bin_centers[np.argmax(tmp_mat,axis=1)]), 'T_max_std': np.std(bin_centers[np.argmax(tmp_mat,axis=1)]) })
             #save binned em
             self.em_binned.append(tmp)
             
