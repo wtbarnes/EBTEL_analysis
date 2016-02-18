@@ -33,6 +33,8 @@ if args.root_dir_figs is None:
     args.root_dir_figs = '/data/datadrive2/EBTEL_figs'
 if args.t_wait_q_scaling is None:
     args.t_wait_q_scaling = ''
+else:
+    args.t_wait_q_scaling = '-b'+str(args.t_wait_q_scaling)
 
 #figure formatting parameters
 fontsize = 22
