@@ -189,7 +189,7 @@ class DEMPlotter(object):
             plt.show()
             
             
-    def plot_em_derivs(self,em_cutoff=1e+23,y_limits=[-10,6]**kwargs):
+    def plot_em_derivs(self,em_cutoff=1e+23,y_limits=[-10,6],print_fig_filename=None,**kwargs):
         """Plot d(log(EM))/d(log(T)) as a function of T for all values of Tn"""
         
         #set up figure
