@@ -6,10 +6,11 @@
 #Import needed libraries
 import sys
 import os
+import logging
 import argparse
-import dill as pickle
+import pickle
 import numpy as np
-sys.path.append('/home/wtb2/Documents/EBTEL_analysis/src/')
+sys.path.append(os.path.join(os.environ[],'EBTEL_analysis/src/'))
 import ebtel_dem as ebd
 import ebtel_plot_em as ebpe
 
@@ -26,89 +27,66 @@ parser.add_argument("--root_dir_figs",help="Root directory to which figures will
 args = parser.parse_args()
 
 #optional command line parameters
-if args.root_dir:
-    root_dir = args.root_dir
-else:
-    root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'
-if args.root_dir_figs:
-    root_dir_figs = args.root_dir_figs
-else:
-    root_dir_figs = '/data/datadrive2/EBTEL-2fluid_figs/'
-if args.t_wait_q_scaling:
-    t_wait_q_scaling = args.t_wait_q_scaling
-    if len(t_wait_q_scaling) > 0:
-        t_wait_q_scaling = '-b' + str(t_wait_q_scaling)
-else:
-    t_wait_q_scaling = ''
-
-    
+if args.root_dir is None:
+    args.root_dir = '/data/datadrive2/EBTEL_runs'
+if args.root_dir_figs is None:
+    args.root_dir_figs = '/data/datadrive2/EBTEL_figs'
+if args.t_wait_q_scaling is None:
+    args.t_wait_q_scaling = ''
 
 #figure formatting parameters
 fontsize = 22
-figsize = (8,8)
 format = 'pdf'
-dpi = 1000 
 
 #static parameters
 t_wait = np.arange(250,5250,250)
-slope_limits = {'cool_lower':6.0,'cool_upper':6.6,'hot_lower':6.8,'hot_upper':7.3}
-lim_method = 'dynamic'
-fit_method = 'fit_all'
-max_percent_drop = 0.92
-delta_t = 0.5
+cool_limits = [10**6.0,10**6.5]
 
 #set directories and filenames
-figdir = '%s_heating_runs/alpha%s/'
+figdir = '%s_heating_runs/alpha%s'
 figname = 'ebtel_L%.1f_tpulse%.1f_alpha%s' + str(t_wait_q_scaling) + '_%s_heating'
 
+#set up logger
+logging.basicConfig(stream=sys.STDOUT,level=logging.INFO)
+
 #Instantiate Process class
-processer = ebd.DEMProcess(root_dir,args.species,args.alpha,args.loop_length,args.tpulse,args.solver,t_wait_q_scaling=t_wait_q_scaling,verbose=True)
+processor = ebd.DEMProcess(args.root_dir, args.species, args.alpha, args.loop_length, args.tpulse, args.solver, scaling_suffix=args.t_wait_q_scaling, aspect_ratio_factor=10.0, em_peak_falloff=0.7)
 #Import the data
-processer.import_raw(t_wait)
-#Compute mean and standard deviation for EM 
-processer.calc_stats()
+lvl1_file=os.path.join(args.root_dir_figs,figdir%(args.species,args.alpha),figname%(args.loop_length,args.tpulse,args.alpha,args.species)+'.lvl1_em.pickle')
+if os.path.isfile(lvl1_file):
+    logging.info("Importing level 1 results from %s"%(lvl1_file))
+    processor.import_from_file(lvl1_file)
+else:
+    processor.import_raw(t_wait,save_to_file=lvl1_file)
 
-#Instantiate Analyze class
-analyzer = ebd.DEMAnalyze(tuple(processer.em), tuple(processer.temp_em), tuple(processer.em_mean), tuple(processer.temp_mean), tuple(processer.em_std), verbose=True, slope_limits=slope_limits, fit_method=fit_method, lim_method=lim_method, delta_t=delta_t, max_percent_drop=max_percent_drop)
-#Filter and interpolate EM curves
-analyzer.interp_and_filter()
-#Fit all curves
-analyzer.many_fits()
+#Statistics and fitting
+processor.calc_stats()
+processor.fit_em(cool_limits=cool_limits)
+processor.calc_fit_stats()
 
-#Pickle results
-with open(root_dir_figs + figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_all_a.fits','wb') as f:
-    pickle.dump([analyzer.cool_fits_all,analyzer.hot_fits_all],f)
-f.close()
+#Pickle results for building histograms later
+with open(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species) + 'lvl2_fits.pickle'),'wb') as f:
+    pickle.dump(processor.fits,f)
 
 #Check for existence of needed directories and create temp names
-if not os.path.exists(root_dir_figs + figdir%(args.species,args.alpha)):
-    os.makedirs(root_dir_figs + figdir%(args.species,args.alpha))
-fn_temp = figdir%(args.species,args.alpha) + figname%(args.loop_length,args.tpulse,args.alpha,args.species)
-
-#Calculate temperature vectors for printing fit lines
-th = []
-tc = []
-for k in range(len(analyzer.hot_fits)):
-    sl = analyzer.fit_limits(analyzer.temp_mean[k],analyzer.em_mean[k])
-    tc.append(np.linspace(sl['cool_lower'],sl['cool_upper'],10))
-    th.append(np.linspace(sl['hot_lower'],sl['hot_upper'],10))
-fit_lines = {'t_cool':tc,'t_hot':th}
+if not os.path.exists(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha))):
+    os.makedirs(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha)))
+fn_temp = os.path.join(figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species))
 
 #Instantiate Plotter class
-plotter = ebpe.DEMPlotter(processer.temp_em, processer.em, processer.temp_mean, processer.em_mean, processer.em_std, analyzer.cool_fits, analyzer.hot_fits, dpi=dpi, format=format, fs=fontsize, figsize=figsize, alfs=0.65)
-#Build composite EM plot
-plotter.plot_em_curves(fit_lines=fit_lines, print_fig_filename=root_dir_figs + fn_temp + '_dem')
+plotter = ebpe.DEMPlotter(processor.em, processor.em_stats, processor.fits, processer.fits_stats, fformat=format, fontsize=fontsize, alfs=0.65)
+plotter.plot_em_curves(print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.em_all'))
 #Shorten figure size for next two plots
 plotter.figsize=(plotter.figsize[0],plotter.figsize[1]/2.0)
-#Build composite slope plot
-plotter.plot_em_slopes(print_fig_filename=root_dir_figs + fn_temp + '_hs_compare')
-#Build derivatives plots
-plotter.plot_em_derivs(print_fig_filename=root_dir_figs + fn_temp + '_dem_derivs')
+#Build remaining plots
+plotter.plot_em_slopes(print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.slopes'))
+plotter.plot_em_derivs(print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.derivs'))
+plotter.plot_em_max(y_limits_t=[10.**5.5,10.**7.5],print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.max'))
 #Check for existence of needed directories to construct MC curves
 if args.alpha is not 'uniform':
-    if not os.path.exists(root_dir_figs + fn_temp + '_dem_mc/'):
-        os.makedirs(root_dir_figs + fn_temp + '_dem_mc/')
+    if not os.path.exists(os.path.join(args.root_dir_figs, fn_temp + '_em_mc/')):
+        os.makedirs(os.path.join(args.root_dir_figs, fn_temp + '_em_mc/'))
     #Build MC plots for each Tn value
-    for k in range(len(t_wait)):
-        plotter.plot_em_curve(k, print_fig_filename=root_dir_figs + fn_temp + '_dem_mc/' + figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_%d_dem'%k)
+    for tw in t_wait:
+        plotter.plot_em_curve(tw, print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '_dem_mc/', figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_tn%d_em'%(tw)))
         
