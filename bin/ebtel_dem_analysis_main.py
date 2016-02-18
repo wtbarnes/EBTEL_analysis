@@ -49,6 +49,11 @@ figname = 'ebtel_L%.1f_tpulse%.1f_alpha%s' + str(args.t_wait_q_scaling) + '_%s_h
 #set up logger
 logging.basicConfig(stream=sys.stdout,level=logging.INFO)
 
+#Check for existence of needed directories and create temp names
+if not os.path.exists(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha))):
+    os.makedirs(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha)))
+fn_temp = os.path.join(figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species))
+
 #Instantiate Process class
 processor = ebd.DEMProcess(args.root_dir, args.species, args.alpha, args.loop_length, args.tpulse, args.solver, scaling_suffix=args.t_wait_q_scaling, aspect_ratio_factor=10.0, em_peak_falloff=0.7)
 #Import the data
@@ -67,11 +72,6 @@ processor.calc_fit_stats()
 #Pickle results for building histograms later
 with open(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species) + 'lvl2_fits.pickle'),'wb') as f:
     pickle.dump(processor.fits,f)
-
-#Check for existence of needed directories and create temp names
-if not os.path.exists(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha))):
-    os.makedirs(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha)))
-fn_temp = os.path.join(figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species))
 
 #Instantiate Plotter class
 plotter = ebpe.DEMPlotter(processor.em, processor.em_stats, processor.fits, processer.fits_stats, fformat=format, fontsize=fontsize, alfs=0.65)
