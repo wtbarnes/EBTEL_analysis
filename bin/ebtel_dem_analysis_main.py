@@ -74,7 +74,7 @@ with open(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha), fig
     pickle.dump(processor.fits,f)
 
 #Instantiate Plotter class
-plotter = ebpe.DEMPlotter(processor.em, processor.em_stats, processor.fits, processer.fits_stats, fformat=format, fontsize=fontsize, alfs=0.65)
+plotter = ebpe.DEMPlotter(processor.em, processor.em_stats, processor.fits, processor.fits_stats, fformat=format, fontsize=fontsize, alfs=0.65)
 plotter.plot_em_curves(print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.em_all'))
 #Shorten figure size for next two plots
 plotter.figsize=(plotter.figsize[0],plotter.figsize[1]/2.0)
