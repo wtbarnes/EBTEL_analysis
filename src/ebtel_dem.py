@@ -174,7 +174,7 @@ class DEMProcess(object):
             indices = np.where(em<self.em_peak_falloff*np.max(em))[0]
             t1 = t[indices[-int((hc_var+1)/2)]]
             limits = sorted([t1,t2])
-            self.logger.debug("Calculated fit limts: (logT1,logT2)=(%.2f,%.2f)"%(np.log10(limts[0]),np.log10(limits[1])))
+            self.logger.debug("Calculated fit limits: (logT1,logT2)=(%.2f,%.2f)"%(np.log10(limits[0]),np.log10(limits[1])))
 
         return self._check_fit_limits(t,em,limits)
 
