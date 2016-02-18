@@ -165,12 +165,14 @@ class DEMProcess(object):
         """Calculate and check temperature limits for fitting"""
 
         if limits is None:
-            #get the last entry for the cool side and the first entry on the hot side
-            dEmdT_mp = np.gradient(em[em>self.em_cutoff],np.gradient(t[em>self.em_cutoff]))[int(len(em[em>self.em_cutoff])/2)]
+            #dynamic index choice
+            f,tnew = interp1d(t[em>self.em_cutoff],em[em>self.em_cutoff]),np.linspace(t[em>self.em_cutoff][0],t[em>self.em_cutoff][-1],10)
+            dEmdT_mp = np.gradient(f(tnew),np.gradient(tnew))[int(len(tnew)/2)]
             hc_var = int(dEmdT_mp/np.fabs(dEmdT_mp))
+            #get temperature corresponding to just above cutoff
             indices = np.where(em < self.em_cutoff)[0]
             t2 = t[indices[-int((hc_var+1)/2)]+hc_var]
-            #get temperature corresponding to just off peak EM
+            #get temperature corresponding to just below peak EM
             indices = np.where(em<self.em_peak_falloff*np.max(em))[0]
             t1 = t[indices[-int((hc_var+1)/2)]]
             limits = sorted([t1,t2])
