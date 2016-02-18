@@ -115,7 +115,7 @@ class DEMPlotter(object):
             plt.show()
 
 
-    def plot_em_max(self,y_limits_em=[10**26.,10**28.],y_limits_t=[10**6.,10**7.],print_fig_filename=None,**kwargs):
+    def plot_em_max(self,t_ref_line=4e+6,y_limits_em=[10**26.,10**28.],y_limits_t=[10**6.,10**7.],print_fig_filename=None,**kwargs):
         """Plot max(EM) and corresponding temperature with error bars"""
         
         #set up figure
@@ -131,6 +131,7 @@ class DEMPlotter(object):
         #set labels
         ax.set_xlabel(r'$t_N$ $\mathrm{(s)}$',fontsize=self.fontsize)
         ax.set_ylabel(r'$T_m$ $\mathrm{(K)}$',fontsize=self.fontsize)
+        ax.axhline(y=t_ref_line,color='black',linestyle=':')
         ax.set_ylim(y_limits_t)
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
         ax.set_yscale('log')
