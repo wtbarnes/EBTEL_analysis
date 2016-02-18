@@ -88,5 +88,5 @@ if args.alpha is not 'uniform':
         os.makedirs(os.path.join(args.root_dir_figs, fn_temp + '_em_mc/'))
     #Build MC plots for each Tn value
     for tw in t_wait:
-        plotter.plot_em_curve(tw, print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '_dem_mc/', figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_tn%d_em'%(tw)))
+        plotter.plot_em_curve(tw, print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '_em_mc/', figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_tn%d_em'%(tw)))
         
