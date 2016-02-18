@@ -55,8 +55,8 @@ class DEMPlotter(object):
                 ax.plot(t,10.**(i*delta_em)*10.**self.fits_stats[i]['hot']['b']*t**self.fits_stats[i]['hot']['a'],color=sns.color_palette('bright')[2], linewidth=2, linestyle='solid')
 
         #plot options
-        ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fontsize)
-        ax.set_ylabel(r'$\log\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
+        ax.set_xlabel(r'$T$ $\mathrm{(K)}$',fontsize=self.fontsize)
+        ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
         ax.set_xlim([10**5.5,10**7.5])
         ax.set_ylim(y_limits)
         ax.set_xscale('log')
@@ -70,12 +70,12 @@ class DEMPlotter(object):
 
         #save or show the figure
         if print_fig_filename is not None:
-            plt.savefig(print_fig_filename+'.'+self.format,format=self.format,dpi=self.dpi,bbox_extra_artists=[leg],bbox_inches='tight')
+            plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi,bbox_extra_artists=[leg],bbox_inches='tight')
         else:
             plt.show()
 
 
-    def plot_em_curve(self,tn_val,y_limits=[10**25.,10**28.],**kwargs):
+    def plot_em_curve(self,tn_val,y_limits=[10**25.,10**28.],print_fig_filename=None,**kwargs):
         """Plot MC and mean EM curves for single value of Tn"""
         
         tn_index = np.where(self.Tn==tn_val)[0]
@@ -97,8 +97,8 @@ class DEMPlotter(object):
         ax.plot(self.em_stats[tn_index]['T_mean'],self.em_stats[tn_index]['em_mean'],color='black',linestyle=self.linestyles[-1],linewidth=2)
         
         #set labels
-        ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fontsize)
-        ax.set_ylabel(r'$\log{\mathrm{EM}}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
+        ax.set_xlabel(r'$T$ $\mathrm{(K)}$',fontsize=self.fontsize)
+        ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
         ax.set_xlim([10**5.5,10**7.5])
         ax.set_ylim(y_limits)
         ax.set_xscale('log')
@@ -108,126 +108,123 @@ class DEMPlotter(object):
         plt.tight_layout()
 
         #save or show figure
-        if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+        if print_fig_filename is not None:
+            plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
             plt.close('all')
         else:
             plt.show()
 
 
-    def plot_em_max(self,temp_max,em_max,**kwargs):
+    def plot_em_max(self,y_limits=[10**26.,10**28.],print_fig_filename=None,**kwargs):
+        """Plot max(EM) and corresponding temperature with error bars"""
+        
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         ax_twin = ax.twinx()
 
-        for i in range(len(self.Tn)):
-            #calculate average and std
-            mean_temp_max = np.mean(temp_max[i])
-            std_temp_max = np.std(temp_max[i])
-            mean_em_max = np.mean(em_max[i])
-            std_em_max = np.std(em_max[i])
+        for tw,ems in zip(self.Tn,self.em_stats):
             #plot points
-            ax.errorbar(self.Tn[i],mean_temp_max,yerr=std_temp_max,fmt='o',color='black')
-            ax_twin.errorbar(self.Tn[i],mean_em_max,yerr=std_em_max,fmt='*',color='black')
+            ax.errorbar(tw,ems['T_max_mean'],yerr=ems['T_max_std'],fmt='o',color='black')
+            ax_twin.errorbar(tw,ems['em_max_mean'],yerr=ems['em_max_std'],fmt='*',color='black')
 
         #set labels
-        ax.set_xlabel(r'$T_N$ $\mathrm{(s)}$',fontsize=self.fs)
-        ax.set_ylabel(r'$\log{T_{max}}$ $\mathrm{(K)}$',fontsize=self.fs)
-        ax.set_ylim([5.5,7.0])
+        ax.set_xlabel(r'$T_N$ $\mathrm{(s)}$',fontsize=self.fontsize)
+        ax.set_ylabel(r'$T_m$ $\mathrm{(K)}$',fontsize=self.fontsize)
+        ax.set_ylim([10**6.,10**7.])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
-        ax.tick_params(axis='both',labelsize=self.alfs*self.fs)
-        ax_twin.set_ylabel(r'$\log{\mathrm{EM}(T_{max})}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fs)
-        ax_twin.set_ylim([28,30])
-        ax_twin.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
+        ax.tick_params(axis='both',labelsize=self.alfs*self.fontsize)
+        ax_twin.set_ylabel(r'$\mathrm{EM}_{\mathrm{max}}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
+        ax_twin.set_ylim(y_limits)
+        ax_twin.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         #avoid cutting off labels
         plt.tight_layout()
 
         #save or show figure
-        if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+        if print_fig_filename is not None:
+            plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
             plt.close('all')
         else:
             plt.show()
 
 
-    def plot_em_slopes(self,**kwargs):
+    def plot_em_slopes(self,y_limits=[0,8],print_fig_filename=None,**kwargs):
+        """Plot cool and hot slopes versus heating frequency with error bars"""
+        
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         
         marker_cool,marker_hot = [],[]
-        for i in range(len(self.cool_fits)):
-            if self.cool_fits[i][0] is not False and self.cool_fits[i][2] is not False:
-                marker_cool = ax.errorbar(self.Tn[i],self.cool_fits[i][0],yerr=self.cool_fits[i][2][0],fmt='o',color='blue',label=r'$\mathrm{cool}$')
-
-            if self.hot_fits[i][0] is not False and self.hot_fits[i][2] is not False:
-                marker_hot = ax.errorbar(self.Tn[i],np.fabs(self.hot_fits[i][0]),yerr=self.hot_fits[i][2][0],fmt='o',color='red',label=r'$\mathrm{hot}$')
+        for tw,fs in zip(self.Tn,self.fits_stats):
+            if fs['cool'] is not None:
+                marker_cool = ax.errorbar(tw,fs['cool']['a'],yerr=fs['cool']['sigma_a'],fmt='o',color=sns.color_palette('deep')[0],label=r'$\mathrm{cool}$')
+            if fs['hot'] is not None:
+                marker_hot = ax.errorbar(tw,np.fabs(fs['hot']['a']),yerr=fs['hot']['sigma_a'],fmt='o',color=sns.color_palette('deep')[2],label=r'$\mathrm{hot}$')
 
         #set labels
-        ax.set_xlabel(r'$T_N$ $\mathrm{(s)}$',fontsize=self.fs)
-        ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{scaling}$',fontsize=self.fs)
-        ax.axhline(y=2,color='k',linestyle='--')
-        ax.axhline(y=3,color='k',linestyle='-')
-        ax.axhline(y=5,color='k',linestyle='-.')
-        ax.set_ylim([0,8])
+        ax.set_xlabel(r'$t_N$ $\mathrm{(s)}$',fontsize=self.fontsize)
+        ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{slope}$',fontsize=self.fontsize)
+        ax.axhline(y=2,color='k',linestyle=':')
+        ax.axhline(y=2.5,color='k',linestyle=':')
+        ax.axhline(y=3,color='k',linestyle=':')        
+        ax.axhline(y=5.5,color='k',linestyle=':')
+        ax.set_ylim(y_limits)
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
-        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
+        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         
         #legend
         if marker_cool and marker_hot:
-            ax.legend([marker_cool,marker_hot],[r'$a$, $\mathrm{cool}$',r'$b$, $\mathrm{hot}$'],loc=1,fontsize=self.alfs*self.fs,numpoints=1)
+            ax.legend([marker_cool,marker_hot],[r'$a$, $\mathrm{cool}$',r'$b$, $\mathrm{hot}$'],loc=1,fontsize=self.alfs*self.fontsize,numpoints=1)
             
         #avoid cutting off labels
         plt.tight_layout()
 
         #save or show figure
-        if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+        if print_fig_filename is not None:
+            plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
             plt.close('all')
         else:
             plt.show()
             
             
-    def plot_em_derivs(self,**kwargs):
+    def plot_em_derivs(self,em_cutoff=1e+23,y_limits=[-10,6]**kwargs):
         """Plot d(log(EM))/d(log(T)) as a function of T for all values of Tn"""
         
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         
+        i = 0
         #Iterate over t_wait values
-        for i in range(len(self.em_mean)):    
-            #remove data below given threshold of mean EM and T
-            filter_inds = np.where(self.em_mean[i] > (self.em_cutoff))
-            em_filter = np.array(self.em_mean[i])[filter_inds[0]]
-            temp_filter = np.array(self.temp_mean[i])[filter_inds[0]]
-            #compute derivative 
-            dem_dt = np.gradient(em_filter,np.gradient(temp_filter))
+        for ems in self.em_stats:
+            #filter and compute derivative 
+            em_tmp = np.log10(ems['em_mean'][ems['em_mean']>em_cutoff]) 
+            t_tmp = np.log10(ems['T_mean'][ems['em_mean']>em_cutoff])
+            dem_dt = np.gradient(em_tmp,np.gradient(t_tmp))
             #plotting
-            ax.plot(temp_filter, dem_dt, color=self.colors[i], linestyle=self.linestyles[i%len(self.linestyles)])
+            ax.plot(t_tmp, dem_dt, color=self.colors[i], linestyle=self.linestyles[i%len(self.linestyles)])
+            #increment counter
+            i += 1
             
         #set labels
-        ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fs)
-        ax.set_ylabel(r'$d\log{\mathrm{EM}}/d\log{T}$',fontsize=self.fs)
+        ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fontsize)
+        ax.set_ylabel(r'$d\log{\mathrm{EM}}/d\log{T}$',fontsize=self.fontsize)
         ax.axhline(y=2,color='k',linestyle=':')
         ax.axhline(y=3,color='k',linestyle=':')
         ax.axhline(y=-2.5,color='k',linestyle=':')
         ax.axhline(y=-5.5,color='k',linestyle=':')
-        if 'y_limits' in kwargs:
-            ax.set_ylim(kwargs['y_limits'])
-        else:
-            ax.set_ylim([-10,6])
+        ax.set_ylim(y_limits)
         ax.set_xlim([5.5,7.5])
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
-        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
+        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         #avoid cutting off labels
         plt.tight_layout()
         
         #save or show figure
-        if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+        if print_fig_filename is not None:
+            plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
             plt.close('all')
         else:
             plt.show()
@@ -270,9 +267,9 @@ class EMHistoBuilder(object):
         else:
             self.dpi = 1000
         if 'format' in kwargs:
-            self.format = kwargs['format']
+            self.fformat = kwargs['format']
         else:
-            self.format = 'eps'
+            self.fformat = 'eps'
         if 'fs' in kwargs:
             self.fs = kwargs['fs']
         else:
@@ -388,7 +385,7 @@ class EMHistoBuilder(object):
         
         #Print or show figure
         if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
             plt.close('all')
         else:
             plt.show()
