@@ -63,7 +63,7 @@ class DEMPlotter(object):
         ax.set_yscale('log')
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         #legend
-        leg = ax.legend(loc=2,fontsize=self.alfs*self.fontsize,title=r'$T_N$ $\mathrm{(s)}$',ncol=2,bbox_to_anchor=(-0.1,1.07))
+        leg = ax.legend(loc=2,fontsize=self.alfs*self.fontsize,title=r'$t_N$ $\mathrm{(s)}$',ncol=2,bbox_to_anchor=(-0.1,1.07))
         plt.setp(leg.get_title(),fontsize=self.alfs*self.fontsize)
         #avoid cutting off labels
         plt.tight_layout()
@@ -115,7 +115,7 @@ class DEMPlotter(object):
             plt.show()
 
 
-    def plot_em_max(self,y_limits=[10**26.,10**28.],print_fig_filename=None,**kwargs):
+    def plot_em_max(self,y_limits_em=[10**26.,10**28.],y_limits_t=[10**6.,10**7.],print_fig_filename=None,**kwargs):
         """Plot max(EM) and corresponding temperature with error bars"""
         
         #set up figure
@@ -129,13 +129,16 @@ class DEMPlotter(object):
             ax_twin.errorbar(tw,ems['em_max_mean'],yerr=ems['em_max_std'],fmt='*',color='black')
 
         #set labels
-        ax.set_xlabel(r'$T_N$ $\mathrm{(s)}$',fontsize=self.fontsize)
+        ax.set_xlabel(r'$t_N$ $\mathrm{(s)}$',fontsize=self.fontsize)
         ax.set_ylabel(r'$T_m$ $\mathrm{(K)}$',fontsize=self.fontsize)
-        ax.set_ylim([10**6.,10**7.])
+        ax.set_ylim(y_limits_t)
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
+        ax.set_yscale('log')
         ax.tick_params(axis='both',labelsize=self.alfs*self.fontsize)
         ax_twin.set_ylabel(r'$\mathrm{EM}_{\mathrm{max}}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
-        ax_twin.set_ylim(y_limits)
+        ax_twin.set_ylim(y_limits_em)
+        ax_twin.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
+        ax_twin.set_yscale('log')
         ax_twin.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         #avoid cutting off labels
         plt.tight_layout()
