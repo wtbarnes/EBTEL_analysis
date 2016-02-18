@@ -47,7 +47,7 @@ figdir = '%s_heating_runs/alpha%s'
 figname = 'ebtel_L%.1f_tpulse%.1f_alpha%s' + str(args.t_wait_q_scaling) + '_%s_heating'
 
 #set up logger
-logging.basicConfig(stream=sys.STDOUT,level=logging.INFO)
+logging.basicConfig(stream=sys.stdout,level=logging.INFO)
 
 #Instantiate Process class
 processor = ebd.DEMProcess(args.root_dir, args.species, args.alpha, args.loop_length, args.tpulse, args.solver, scaling_suffix=args.t_wait_q_scaling, aspect_ratio_factor=10.0, em_peak_falloff=0.7)
