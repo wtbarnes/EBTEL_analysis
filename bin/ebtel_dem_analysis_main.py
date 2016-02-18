@@ -10,7 +10,7 @@ import logging
 import argparse
 import pickle
 import numpy as np
-sys.path.append(os.path.join(os.environ['RESEARCH_DIR'],'EBTEL_analysis/src/'))
+sys.path.append(os.path.join('/home/wtb2/Documents','EBTEL_analysis/src/'))
 import ebtel_dem as ebd
 import ebtel_plot_em as ebpe
 
