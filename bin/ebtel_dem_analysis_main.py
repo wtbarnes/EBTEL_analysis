@@ -70,7 +70,7 @@ processor.fit_em(cool_limits=cool_limits)
 processor.calc_fit_stats()
 
 #Pickle results for building histograms later
-with open(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species) + 'lvl2_fits.pickle'),'wb') as f:
+with open(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '.lvl2_fits.pickle'),'wb') as f:
     pickle.dump(processor.fits,f)
 
 #Instantiate Plotter class
