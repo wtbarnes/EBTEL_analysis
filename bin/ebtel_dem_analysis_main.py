@@ -44,7 +44,7 @@ cool_limits = [10**6.0,10**6.5]
 
 #set directories and filenames
 figdir = '%s_heating_runs/alpha%s'
-figname = 'ebtel_L%.1f_tpulse%.1f_alpha%s' + str(t_wait_q_scaling) + '_%s_heating'
+figname = 'ebtel_L%.1f_tpulse%.1f_alpha%s' + str(args.t_wait_q_scaling) + '_%s_heating'
 
 #set up logger
 logging.basicConfig(stream=sys.STDOUT,level=logging.INFO)
