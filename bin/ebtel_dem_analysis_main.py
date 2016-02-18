@@ -83,7 +83,7 @@ plotter.plot_em_slopes(print_fig_filename=os.path.join(args.root_dir_figs, fn_te
 plotter.plot_em_derivs(print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.derivs'))
 plotter.plot_em_max(y_limits_t=[10.**5.5,10.**7.5],print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.max'))
 #Check for existence of needed directories to construct MC curves
-if args.alpha is not 'uniform':
+if args.alpha != 'uniform':
     if not os.path.exists(os.path.join(args.root_dir_figs, fn_temp + '_em_mc/')):
         os.makedirs(os.path.join(args.root_dir_figs, fn_temp + '_em_mc/'))
     #Build MC plots for each Tn value
