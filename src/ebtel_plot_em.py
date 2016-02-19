@@ -270,7 +270,7 @@ class EMHistoBuilder(object):
         #Assemble temp file name
         self.fn_temp = os.path.join(root_dir, species + '_heating_runs','alpha%s','ebtel_L' +str(loop_length) + '_tpulse' + str(tpulse) + '_alpha%s%s_' + species + '_heating.lvl2_fits.pickle')
         #Initialize dictionary to store separate histograms
-        self.histo_dict {},{}
+        self.histo_dict = {}
         
             
     def load_fits(self,t_wait_interval=0,t_wait_length=20,**kwargs):
