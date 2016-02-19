@@ -248,95 +248,58 @@ class DEMPlotter(object):
         return new_ticks
         
         
+        
 class EMHistoBuilder(object):
     """Class to build histograms of slope values to compare across heating functions and heating frequencies"""
     
-    def __init__(self,species,loop_length,tpulse,alpha,**kwargs):
+    def __init__(self,species, loop_length, tpulse, alpha, group='by_alpha', root_dir = '/data/datadrive2/EBTEL_figs', fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, **kwargs):
         
+        #configure logger
+        self.logger = logging.getLogger(type(self).__name__)
         #Load in heating function values and set needed variables
         self.alpha = alpha
         if len(self.alpha) == 1:
-            print("Warning: You have only specified one heating function.")
-        if 'group' in kwargs:
-            self.group = kwargs['group']
-        else:
-            self.group = 'by_alpha'
-        if 'root_dir' in kwargs:
-            root_dir = kwargs['root_dir']
-        else:
-            root_dir = '/data/datadrive2/EBTEL-2fluid_figs/'
-        #Plotting options
-        if 'dpi' in kwargs:
-            self.dpi = kwargs['dpi']
-        else:
-            self.dpi = 1000
-        if 'format' in kwargs:
-            self.fformat = kwargs['format']
-        else:
-            self.fformat = 'eps'
-        if 'fs' in kwargs:
-            self.fs = kwargs['fs']
-        else:
-            self.fs = 18.0
-        if 'alfs' in kwargs:
-            self.alfs = kwargs['alfs']
-        else:
-            self.alfs = 0.75
-        if 'figsize' in kwargs:
-            self.figsize = kwargs['figsize']
-        else:
-            self.figsize = (12,12)
+            self.logger.warning("Only one heating function specified.")
+        #keyword options
+        self.group = group
+        self.dpi = dpi
+        self.fformat = fformat
+        self.fontsize = fontsize
+        self.alfs = alfs
+        self.figsize = figsize
         #Assemble temp file name
-        self.fn_temp = root_dir + species + '_heating_runs/alpha%s/ebtel_L' +str(loop_length) + '_tpulse' + str(tpulse) + '_alpha%s%s_' + species + '_heating_all_a.fits'
+        self.fn_temp = os.path.join(root_dir, species + '_heating_runs','alpha%s','ebtel_L' +str(loop_length) + '_tpulse' + str(tpulse) + '_alpha%s%s_' + species + '_heating.lvl2_fits.pickle')
         #Initialize dictionary to store separate histograms
-        self.histo_dict_cool = {}
-        self.histo_dict_hot = {}
+        self.histo_dict {},{}
         
             
-    def loader(self,interval,**kwargs):
+    def load_fits(self,t_wait_interval=0,t_wait_length=20,**kwargs):
         """Load in data and create dictionaries with slope values grouped according to 'group' option"""
         
         #Loop over (alpha,b) values 
         for ab in self.alpha:
             #Unpickle the file
             with open(self.fn_temp%(ab[0],ab[0],ab[1]),'rb') as f: 
-                cool,hot = pickle.load(f)
-            f.close()
+                fits_dict = pickle.load(f)
             #Group by alpha method
             if self.group is 'by_alpha':
-                self.histo_dict_cool[''.join(ab)] = list(itertools.chain(*cool))
-                self.histo_dict_hot[''.join(ab)] = list(itertools.chain(*hot))
+                self.histo_dict['cool'][''.join(ab)] = [np.fabs(d['cool']['a']) for d in list(itertools.chain(*fits_dict)) if d['cool'] is not None]
+                self.histo_dict['hot'][''.join(ab)] = [np.fabs(d['hot']['a']) for d in list(itertools.chain(*fits_dict)) if d['hot'] is not None]
             #Group by Tn method
             elif self.group is 'by_t_wait':
-                for i in np.arange(0 + interval,20+interval,1+interval):
+                for i in np.arange(0 + t_wait_interval,t_wait_length+t_wait_interval,1+t_wait_interval):
                     try:
-                        self.histo_dict_cool[str(i)] = self.histo_dict_cool[str(i)] + cool[i]
-                        self.histo_dict_hot[str(i)] = self.histo_dict_hot[str(i)] + hot[i]
+                        self.histo_dict['cool'][str(i)].extend([np.fabs(d['cool']['a']) for d in fits_dict[i] if d['cool'] is not None])
+                        self.histo_dict['hot'][str(i)].extend([np.fabs(d['hot']['a']) for d in fits_dict[i] if d['hot'] is not None])
                     except KeyError:
-                        self.histo_dict_cool[str(i)] = []
-                        self.histo_dict_cool[str(i)] = self.histo_dict_cool[str(i)] + cool[i]
-                        self.histo_dict_hot[str(i)] = []
-                        self.histo_dict_hot[str(i)] = self.histo_dict_hot[str(i)] + hot[i]
+                        self.histo_dict['cool'][str(i)] = [np.fabs(d['cool']['a']) for d in fits_dict[i] if d['cool'] is not None]
+                        self.histo_dict['hot'][str(i)] = [np.fabs(d['hot']['a']) for d in fits_dict[i] if d['hot'] is not None]
             else:
                 raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
-                
-        #Filter out False values that get put in when fitting cannot be performed
-        for key in self.histo_dict_cool:
-            self.histo_dict_cool[key] = np.fabs([x for x in self.histo_dict_cool[key] if x is not False])
-        for key in self.histo_dict_hot:
-            self.histo_dict_hot[key] = np.fabs([x for x in self.histo_dict_hot[key] if x is not False])
             
                 
-    def histo_maker(self,temp_choice,histo_opts,**kwargs):
+    def make_fit_histogram(self,temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, print_fig_filename=None,**kwargs):
         """Build histograms from hot and cool dictionaries built up by self.loader()"""
-        
-        #Choose hot or cool
-        if temp_choice is 'cool':
-            hist_dict = self.histo_dict_cool
-        elif temp_choice is 'hot':
-            hist_dict = self.histo_dict_hot
-        else:
-            raise ValueError("Invalid choice of histogram dictionary.")
 
         #Set up figure
         fig = plt.figure(figsize=self.figsize)
@@ -345,11 +308,11 @@ class EMHistoBuilder(object):
         #Initialize y-limits values to find max values
         ylims_final = [0.0,0.0]
         #Loop over histograms
-        for key in hist_dict:
+        for key in self.histo_dict[temp_choice]:
             if len(hist_dict[key]) < 10:
                 pass
             else:
-                ax.hist(hist_dict[key], self.freedman_diaconis(hist_dict[key]), histtype='step',**histo_opts[key])
+                ax.hist(self.histo_dict[temp_choice][key], self.freedman_diaconis(self.histo_dict[temp_choice][key]), histtype='step',**histo_opts[key])
                 ylims = ax.get_ylim()
                 if ylims[1] > ylims_final[1]:
                     ylims_final[1] = ylims[1]
@@ -359,37 +322,40 @@ class EMHistoBuilder(object):
         #Labels and styling
         #Check for normalization in just one set; assumed all or none are normed
         if 'normed' in list(histo_opts.values())[0] and list(histo_opts.values())[0]['normed'] is True:
-            ax.set_ylabel(r'$\mathrm{Normalized}$ $\mathrm{Frequency}$',fontsize=self.fs)            
+            ax.set_ylabel(r'$\mathrm{Normalized}$ $\mathrm{Frequency}$',fontsize=self.fontsize)            
         else:
-            ax.set_ylabel(r'$\mathrm{Frequency}$',fontsize=self.fs)
-        ax.set_ylim(ylims_final)
+            ax.set_ylabel(r'$\mathrm{Frequency}$',fontsize=self.fontsize)
+        if y_limits is None:
+            ax.set_ylim(ylims_final)
+        else:
+            ax.set_ylim(y_limits)
         ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
-        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fs)
-        if 'x_limits' in kwargs:
-            ax.set_xlim(kwargs['x_limits'])
-        if temp_choice is 'cool':
-            ax.set_xlabel(r'$a$',fontsize=self.fs)
-            ax.axvline(x=2,color='k',linestyle='-.',linewidth=2)
-            ax.axvline(x=5,color='k',linestyle='-.',linewidth=2)
+        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
+        if x_limits is not None:
+            ax.set_xlim(x_limits)
+        if temp_choice == 'cool':
+            ax.set_xlabel(r'$a$',fontsize=self.fontsize)
+            ax.axvline(x=2,color='k',linestyle=':',linewidth=2)
+            ax.axvline(x=5,color='k',linestyle=':',linewidth=2)
         else:
-            ax.set_xlabel(r'$b$',fontsize=self.fs)
+            ax.set_xlabel(r'$b$',fontsize=self.fontsize)
+            ax.axvline(x=5.5,color='k',linestyle='-.',linewidth=2)
             ax.axvline(x=5.5,color='k',linestyle='-.',linewidth=2)
             
-        if 'leg_off' not in kwargs or kwargs['leg_off']is False:
-            if 'leg_loc' in kwargs:
-                leg_loc = kwargs['leg_loc']
-            else:
+        #TODO: sort legend by Tn value
+        if leg:
+            if leg_loc is None:
                 leg_loc = 'best'
-            if self.group is 'by_alpha':
+            if self.group == 'by_alpha':
                 leg_title = r'$\alpha$'
-            elif self.group is 'by_t_wait':
-                leg_title = r'$T_N$ $\mathrm{(s)}$'
-            leg = ax.legend(fontsize=self.alfs*self.fs,loc=leg_loc,ncol=1,title=leg_title)
-            plt.setp(leg.get_title(),fontsize=self.alfs*self.fs)
+            else:
+                leg_title = r'$t_N$ $\mathrm{(s)}$'
+            leg = ax.legend(fontsize=self.alfs*self.fontsize,loc=leg_loc,ncol=1,title=leg_title)
+            plt.setp(leg.get_title(),fontsize=self.alfs*self.fontsize)
         
         #Print or show figure
-        if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename']+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
+        if print_fig_filename is not None:
+            plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
             plt.close('all')
         else:
             plt.show()
