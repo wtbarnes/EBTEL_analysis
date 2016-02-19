@@ -4,8 +4,9 @@
 #14 May 2015
 
 #Import needed modules
+import os
 import logging
-import dill as pickle
+import pickle
 import itertools
 import numpy as np
 import matplotlib
@@ -271,6 +272,7 @@ class EMHistoBuilder(object):
         self.fn_temp = os.path.join(root_dir, species + '_heating_runs','alpha%s','ebtel_L' +str(loop_length) + '_tpulse' + str(tpulse) + '_alpha%s%s_' + species + '_heating.lvl2_fits.pickle')
         #Initialize dictionary to store separate histograms
         self.histo_dict = {}
+        self.histo_dict['cool'],self.histo_dict['hot'] = {},{}
         
             
     def load_fits(self,t_wait_interval=0,t_wait_length=20,**kwargs):
@@ -309,7 +311,7 @@ class EMHistoBuilder(object):
         ylims_final = [0.0,0.0]
         #Loop over histograms
         for key in self.histo_dict[temp_choice]:
-            if len(hist_dict[key]) < 10:
+            if len(self.histo_dict[temp_choice][key]) < 10:
                 pass
             else:
                 ax.hist(self.histo_dict[temp_choice][key], self.freedman_diaconis(self.histo_dict[temp_choice][key]), histtype='step',**histo_opts[key])
