@@ -344,7 +344,6 @@ class EMHistoBuilder(object):
             ax.axvline(x=5.5,color='k',linestyle='-.',linewidth=2)
             ax.axvline(x=5.5,color='k',linestyle='-.',linewidth=2)
             
-        #TODO: sort legend by Tn value
         if leg:
             if leg_loc is None:
                 leg_loc = 'best'
