@@ -9,6 +9,7 @@ import logging
 import pickle
 import itertools
 import numpy as np
+from astroML import density_estimation
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -300,7 +301,7 @@ class EMHistoBuilder(object):
                 raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
             
                 
-    def make_fit_histogram(self,temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, print_fig_filename=None,**kwargs):
+    def make_fit_histogram(self,temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None,**kwargs):
         """Build histograms from hot and cool dictionaries built up by self.loader()"""
 
         #Set up figure
@@ -314,7 +315,7 @@ class EMHistoBuilder(object):
             if len(self.histo_dict[temp_choice][key]) < 10:
                 pass
             else:
-                ax.hist(self.histo_dict[temp_choice][key], self.freedman_diaconis(self.histo_dict[temp_choice][key]), histtype='step',**histo_opts[key])
+                ax.hist(self.histo_dict[temp_choice][key], bins=self._size_bins(self.histo_dict[temp_choice][key],bin_tool), histtype='step',**histo_opts[key])
                 ylims = ax.get_ylim()
                 if ylims[1] > ylims_final[1]:
                     ylims_final[1] = ylims[1]
@@ -366,11 +367,20 @@ class EMHistoBuilder(object):
             plt.show()
         
         
-    def freedman_diaconis(self,hist,**kwargs):
-        q75,q25 = np.percentile(hist,[75,25])
-        iqr = q75 - q25
-        w = 2.0*iqr*(len(hist))**(-1.0/3.0)
-        return int((np.max(np.array(hist)) - np.min(np.array(hist)))/w)
+    def _size_bins(self,hist,bin_tool,**kwargs):
+        """Use astroML routines to choose bin edges"""
+        
+        if bin_tool == 'freedman':
+            dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True)
+        elif bin_tool == 'scotts':
+            dx,bins = density_estimation.scotts_bin_width(hist,return_bins=True)
+        elif bin_tool == 'knuth':
+            dx,bins = density_estimation.knuth_bin_width(hist,return_bins=True)
+        else:
+            self.logger.warning("Unrecognized bin_tool option. Using Freedman-Diaconis rule.")
+            dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True)
+            
+        return bins
         
     
     def tick_maker(self,old_ticks,n,**kwargs):
