@@ -29,15 +29,15 @@ class Plotter(object):
         self.linestyles = ('-','--','-.',':')
         #load variables
         if lvl0_filename is not None:
-            self.load_variables()
+            self.load_variables(lvl0_filename)
         else:
             self.logger.warning("No file specified. Variable namespace will not be populated.")
 
-    def load_variables(self,**kwargs):
+    def load_variables(self,lvl0_filename,**kwargs):
         #load plasma parameters
         try:
             index_offset = 0
-            data = np.loadtxt(self.lvl0_filename+'.txt')
+            data = np.loadtxt(lvl0_filename+'.txt')
             if self.two_fluid:
                 index_offset += 1 
                 self.temp_i = data[:,2]
@@ -49,44 +49,49 @@ class Plotter(object):
             self.dens_apex = data[:,6+3*index_offset]
             self.heat = data[:,10+5*index_offset]
         except:
-            self.logger.warning("Unable to load plasma parameters from %s."%(self.lvl0_filename+'.txt'))
+            self.logger.warning("Unable to load plasma parameters from %s."%(lvl0_filename+'.txt'))
             pass
 
         #load dem parameters
         try:
-            data = np.loadtxt(self.lvl0_filename+'_dem.txt')
+            data = np.loadtxt(lvl0_filename+'_dem.txt')
             self.temp_dem = data[:,0]
             self.dem_tr = data[:,1]
             self.dem_cor = data[:,2]
             self.dem_tot = data[:,3]
             self.em_cor = data[:,4]
         except:
-            self.logger.warning("Unable to load DEM parameters from %s."%(self.lvl0_filename+'_dem.txt'))
+            self.logger.warning("Unable to load DEM parameters from %s."%(lvl0_filename+'_dem.txt'))
             pass
             
         #load heat parameters
         try:
-            self.events = np.loadtxt(self.lvl0_filename+'_heat_amp.txt')
+            self.events = np.loadtxt(lvl0_filename+'_heat_amp.txt')
         except:
-            self.logger.warning("Unable to load heating event amplitudes from %s."%(self.lvl0_filename+'_heat_amp.txt'))
+            self.logger.warning("Unable to load heating event amplitudes from %s."%(lvl0_filename+'_heat_amp.txt'))
             pass
 
 
     def plot_params(self,print_fig_filename=None,**kwargs):
         #set up figure
-        fig,ax = plt.subplots(3,1,figsize=(1.5*self.figsize[0],self.figsize[1]))
+        fig,ax = plt.subplots(3,1,figsize=(1.5*self.figsize[0],self.figsize[1]),sharex=True)
         ax_n = ax[1].twinx()
         ax_na = ax[2].twinx()
+        
+        if self.two_fluid:
+            tlab = r'$T_e$'
+        else:
+            tlab = r'$T$'
 
         #plot heating
-        ax[0].plot(self.time,self.heat)
+        ax[0].plot(self.time,self.heat,color=sns.color_palette('deep')[0])
         ax[0].set_ylabel(r'$h$ (erg cm$^{-3}$ s$^{-1}$)',fontsize=self.fontsize)
         ax[0].set_xlim([self.time[0],self.time[-1]])
         ax[0].locator_params(nbins=5)
         ax[0].ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
         ax[0].tick_params(axis='both',labelsize=self.alfs*self.fontsize,pad=8)
         #plot average temperature and density
-        line_te = ax[1].plot(self.time,self.temp_e/10**6,label=r'$T_e$')
+        line_te = ax[1].plot(self.time,self.temp_e/10**6,label=tlab,color=sns.color_palette('deep')[0])
         if self.two_fluid:
             line_ti = ax[1].plot(self.time,self.temp_i/10**6,color=sns.color_palette('deep')[2],label=r'$T_i$')
         ax[1].set_ylabel(r'$T$ (MK)',fontsize=self.fontsize)
@@ -102,7 +107,7 @@ class Plotter(object):
         ax_n.tick_params(axis='both',labelsize=self.alfs*self.fontsize,pad=8)
         ax[1].set_xlim([self.time[0],self.time[-1]])
         #plot apex temperature and density
-        ax[2].plot(self.time,self.temp_apex_e/10**6)
+        ax[2].plot(self.time,self.temp_apex_e/10**6,color=sns.color_palette('deep')[0])
         if self.two_fluid:
             ax[2].plot(self.time,self.temp_apex_i/10**6,color=sns.color_palette('deep')[2])
         ax[2].set_ylabel(r'$T_a$ (MK)',fontsize=self.fontsize)
@@ -122,7 +127,7 @@ class Plotter(object):
         #configure legend
         lines = line_te + line_n
         if self.two_fluid:
-            lines += line_ti
+            lines = line_te + line_ti + line_n
         labels = [l.get_label() for l in lines]
         ax[1].legend(lines,labels,loc=1)
 
