@@ -114,9 +114,11 @@ class Configurer(object):
             self.logger.debug('Reshaping EBTEL results file %s'%(tmp_fn))
             tmp_data = np.loadtxt(tmp_fn)
             t,T,n = tmp_data[:,0],tmp_data[:,1],tmp_data[:,n_index]
-            #check for existence of top level directories
+            #check for existence of top level directories for config and data
             if not os.path.exists(os.path.join(self.config_path,self.fn%(c[0]))):
                 os.makedirs(os.path.join(self.config_path,self.fn%(c[0])))
+            if not os.path.exists(os.path.join(self.data_path,self.fn%(c[0]))):
+                os.makedirs(os.path.join(self.data_path,self.fn%(c[0])))
             #save reshaped results
             np.savetxt(os.path.join(self.config_path,self.fn%(c[0]),self.fn%(c[0])+'_'+str(int(c[1]))+'.reshape.txt'), np.transpose([t,T,n]), header=str(len(t)),comments='', fmt='%f\t%e\t%e')
 
