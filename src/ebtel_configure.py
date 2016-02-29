@@ -110,11 +110,15 @@ class Configurer(object):
 
         #loop through files, print data as configuration file for IonPopSolver
         for c in self.config_array:
-            tmp_fn = os.path.join(path_to_ebtel_results,self.fn%(c[0]),self.fn%(c[0])+'_'+int(c[1])+'.txt')
+            tmp_fn = os.path.join(path_to_ebtel_results,self.fn%(c[0]),self.fn%(c[0])+'_'+str(int(c[1]))+'.txt')
             self.logger.debug('Reshaping EBTEL results file %s'%(tmp_fn))
             tmp_data = np.loadtxt(tmp_fn)
             t,T,n = tmp_data[:,0],tmp_data[:,1],tmp_data[:,n_index]
-            np.savetxt(os.path.join(self.config_path,self.fn%(c[0]),self.fn%(c[0])+'_'+int(c[1])+'.reshape.txt'),np.transpose([t,T,n]),header=str(len(t)),comments='',fmt='%f\t%e\t%e')
+            #check for existence of top level directories
+            if not os.path.exists(os.path.join(self.config_path,self.fn%(c[0]))):
+                os.makedirs(os.path.join(self.config_path,self.fn%(c[0])))
+            #save reshaped results
+            np.savetxt(os.path.join(self.config_path,self.fn%(c[0]),self.fn%(c[0])+'_'+str(int(c[1]))+'.reshape.txt'), np.transpose([t,T,n]), header=str(len(t)),comments='', fmt='%f\t%e\t%e')
 
 
     def print_ips_config(self,**kwargs):
@@ -123,8 +127,8 @@ class Configurer(object):
         f = open(os.path.join(self.config_path,'ebtel_L' + str(self.config_dictionary['loop_length']) + '_tpulse' + str(2.0*self.config_dictionary['t_pulse_half']) + '_' + self.config_dictionary['solver'] + '_job_array.conf'),'w')
 
         for c in self.config_array:
-            f.write('%s\t'%(os.path.join(self.config_path,self.fn%(c[0]),self.fn%(c[0])+'_'+int(c[1])+'.reshape.txt')))
-            f.write('%s\n'%(os.path.join(self.data_path,self.fn%(c[0]),self.fn%(c[0])+'_'+int(c[1])+'.ips_results.txt')))
+            f.write('%s\t'%(os.path.join(self.config_path,self.fn%(c[0]),self.fn%(c[0])+'_'+str(int(c[1]))+'.reshape.txt')))
+            f.write('%s\n'%(os.path.join(self.data_path,self.fn%(c[0]),self.fn%(c[0])+'_'+str(int(c[1]))+'.ips_results.txt')))
 
         f.close()
 
