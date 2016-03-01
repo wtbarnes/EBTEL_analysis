@@ -103,6 +103,7 @@ class Configurer(object):
 
         #read in job array config file
         self.config_array = np.loadtxt(os.path.join(path_to_ebtel_config,'ebtel_L' + str(self.config_dictionary['loop_length']) + '_tpulse' + str(2.0*self.config_dictionary['t_pulse_half']) + '_' + self.config_dictionary['solver'] + '_job_array.conf'))
+        self.config_array_clean = []
 
         n_index = 2
         if self.config_dictionary['heat_species'] == 'electron' or self.config_dictionary['heat_species'] == 'ion':
@@ -112,7 +113,11 @@ class Configurer(object):
         for c in self.config_array:
             tmp_fn = os.path.join(path_to_ebtel_results,self.fn%(c[0]),self.fn%(c[0])+'_'+str(int(c[1]))+'.txt')
             self.logger.debug('Reshaping EBTEL results file %s'%(tmp_fn))
-            tmp_data = np.loadtxt(tmp_fn)
+            try:
+                tmp_data = np.loadtxt(tmp_fn)
+            except FileNotFoundError:
+                self.logger.exception("%s cannot be loaded"%tmp_fn)
+                continue
             t,T,n = tmp_data[:,0],tmp_data[:,1],tmp_data[:,n_index]
             #check for existence of top level directories for config and data
             if not os.path.exists(os.path.join(self.config_path,self.fn%(c[0]))):
@@ -121,6 +126,10 @@ class Configurer(object):
                 os.makedirs(os.path.join(self.data_path,self.fn%(c[0])))
             #save reshaped results
             np.savetxt(os.path.join(self.config_path,self.fn%(c[0]),self.fn%(c[0])+'_'+str(int(c[1]))+'.reshape.txt'), np.transpose([t,T,n]), header=str(len(t)),comments='', fmt='%f\t%e\t%e')
+            #save successful load parameters to clean config
+            self.config_array_clean.append([c[0],c[1]])
+            
+        self.config_array_clean = np.array(self.config_array_clean)
 
 
     def print_ips_config(self,**kwargs):
@@ -128,7 +137,7 @@ class Configurer(object):
 
         f = open(os.path.join(self.config_path,'ebtel_L' + str(self.config_dictionary['loop_length']) + '_tpulse' + str(2.0*self.config_dictionary['t_pulse_half']) + '_' + self.config_dictionary['solver'] + '_job_array.conf'),'w')
 
-        for c in self.config_array:
+        for c in self.config_array_clean:
             f.write('%s\t'%(os.path.join(self.config_path,self.fn%(c[0]),self.fn%(c[0])+'_'+str(int(c[1]))+'.reshape.txt')))
             f.write('%s\n'%(os.path.join(self.data_path,self.fn%(c[0]),self.fn%(c[0])+'_'+str(int(c[1]))+'.ips_results.txt')))
 
