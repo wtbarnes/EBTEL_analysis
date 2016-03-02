@@ -6,10 +6,14 @@
 #Import needed modules
 import numpy as np
 import os
+import __builtin__
 import logging
 import itertools
 import xml.etree.ElementTree as ET
 import xml.dom.minidom as xdm
+
+#Resolve Python 2/3 exception problem
+exc = getattr(__builtin__,"IOError","FileNotFoundError")
 
 class Configurer(object):
 
@@ -115,7 +119,7 @@ class Configurer(object):
             self.logger.debug('Reshaping EBTEL results file %s'%(tmp_fn))
             try:
                 tmp_data = np.loadtxt(tmp_fn)
-            except FileNotFoundError:
+            except exc:
                 self.logger.exception("%s cannot be loaded"%tmp_fn)
                 continue
             t,T,n = tmp_data[:,0],tmp_data[:,1],tmp_data[:,n_index]
