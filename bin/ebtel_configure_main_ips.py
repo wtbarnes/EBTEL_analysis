@@ -1,5 +1,6 @@
-#ebtel_configure_main_ips.py
+#!/bin/env python
 
+#ebtel_configure_main_ips.py
 #Will Barnes
 #29 February 2016
 
