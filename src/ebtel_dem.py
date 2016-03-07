@@ -124,7 +124,7 @@ class DEMProcess(object):
                 t_cool,em_cool,t_hot,em_hot = self._split_branch(lower['bin_centers'],lower['hist'])
                 #calculate limits if necessary
                 cool_lims,hot_lims = cool_limits,hot_limits
-                cool_lims = self._find_fit_limits(t_cool,em_cool,cool_lims)
+                cool_lims = self._find_fit_limits(t_cool,em_cool,cool_lims,temp_opt='cool')
                 hot_lims = self._find_fit_limits(t_hot,em_hot,hot_lims)
                 #compute fit values
                 dc = self._fit_em_branch(t_cool,em_cool,cool_lims)
@@ -165,14 +165,17 @@ class DEMProcess(object):
             self.fits_stats.append({'cool':dc,'hot':dh})
 
 
-    def _find_fit_limits(self,t,em,limits):
+    def _find_fit_limits(self,t,em,limits,temp_opt='hot'):
         """Calculate and check temperature limits for fitting"""
 
         if limits is None:
             #dynamic index choice
-            f,tnew = interp1d(t[em>self.em_cutoff],em[em>self.em_cutoff]),np.linspace(t[em>self.em_cutoff][0],t[em>self.em_cutoff][-1],10)
-            dEmdT_mp = np.gradient(f(tnew),np.gradient(tnew))[int(len(tnew)/2)]
-            hc_var = int(dEmdT_mp/np.fabs(dEmdT_mp))
+            #f,tnew = interp1d(t[em>self.em_cutoff],em[em>self.em_cutoff]),np.linspace(t[em>self.em_cutoff][0],t[em>self.em_cutoff][-1],10)
+            #dEmdT_mp = np.gradient(f(tnew),np.gradient(tnew))[int(len(tnew)/2)]
+            #hc_var = int(dEmdT_mp/np.fabs(dEmdT_mp))
+            hc_var = -1.0
+            if temp_opt == 'cool':
+                hc_var = 1
             #get temperature corresponding to just above cutoff
             indices = np.where(em < self.em_cutoff)[0]
             t2 = t[indices[-int((hc_var+1)/2)]+hc_var]
