@@ -32,7 +32,7 @@ class DEMProcess(object):
         self.binner = emb.EM_Binner(2.*loop_length*1.e+8)
 
 
-    def import_raw(self,Tn,save_to_file=None,**kwargs):
+    def import_raw(self,Tn,save_to_file=None,read_teff=False,**kwargs):
         """Import all runs for given Tn waiting time values; calculate EM distributions from t,T,n."""
 
         self.em = []
@@ -49,8 +49,12 @@ class DEMProcess(object):
                     self.logger.debug("Reading %s"%pfile)
                     data = np.loadtxt(os.path.join(tn_path,pfile))
                     n_index = 2
+                    t_index = 1
                     if 'electron' in tn_path or 'ion' in tn_path: n_index += 1
-                    t,T,n = data[:,0],data[:,1],data[:,n_index]
+                    if read_teff:
+                        n_index = 3
+                        t_index = 2
+                    t,T,n = data[:,0],data[:,t_index],data[:,n_index]
                     #calculate emission measure distribution
                     self.binner.set_data(t,T,n)
                     self.binner.build_em_dist()
