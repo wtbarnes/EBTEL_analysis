@@ -6,7 +6,10 @@
 #Import needed modules
 import numpy as np
 import os
-import __builtin__
+try:
+    import __builtin__
+except ImportError:
+    import builtins as __builtin__
 import logging
 import itertools
 import xml.etree.ElementTree as ET
