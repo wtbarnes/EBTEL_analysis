@@ -48,7 +48,7 @@ class EM_Binner(object):
     def _differential_emission_measure_calc(self,n,tmin,tmax):
         """Calculate differential emission measure distribution"""
         
-        em = self.emission_measure_calc(n)
+        em = self._emission_measure_calc(n)
         #EBTEL method for calculating coronal DEM
         tmax = np.log10(tmax)
         tmin = np.log10(tmin)
