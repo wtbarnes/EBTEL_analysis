@@ -75,21 +75,43 @@ class DEMPlotter(object):
             plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi,bbox_extra_artists=[leg],bbox_inches='tight')
         else:
             plt.show()
-
-
-    def plot_em_curve(self,tn_val,y_limits=[10**25.,10**28.],print_fig_filename=None,**kwargs):
-        """Plot MC and mean EM curves for single value of Tn"""
+            
+            
+    def plot_em_curves_grid(self,y_limits=[10**26.,10**32.],num_cols=4,print_fig_filename=None,**kwargs):
+            """Make subplot grid of EM curves"""
+            
+            num_rows=int(np.ceil(len(self.Tn)/num_cols))
+            fig,axes=plt.subplots(num_rows,num_cols,figsize=(1.5*self.figsize[0],1.5*self.figsize[1]),sharex=True,sharey=True)
+            
+            for ax,tn in zip(axes.flatten(),self,Tn):
+                self._make_em_axes(ax,tn)
+                #labels
+                ax.set_xlabel(r'$T$ $\mathrm{(K)}$',fontsize=self.fontsize)
+                ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
+                #limits and scale
+                ax.set_xlim([10**5.5,10**7.5])
+                ax.set_ylim(y_limits)
+                ax.set_xscale('log')
+                ax.set_yscale('log')
+                ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
+                
+            #save or show figure
+            if print_fig_filename is not None:
+                plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
+                plt.close('all')
+            else:
+                plt.show()
+            
+            
+    def _make_em_axes(self,ax,tn_val):
+        """Plot single em curve"""
         
         tn_index = np.where(self.Tn==tn_val)[0]
         if len(tn_index) != 1:
             raise ValueError("Invalid wait time %f. Use a valid value from self.Tn"%(tn_val))
         else:
             tn_index = tn_index[0]
-        
-        #set up figure
-        fig = plt.figure(figsize=self.figsize)
-        ax = fig.gca()
-
+            
         #standard deviation
         ax.fill_between(self.em_stats[tn_index]['T_mean'], self.em_stats[tn_index]['em_mean']-self.em_stats[tn_index]['em_std'], self.em_stats[tn_index]['em_mean']+self.em_stats[tn_index]['em_std'], facecolor=sns.color_palette('deep')[2], edgecolor=sns.color_palette('deep')[2], alpha=0.75)
         #MC histograms
@@ -97,6 +119,16 @@ class DEMPlotter(object):
             ax.hist(h['T'],bins=h['bins'],weights=h['em'],histtype='step',color=sns.color_palette('deep')[0],linestyle=self.linestyles[-1],alpha=0.1)
         #mean
         ax.plot(self.em_stats[tn_index]['T_mean'],self.em_stats[tn_index]['em_mean'],color='black',linestyle=self.linestyles[-1],linewidth=2)
+
+
+    def plot_em_curve(self,tn_val,y_limits=[10**25.,10**28.],print_fig_filename=None,**kwargs):
+        """Plot MC and mean EM curves for single value of Tn"""
+        
+        #set up figure
+        fig = plt.figure(figsize=self.figsize)
+        ax = fig.gca()
+
+        self._make_em_axes(ax,tn_val)
         
         #set labels
         ax.set_xlabel(r'$T$ $\mathrm{(K)}$',fontsize=self.fontsize)
