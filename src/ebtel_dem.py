@@ -14,6 +14,7 @@ from scipy.interpolate import interp1d
 
 
 class DEMProcess(object):
+    """Class for processing and importing  EBTEL data"""
 
     def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, em_cutoff=1e+25, em_peak_falloff=0.99, **kwargs):
         """Constructor for process class"""
