@@ -82,19 +82,33 @@ class DEMPlotter(object):
             
             num_rows=int(np.ceil(len(self.Tn)/num_cols))
             fig,axes=plt.subplots(num_rows,num_cols,figsize=(1.5*self.figsize[0],1.5*self.figsize[1]),sharex=True,sharey=True)
+            plt.subplots_adjust(hspace=0.0,wspace=0.0,left=0.05,bottom=0.05)
             
-            for ax,tn in zip(axes.flatten(),self,Tn):
-                self._make_em_axes(ax,tn)
-                #labels
-                ax.set_xlabel(r'$T$ $\mathrm{(K)}$',fontsize=self.fontsize)
-                ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
+            for ax,i in zip(axes.flatten(),range(len(self.Tn))):
+                #plot histograms and mean
+                self._make_em_axes(ax,self.Tn[i])
+                #fit lines
+                if self.fits_stats[i]['cool'] is not None:
+                    t = np.array([self.fits_stats[i]['cool']['limits'][0],self.fits_stats[i]['cool']['limits'][1]])
+                    ax.plot(t,10.**self.fits_stats[i]['cool']['b']*t**self.fits_stats[i]['cool']['a'],color=sns.color_palette('bright')[0], linewidth=2, linestyle='solid')
+                if self.fits_stats[i]['hot'] is not None:
+                    t = np.array([self.fits_stats[i]['hot']['limits'][0],self.fits_stats[i]['hot']['limits'][1]])
+                    ax.plot(t,10.**self.fits_stats[i]['hot']['b']*t**self.fits_stats[i]['hot']['a'],color=sns.color_palette('bright')[2], linewidth=2, linestyle='solid')
+                #text
+                ax.text(0.7,0.9,r'$t_N=%d$ $\mathrm{s}$'%(self.Tn[i]),transform=ax.transAxes,fontsize=self.alfs*self.fontsize)
+                if self.fits_stats[i]['cool'] is not None:ax.text(0.12,0.9,r'$a=%.3f$'%(self.fits_stats[i]['cool']['a']),fontsize=self.alfs*self.fontsize,transform=ax.transAxes,color=sns.color_palette('bright')[0],ha='left',va='center')
+                if self.fits_stats[i]['hot'] is not None:ax.text(0.12,0.8,r'$b=%.3f$'%(np.fabs(self.fits_stats[i]['hot']['a'])),fontsize=self.alfs*self.fontsize,transform=ax.transAxes,color=sns.color_palette('bright')[2],ha='left',va='center')
                 #limits and scale
                 ax.set_xlim([10**5.5,10**7.5])
                 ax.set_ylim(y_limits)
                 ax.set_xscale('log')
                 ax.set_yscale('log')
                 ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
-                
+            
+            #labels    
+            fig.text(0.5, 0.005, r'$T$ $\mathrm{(K)}$', ha='center', va='center',fontsize=self.fontsize) #xlabel
+            fig.text(0.005, 0.5, r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$', ha='center', va='center', rotation='vertical',fontsize=self.fontsize) #ylabel
+                            
             #save or show figure
             if print_fig_filename is not None:
                 plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
