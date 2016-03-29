@@ -21,20 +21,14 @@ parser.add_argument("-L","--loop_length",type=float,help="Loop half-length (in M
 parser.add_argument("-a","--alpha",help="Power-law index for amplitude distribution")
 parser.add_argument("-S","--solver",help="Solver used in EBTEL")
 parser.add_argument("-t","--tpulse",type=float,help="Duration of heating pulses")
-parser.add_argument("--t_wait_q_scaling",help="Scaling between T_N and Q")
-parser.add_argument("--root_dir",help="Root directory from which EBTEL output will be read.")
-parser.add_argument("--root_dir_figs",help="Root directory to which figures will be output.")
+parser.add_argument("--t_wait_q_scaling",help="Scaling between T_N and Q",default='')
+parser.add_argument("--root_dir",help="Root directory from which EBTEL output will be read.",default='/data/datadrive2/EBTEL_runs')
+parser.add_argument("--root_dir_figs",help="Root directory to which figures will be output.",default='/data/datadrive2/EBTEL_figs')
 parser.add_argument("--read_teff",help="Flag for reading results from IonPopSolver code.", action='store_true')
 args = parser.parse_args()
 
 #optional command line parameters
-if args.root_dir is None:
-    args.root_dir = '/data/datadrive2/EBTEL_runs'
-if args.root_dir_figs is None:
-    args.root_dir_figs = '/data/datadrive2/EBTEL_figs'
-if args.t_wait_q_scaling is None:
-    args.t_wait_q_scaling = ''
-else:
+if args.t_wait_q_scaling:
     args.t_wait_q_scaling = '-b'+str(args.t_wait_q_scaling)
 
 #figure formatting parameters
