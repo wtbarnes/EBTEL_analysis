@@ -110,16 +110,16 @@ class DEMProcess(object):
             self.em_binned.append(tmp)
 
 
-    def fit_em(self,cool_limits=None,hot_limits=None):
+    def diagnose_em(self,cool_limits=None,hot_limits=None,t_ratio_cool=10**6.,t_ratio_hot=10**7.):
         """Fit binned emission measure histograms on hot and cool sides"""
 
         if not hasattr(self,'em_binned'):
-            raise AttributeError("EM histograms not yet binned. Run self.calc_stats() before fitting EMs.")
+            raise AttributeError("EM histograms not yet binned. Run self.calc_stats() before calculating EM diagnostics.")
 
-        self.fits = []
+        self.diagnostics=[]
 
         for upper in self.em_binned:
-            tmp = []
+            tmp,tmp_ratio = [],[]
             for lower in upper:
                 #split the curve
                 t_cool,em_cool,t_hot,em_hot = self._split_branch(lower['bin_centers'],lower['hist'])
@@ -130,20 +130,21 @@ class DEMProcess(object):
                 #compute fit values
                 dc = self._fit_em_branch(t_cool,em_cool,cool_lims)
                 dh = self._fit_em_branch(t_hot,em_hot,hot_lims)
+                #compute em ratio
+                ratio = self._calc_em_ratio(t_ratio_cool,t_ratio_hot,lower['bin_centers'],lower['hist'])
                 #store
-                tmp.append({'cool':dc,'hot':dh})
-            self.fits.append(tmp)
+                tmp.append({'cool':dc,'hot':dh,'ratio':ratio})
+            self.diagnostics.append(tmp)
 
-
-    def calc_fit_stats(self,mc_threshold=0.9,**kwargs):
+    def calc_diagnostic_stats(self,mc_threshold=0.9,**kwargs):
         """Calculate fit statistics"""
 
-        if not hasattr(self,'fits'):
-            raise AttributeError("Before computing fit statistics, run self.fit_em() to calculate fits to EM distributions.")
+        if not hasattr(self,'diagnostics'):
+            raise AttributeError("Before computing diagnostic statistics, run self.diagnose_em() to calculate fits,ratio diagnostics.")
 
-        self.fits_stats = []
-
-        for upper in self.fits:
+        self.diagnostics_stats = []
+        
+        for upper in self.diagnostics:
             tmp_cool,tmp_hot,tmp_lim_cool,tmp_lim_hot = [],[],[],[]
             for lower in upper:
                 if lower['cool'] is not None:
@@ -163,7 +164,25 @@ class DEMProcess(object):
             else:
                 dh = None
 
-            self.fits_stats.append({'cool':dc,'hot':dh})
+            self.diagnostics_stats.append({'cool':dc, 'hot':dh, 'ratio':{'mean':np.mean(np.array(upper_ratio)), 'sigma':np.std(np.array(upper_ratio))}})
+            
+            
+    def _calc_em_ratio(self,t_cool,t_hot,t,em):
+        """Calculate EM ratio from EM(t_cool) and EM(t_hot)"""
+        
+        #check on temperature
+        if t_cool > t_hot:
+            self.logger.warning("t_cool > t_hot; Reassigning such that t_cool < t_hot.")
+            tmp=t_cool
+            t_cool=t_hot
+            t_hot=tmp
+        if t_hot > t[-1] or t_cool < t[0]:
+            raise IndexError("Hot and/or cool temperature out of range. Select hot/cool T values in (%.3e,%.3e)"%(t[0],t[-1]))
+            
+        #interpolate
+        f=interp1d(t,em,kind='cubic')
+        
+        return f(t_hot)/f(t_cool)
 
 
     def _find_fit_limits(self,t,em,limits,temp_opt='hot'):

@@ -38,6 +38,7 @@ format = 'pdf'
 #static parameters
 t_wait = np.arange(250,5250,250)
 cool_limits = [10**6.0,10**6.5]
+t_ratio_cool,t_ratio_hot=10**6.3,10**7.1 #Fe XV EIS line, Fe XX-XXII MaGIXS lines
 
 #set directories and filenames
 figdir = '%s_heating_runs/alpha%s'
@@ -61,17 +62,17 @@ if os.path.isfile(lvl1_file):
 else:
     processor.import_raw(t_wait,save_to_file=lvl1_file,read_teff=args.read_teff)
 
-#Statistics and fitting
+#Statistics and diagnostics
 processor.calc_stats()
-processor.fit_em(cool_limits=cool_limits)
-processor.calc_fit_stats()
+processor.diagnose_em(cool_limits=cool_limits)
+processor.calc_diagnostic_stats()
 
 #Pickle results for building histograms later
-with open(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '.lvl2_fits.pickle'),'wb') as f:
-    pickle.dump(processor.fits,f)
+with open(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '.lvl2_diagnostics.pickle'),'wb') as f:
+    pickle.dump(processor.diagnostics,f)
 
 #Instantiate Plotter class
-plotter = ebpe.DEMPlotter(processor.em, processor.em_stats, processor.fits, processor.fits_stats, fformat=format, fontsize=fontsize, alfs=0.65)
+plotter = ebpe.DEMPlotter(processor.em, processor.em_stats, processor.diagnostics, processor.diagnostics_stats, fformat=format, fontsize=fontsize, alfs=0.65)
 plotter.plot_em_curves(print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.em_all'))
 #Shorten figure size for next two plots
 plotter.figsize=(plotter.figsize[0],plotter.figsize[1]/2.0)

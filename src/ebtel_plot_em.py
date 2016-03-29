@@ -19,14 +19,14 @@ from scipy.optimize import curve_fit
 
 class DEMPlotter(object):
 
-    def __init__(self,em,em_stats,fits,fits_stats,Tn = np.arange(250,5250,250),dpi=1000,fontsize=18.,figsize=(8,8),alfs=0.75,fformat='eps',**kwargs):
+    def __init__(self,em,em_stats,diagnostics,diagnosticss_stats,Tn = np.arange(250,5250,250),dpi=1000,fontsize=18.,figsize=(8,8),alfs=0.75,fformat='eps',**kwargs):
         #set up logger
         self.logger = logging.getLogger(type(self).__name__)
         #arguments
         self.em = em
         self.em_stats = em_stats
-        self.fits = fits
-        self.fits_stats = fits_stats
+        self.diagnostics = diagnostics
+        self.diagnostics_stats = diagnostics_stats
         #keyword arguments
         self.dpi,self.fontsize,self.figsize,self.alfs,self.fformat = dpi,fontsize,figsize,alfs,fformat
         self.Tn = Tn
@@ -49,12 +49,12 @@ class DEMPlotter(object):
             #em
             ax.plot(self.em_stats[i]['T_mean'], 10.**(i*delta_em)*self.em_stats[i]['em_mean'], linestyle=self.linestyles[i%len(self.linestyles)], color=self.colors[i], label=r'$%d$'%self.Tn[i] )
             #fit lines
-            if self.fits_stats[i]['cool'] is not None:
-                t = np.array([self.fits_stats[i]['cool']['limits'][0],self.fits_stats[i]['cool']['limits'][1]])
-                ax.plot(t,10.**(i*delta_em)*10.**self.fits_stats[i]['cool']['b']*t**self.fits_stats[i]['cool']['a'],color=sns.color_palette('bright')[0], linewidth=2, linestyle='solid')
-            if self.fits_stats[i]['hot'] is not None:
-                t = np.array([self.fits_stats[i]['hot']['limits'][0],self.fits_stats[i]['hot']['limits'][1]])
-                ax.plot(t,10.**(i*delta_em)*10.**self.fits_stats[i]['hot']['b']*t**self.fits_stats[i]['hot']['a'],color=sns.color_palette('bright')[2], linewidth=2, linestyle='solid')
+            if self.diagnostics_stats[i]['cool'] is not None:
+                t = np.array([self.diagnostics_stats[i]['cool']['limits'][0],self.diagnostics_stats[i]['cool']['limits'][1]])
+                ax.plot(t,10.**(i*delta_em)*10.**self.diagnostics_stats[i]['cool']['b']*t**self.diagnostics_stats[i]['cool']['a'],color=sns.color_palette('bright')[0], linewidth=2, linestyle='solid')
+            if self.diagnostics_stats[i]['hot'] is not None:
+                t = np.array([self.diagnostics_stats[i]['hot']['limits'][0],self.diagnostics_stats[i]['hot']['limits'][1]])
+                ax.plot(t,10.**(i*delta_em)*10.**self.diagnostics_stats[i]['hot']['b']*t**self.diagnostics_stats[i]['hot']['a'],color=sns.color_palette('bright')[2], linewidth=2, linestyle='solid')
 
         #plot options
         ax.set_xlabel(r'$T$ $\mathrm{(K)}$',fontsize=self.fontsize)
@@ -88,16 +88,18 @@ class DEMPlotter(object):
                 #plot histograms and mean
                 self._make_em_axes(ax,self.Tn[i])
                 #fit lines
-                if self.fits_stats[i]['cool'] is not None:
-                    t = np.array([self.fits_stats[i]['cool']['limits'][0],self.fits_stats[i]['cool']['limits'][1]])
-                    ax.plot(t,10.**self.fits_stats[i]['cool']['b']*t**self.fits_stats[i]['cool']['a'],color=sns.color_palette('bright')[0], linewidth=2, linestyle='solid')
-                if self.fits_stats[i]['hot'] is not None:
-                    t = np.array([self.fits_stats[i]['hot']['limits'][0],self.fits_stats[i]['hot']['limits'][1]])
-                    ax.plot(t,10.**self.fits_stats[i]['hot']['b']*t**self.fits_stats[i]['hot']['a'],color=sns.color_palette('bright')[2], linewidth=2, linestyle='solid')
+                if self.diagnostics_stats[i]['cool'] is not None:
+                    t = np.array([self.diagnostics_stats[i]['cool']['limits'][0],self.diagnostics_stats[i]['cool']['limits'][1]])
+                    ax.plot(t,10.**self.diagnostics_stats[i]['cool']['b']*t**self.diagnostics_stats[i]['cool']['a'],color=sns.color_palette('bright')[0], linewidth=2, linestyle='solid')
+                if self.diagnostics_stats[i]['hot'] is not None:
+                    t = np.array([self.diagnostics_stats[i]['hot']['limits'][0],self.diagnostics_stats[i]['hot']['limits'][1]])
+                    ax.plot(t,10.**self.diagnostics_stats[i]['hot']['b']*t**self.diagnostics_stats[i]['hot']['a'],color=sns.color_palette('bright')[2], linewidth=2, linestyle='solid')
                 #text
                 ax.text(0.7,0.9,r'$t_N=%d$ $\mathrm{s}$'%(self.Tn[i]),transform=ax.transAxes,fontsize=self.alfs*self.fontsize)
-                if self.fits_stats[i]['cool'] is not None:ax.text(0.12,0.9,r'$a=%.3f$'%(self.fits_stats[i]['cool']['a']),fontsize=self.alfs*self.fontsize,transform=ax.transAxes,color=sns.color_palette('bright')[0],ha='left',va='center')
-                if self.fits_stats[i]['hot'] is not None:ax.text(0.12,0.8,r'$b=%.3f$'%(np.fabs(self.fits_stats[i]['hot']['a'])),fontsize=self.alfs*self.fontsize,transform=ax.transAxes,color=sns.color_palette('bright')[2],ha='left',va='center')
+                if self.diagnostics_stats[i]['cool'] is not None:
+                    ax.text(0.12,0.9,r'$a=%.3f$'%(self.diagnostics_stats[i]['cool']['a']), fontsize=self.alfs*self.fontsize, transform=ax.transAxes, color=sns.color_palette('bright')[0], ha='left', va='center')
+                if self.diagnostics_stats[i]['hot'] is not None:
+                    ax.text(0.12,0.8,r'$b=%.3f$'%(np.fabs(self.diagnostics_stats[i]['hot']['a'])), fontsize=self.alfs*self.fontsize, transform=ax.transAxes, color=sns.color_palette('bright')[2], ha='left', va='center')
                 #limits and scale
                 ax.set_xlim([10**5.5,10**7.5])
                 ax.set_ylim(y_limits)
@@ -208,7 +210,7 @@ class DEMPlotter(object):
         ax = fig.gca()
         
         marker_cool,marker_hot = [],[]
-        for tw,fs in zip(self.Tn,self.fits_stats):
+        for tw,fs in zip(self.Tn,self.diagnostics_stats):
             if fs['cool'] is not None:
                 marker_cool = ax.errorbar(tw,fs['cool']['a'],yerr=fs['cool']['sigma_a'],fmt='o',color=sns.color_palette('deep')[0],label=r'$\mathrm{cool}$')
             if fs['hot'] is not None:
