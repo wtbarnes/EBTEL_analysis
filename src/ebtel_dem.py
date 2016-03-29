@@ -145,8 +145,9 @@ class DEMProcess(object):
         self.diagnostics_stats = []
         
         for upper in self.diagnostics:
-            tmp_cool,tmp_hot,tmp_lim_cool,tmp_lim_hot = [],[],[],[]
+            tmp_cool,tmp_hot,tmp_lim_cool,tmp_lim_hot,tmp_ratio = [],[],[],[],[]
             for lower in upper:
+                tmp_ratio.append(lower['ratio'])
                 if lower['cool'] is not None:
                     tmp_cool.append([lower['cool']['a'],lower['cool']['b']])
                     tmp_lim_cool.append(lower['cool']['limits'])
@@ -164,7 +165,7 @@ class DEMProcess(object):
             else:
                 dh = None
 
-            self.diagnostics_stats.append({'cool':dc, 'hot':dh, 'ratio':{'mean':np.mean(np.array(upper_ratio)), 'sigma':np.std(np.array(upper_ratio))}})
+            self.diagnostics_stats.append({'cool':dc, 'hot':dh, 'ratio':{'mean':np.mean(np.array(tmp_ratio)), 'sigma':np.std(np.array(tmp_ratio))}})
             
             
     def _calc_em_ratio(self,t_cool,t_hot,t,em):
