@@ -141,8 +141,14 @@ class Configurer(object):
 
     def print_ips_config(self,**kwargs):
         """Print file with IonPopSolver configuration options"""
+        
+        #check for t_wait-q scaling
+        if self.t_wait_q_scaling:
+            scaling_suffix = '_-b'+str(self.t_wait_q_scaling)
+        else:
+            scaling_suffix = ''
 
-        f = open(os.path.join(self.config_path,'ebtel_L' + str(self.config_dictionary['loop_length']) + '_tpulse' + str(2.0*self.config_dictionary['t_pulse_half']) + '_' + self.config_dictionary['solver'] + '_job_array.conf'),'w')
+        f = open(os.path.join(self.config_path,'ebtel_L' + str(self.config_dictionary['loop_length']) + scaling_suffix + '_tpulse' + str(2.0*self.config_dictionary['t_pulse_half']) + '_' + self.config_dictionary['solver'] + '_job_array.conf'),'w')
 
         for c in self.config_array_clean:
             f.write('%s\t'%(os.path.join(self.config_path,self.fn%(c[0]),self.fn%(c[0])+'_'+str(int(c[1]))+'.reshape.txt')))
