@@ -10,7 +10,7 @@ import logging
 import argparse
 import pickle
 import numpy as np
-sys.path.append(os.path.join('/home/wtb2/Documents','EBTEL_analysis/src/'))
+sys.path.append(os.path.join(os.environ['RESEARCH_DIR'],'EBTEL_analysis/src/'))
 import ebtel_dem as ebd
 import ebtel_plot_em as ebpe
 
@@ -24,6 +24,7 @@ parser.add_argument("-t","--tpulse",type=float,help="Duration of heating pulses"
 parser.add_argument("--t_wait_q_scaling",help="Scaling between T_N and Q")
 parser.add_argument("--root_dir",help="Root directory from which EBTEL output will be read.")
 parser.add_argument("--root_dir_figs",help="Root directory to which figures will be output.")
+parser.add_argument("--read_teff",help="Flag for reading results from IonPopSolver code.", action='store_true')
 args = parser.parse_args()
 
 #optional command line parameters
@@ -64,7 +65,7 @@ if os.path.isfile(lvl1_file):
     logging.info("Importing level 1 results from %s"%(lvl1_file))
     processor.import_from_file(lvl1_file)
 else:
-    processor.import_raw(t_wait,save_to_file=lvl1_file)
+    processor.import_raw(t_wait,save_to_file=lvl1_file,read_teff=args.read_teff)
 
 #Statistics and fitting
 processor.calc_stats()
