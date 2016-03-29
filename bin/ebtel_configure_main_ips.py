@@ -23,7 +23,7 @@ parser.add_argument("-S","--solver",help="Solver used to compute solutions.")
 parser.add_argument("--root_dir_ebtel",help="Optional root directory for EBTEL data files",default='/data/datadrive2/EBTEL_runs')
 parser.add_argument("--root_dir",help="Optional root directory for config files",default='/data/datadrive2/IonPopSolver_runs')
 parser.add_argument("--t_wait_scaling",type=float,help="Optional parameter to force scaling between wait time and event amplitude, Q\propto T_N^b; b in Cargill(2014)",default=None)
-parser.add_argument("--quiet_logger",help="Optional parameter to set logging level to warning.",action='store_false')
+parser.add_argument("--quiet_logger",help="Optional parameter to set logging level to warning.",action='store_true')
 #Declare the parser dictionary
 args = parser.parse_args()
 
