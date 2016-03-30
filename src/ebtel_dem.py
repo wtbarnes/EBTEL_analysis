@@ -110,9 +110,8 @@ class DEMProcess(object):
             self.em_binned.append(tmp)
 
 
-    def diagnose_em(self,cool_limits=None,hot_limits=None,t_ratio_cool=[10**6.],t_ratio_hot=[10**7.]):
+    def diagnose_em(self,cool_limits=None,hot_limits=None,t_ratio_cool=[10**6.],t_ratio_hot=[10**7.],calc_slope=True,calc_ratio=True):
         """Fit binned emission measure histograms on hot and cool sides"""
-        #TODO:how to do statistics on many fits?
 
         if not hasattr(self,'em_binned'):
             raise AttributeError("EM histograms not yet binned. Run self.calc_stats() before calculating EM diagnostics.")
@@ -128,17 +127,25 @@ class DEMProcess(object):
         for upper in self.em_binned:
             tmp = []
             for lower in upper:
-                #split the curve
-                t_cool,em_cool,t_hot,em_hot = self._split_branch(lower['bin_centers'],lower['hist'])
-                #calculate limits if necessary
-                cool_lims,hot_lims = cool_limits,hot_limits
-                cool_lims = self._find_fit_limits(t_cool,em_cool,cool_lims,temp_opt='cool')
-                hot_lims = self._find_fit_limits(t_hot,em_hot,hot_lims)
-                #compute fit values
-                dc = self._fit_em_branch(t_cool,em_cool,cool_lims)
-                dh = self._fit_em_branch(t_hot,em_hot,hot_lims)
+                if calc_slope:
+                    #split the curve
+                    t_cool,em_cool,t_hot,em_hot = self._split_branch(lower['bin_centers'],lower['hist'])
+                    #calculate limits if necessary
+                    cool_lims,hot_lims = cool_limits,hot_limits
+                    cool_lims = self._find_fit_limits(t_cool,em_cool,cool_lims,temp_opt='cool')
+                    hot_lims = self._find_fit_limits(t_hot,em_hot,hot_lims)
+                    #compute fit values
+                    dc = self._fit_em_branch(t_cool,em_cool,cool_lims)
+                    dh = self._fit_em_branch(t_hot,em_hot,hot_lims)
+                else:
+                    dc,dh=None,None
+                if calc_ratio:
+                    #compute em ratio
+                    tmp_ratio=[self._calc_em_ratio(tp[0],tp[1],lower['bin_centers'],lower['hist']) for tp in self.em_ratio_tpairs]
+                else:
+                    tmp_ratio=[None for _ in self.em_ratio_tpairs]
                 #compute em ratio and store
-                tmp.append({'cool':dc,'hot':dh,'ratio':[self._calc_em_ratio(tp[0],tp[1],lower['bin_centers'],lower['hist']) for tp in self.em_ratio_tpairs]})
+                tmp.append({'cool':dc,'hot':dh,'ratio':tmp_ratio})
             self.diagnostics.append(tmp)
             
 

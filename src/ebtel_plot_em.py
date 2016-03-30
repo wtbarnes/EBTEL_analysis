@@ -253,7 +253,7 @@ class DEMPlotter(object):
         for tw,fs in zip(self.Tn,self.diagnostics_stats):
             for i in range(len(fs['ratio']['tpairs'])):
                 ax.errorbar(tw, fs['ratio']['mean'][i], yerr=fs['ratio']['sigma'][i], fmt='o', color=sns.color_palette('deep')[i], 
-                label=r'$(T_c=%.2f$ $\mathrm{MK}$, $T_h=%.2f$ $\mathrm{MK}$'%(fs['ratio']['tpairs'][i][0]/1e+6,fs['ratio']['tpairs'][i][1]/1e+6))
+                label=r'$T_c=%.2f$ $\mathrm{MK}$, $T_h=%.2f$ $\mathrm{MK}$'%(fs['ratio']['tpairs'][i][0]/1e+6,fs['ratio']['tpairs'][i][1]/1e+6))
             
         #set labels
         ax.set_xlabel(r'$t_N$ $\mathrm{(s)}$',fontsize=self.fontsize)
