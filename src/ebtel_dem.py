@@ -110,16 +110,23 @@ class DEMProcess(object):
             self.em_binned.append(tmp)
 
 
-    def diagnose_em(self,cool_limits=None,hot_limits=None,t_ratio_cool=10**6.,t_ratio_hot=10**7.):
+    def diagnose_em(self,cool_limits=None,hot_limits=None,t_ratio_cool=[10**6.],t_ratio_hot=[10**7.]):
         """Fit binned emission measure histograms on hot and cool sides"""
+        #TODO:how to do statistics on many fits?
 
         if not hasattr(self,'em_binned'):
             raise AttributeError("EM histograms not yet binned. Run self.calc_stats() before calculating EM diagnostics.")
+            
+        if len(t_ratio_cool) != len(t_ratio_hot):
+            raise ValueError("Temperature ratio lists must have same length.")
+            
+        #zip cool and hot temperatures together and make public
+        self.em_ratio_tpairs=[[tc,th] for tc,th in zip(t_ratio_cool,t_ratio_hot)]
 
         self.diagnostics=[]
 
         for upper in self.em_binned:
-            tmp,tmp_ratio = [],[]
+            tmp = []
             for lower in upper:
                 #split the curve
                 t_cool,em_cool,t_hot,em_hot = self._split_branch(lower['bin_centers'],lower['hist'])
@@ -130,11 +137,10 @@ class DEMProcess(object):
                 #compute fit values
                 dc = self._fit_em_branch(t_cool,em_cool,cool_lims)
                 dh = self._fit_em_branch(t_hot,em_hot,hot_lims)
-                #compute em ratio
-                ratio = self._calc_em_ratio(t_ratio_cool,t_ratio_hot,lower['bin_centers'],lower['hist'])
-                #store
-                tmp.append({'cool':dc,'hot':dh,'ratio':ratio})
+                #compute em ratio and store
+                tmp.append({'cool':dc,'hot':dh,'ratio':[self._calc_em_ratio(tp[0],tp[1],lower['bin_centers'],lower['hist']) for tp in self.em_ratio_tpairs]})
             self.diagnostics.append(tmp)
+            
 
     def calc_diagnostic_stats(self,mc_threshold=0.9,**kwargs):
         """Calculate fit statistics"""
@@ -156,6 +162,7 @@ class DEMProcess(object):
                     tmp_lim_hot.append(lower['hot']['limits'])
 
             #reject small number statistics
+            #slopes
             if float(len(tmp_cool))/float(len(upper)) >= mc_threshold:
                 dc = {'a':np.mean(np.array(tmp_cool),axis=0)[0], 'b':np.mean(np.array(tmp_cool),axis=0)[1], 'sigma_a':np.std(np.array(tmp_cool),axis=0)[0],'limits':np.mean(np.array(tmp_lim_cool),axis=0)}
             else:
@@ -164,8 +171,18 @@ class DEMProcess(object):
                 dh = {'a':np.mean(np.array(tmp_hot),axis=0)[0], 'b':np.mean(np.array(tmp_hot),axis=0)[1], 'sigma_a':np.std(np.array(tmp_hot),axis=0)[0],'limits':np.mean(np.array(tmp_lim_hot),axis=0)}
             else:
                 dh = None
-
-            self.diagnostics_stats.append({'cool':dc, 'hot':dh, 'ratio':{'mean':np.mean(np.array(tmp_ratio)), 'sigma':np.std(np.array(tmp_ratio))}})
+            #ratio
+            tmp_ratio_stats={'mean':[],'sigma':[],'tpairs':self.em_ratio_tpairs}
+            for i in range(len(self.em_ratio_tpairs)):
+                filtered_ratios=np.array([r for r in np.array(tmp_ratio)[:,i] if r is not None])
+                if float(len(filtered_ratios))/float(len(upper)) >= mc_threshold:
+                    tmp_ratio_stats['mean'].append(np.mean(filtered_ratios))
+                    tmp_ratio_stats['sigma'].append(np.std(filtered_ratios))
+                else:
+                    tmp_ratio_stats['mean'].append(None)
+                    tmp_ratio_stats['sigma'].append(None)
+            
+            self.diagnostics_stats.append({'cool':dc, 'hot':dh, 'ratio':tmp_ratio_stats})
             
             
     def _calc_em_ratio(self,t_cool,t_hot,t,em):
@@ -182,8 +199,11 @@ class DEMProcess(object):
             
         #interpolate
         f=interp1d(t,em,kind='cubic')
-        
-        return f(t_hot)/f(t_cool)
+        em_cool,em_hot=f(t_cool),f(t_hot)
+        if em_cool < self.em_cutoff/10.0 or em_hot < self.em_cutoff/10.0:
+            return None
+        else:
+            return em_hot/em_cool
 
 
     def _find_fit_limits(self,t,em,limits,temp_opt='hot'):
