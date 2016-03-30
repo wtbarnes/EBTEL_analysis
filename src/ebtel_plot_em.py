@@ -243,6 +243,41 @@ class DEMPlotter(object):
             plt.show()
             
             
+    def plot_em_ratios(self,y_limits=[0,2],print_fig_filename=None,**kwargs):
+        """Plot EM(T_hot)/EM(T_cool) ratio as a function of Tn"""
+        
+        #set up figure
+        fig = plt.figure(figsize=self.figsize)
+        ax = fig.gca()
+        
+        for tw,fs in zip(self.Tn,self.diagnostics_stats):
+            for i in range(len(fs['ratio']['tpairs'])):
+                ax.errorbar(tw, fs['ratio']['mean'][i], yerr=fs['ratio']['sigma'][i], fmt='o', color=sns.color_palette('deep')[i], 
+                label=r'$(T_c=%.2f$ $\mathrm{MK}$, $T_h=%.2f$ $\mathrm{MK}$'%(fs['ratio']['tpairs'][i][0]/1e+6,fs['ratio']['tpairs'][i][1]/1e+6))
+            
+        #set labels
+        ax.set_xlabel(r'$t_N$ $\mathrm{(s)}$',fontsize=self.fontsize)
+        ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{ratio}$',fontsize=self.fontsize)
+        ax.set_ylim(y_limits)
+        ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
+        ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
+        ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
+        
+        #legend
+        handles,labels=ax.get_legend_handles_labels()
+        ax.legend(handles[0:i+1],labels[0:i+1],fontsize=self.alfs*self.fontsize, numpoints=1, loc=2)
+        
+        #avoid cutting off labels
+        plt.tight_layout()
+
+        #save or show figure
+        if print_fig_filename is not None:
+            plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
+            plt.close('all')
+        else:
+            plt.show()
+            
+            
     def plot_em_derivs(self,em_cutoff=1e+23,y_limits=[-10,6],print_fig_filename=None,**kwargs):
         """Plot d(log(EM))/d(log(T)) as a function of T for all values of Tn"""
         
