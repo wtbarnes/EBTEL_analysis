@@ -19,7 +19,7 @@ from scipy.optimize import curve_fit
 
 class DEMPlotter(object):
 
-    def __init__(self,em,em_stats,diagnostics,diagnosticss_stats,Tn = np.arange(250,5250,250),dpi=1000,fontsize=18.,figsize=(8,8),alfs=0.75,fformat='eps',**kwargs):
+    def __init__(self,em,em_stats,diagnostics,diagnostics_stats,Tn = np.arange(250,5250,250),dpi=1000,fontsize=18.,figsize=(8,8),alfs=0.75,fformat='eps',**kwargs):
         #set up logger
         self.logger = logging.getLogger(type(self).__name__)
         #arguments
