@@ -10,7 +10,6 @@ import numpy as np
 import logging
 import em_binner as emb
 from scipy.optimize import curve_fit
-from scipy.interpolate import interp1d
 
 
 class DEMProcess(object):
@@ -205,9 +204,9 @@ class DEMProcess(object):
             raise IndexError("Hot and/or cool temperature out of range. Select hot/cool T values in (%.3e,%.3e)"%(t[0],t[-1]))
             
         #interpolate
-        f=interp1d(t,em,kind='cubic')
-        em_cool,em_hot=f(t_cool),f(t_hot)
-        if em_cool < self.em_cutoff/10.0 or em_hot < self.em_cutoff/10.0:
+        em_cool,em_hot=np.interp(t_cool,t,em),np.interp(t_hot,t,em)
+        if em_cool < self.em_cutoff or em_hot < self.em_cutoff:
+            self.logger.warning("Interpolated EM below EM threshold. Returning None.")
             return None
         else:
             return em_hot/em_cool
@@ -243,8 +242,7 @@ class DEMProcess(object):
             self.logger.warning("Fit limits outside of temperature range. %.2f < %.2f MK or %.2f > %.2f MK. Returning None."%(limits[0]/1e+6,t[0]/1e+6,limits[1]/1e+6,t[-1]/1e+6))
             return None
 
-        f = interp1d(t,em,kind='cubic')
-        emnew = f(np.array([limits[0],limits[1]]))
+        emnew = np.interp(np.array([limits[0],limits[1]]),t,em)
         if emnew[0] < self.em_cutoff or emnew[1] < self.em_cutoff:
             self.logger.warning("Fit limits below EM threshold, logEM_thresh=%.2f. logEM0,logEM1 = (%.2f,%.2f). Returning None."%(np.log10(self.em_cutoff),np.log10(emnew[0]),np.log10(emnew[1])))
             return None
