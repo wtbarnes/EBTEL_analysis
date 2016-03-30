@@ -243,7 +243,7 @@ class DEMPlotter(object):
             plt.show()
             
             
-    def plot_em_ratios(self,y_limits=[0,2],print_fig_filename=None,**kwargs):
+    def plot_em_ratios(self,y_limits=[0,2],print_fig_filename=None,legend_labels=None,**kwargs):
         """Plot EM(T_hot)/EM(T_cool) ratio as a function of Tn"""
         
         #set up figure
@@ -265,7 +265,12 @@ class DEMPlotter(object):
         
         #legend
         handles,labels=ax.get_legend_handles_labels()
-        ax.legend(handles[0:i+1],labels[0:i+1],fontsize=self.alfs*self.fontsize, numpoints=1, loc=2)
+        leghand=handles[0:i+1]
+        if legend_labels and len(legend_labels)==len(leghand):
+            leglab=legend_labels
+        else:
+            leglab=labels[0:i+1]
+        ax.legend(leghand,leglab,fontsize=self.alfs*self.fontsize, numpoints=1, loc=2)
         
         #avoid cutting off labels
         plt.tight_layout()
