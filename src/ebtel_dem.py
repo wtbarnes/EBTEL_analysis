@@ -206,7 +206,7 @@ class DEMProcess(object):
         #interpolate
         em_interp=np.interp([t_cool,t_hot],t,em)
         if em_interp[0] < self.em_cutoff or em_interp[1] < self.em_cutoff:
-            self.logger.warning("Interpolated EM below EM threshold. Returning None.")
+            self.logger.debug("Interpolated EM below EM threshold. Returning None.")
             return None
         else:
             return em_interp[1]/em_interp[0]

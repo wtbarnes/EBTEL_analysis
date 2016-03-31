@@ -38,7 +38,8 @@ format = 'pdf'
 #static parameters
 t_wait = np.arange(250,5250,250)
 cool_limits = [10**6.0,10**6.5]
-t_ratio_cool,t_ratio_hot=10**6.3,10**7.1 #Fe XV EIS line, Fe XX-XXII MaGIXS lines
+t_ratio_cool=[10**6.3,1.6e+6,10**6.3]
+t_ratio_hot=[10**7.1,8.9e+6,8.9e+6] #Fe XV EIS line, Fe XX-XXII MaGIXS lines
 
 #set directories and filenames
 figdir = '%s_heating_runs/alpha%s'
@@ -53,7 +54,7 @@ if not os.path.exists(os.path.join(args.root_dir_figs, figdir%(args.species,args
 fn_temp = os.path.join(figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species))
 
 #Instantiate Process class
-processor = ebd.DEMProcess(args.root_dir, args.species, args.alpha, args.loop_length, args.tpulse, args.solver, scaling_suffix=args.t_wait_q_scaling, aspect_ratio_factor=10.0, em_peak_falloff=0.7)
+processor = ebd.DEMProcess(args.root_dir, args.species, args.alpha, args.loop_length, args.tpulse, args.solver, scaling_suffix=args.t_wait_q_scaling, aspect_ratio_factor=10.0, em_peak_falloff=0.7,em_cutoff=1e+24)
 #Import the data
 lvl1_file=os.path.join(args.root_dir_figs,figdir%(args.species,args.alpha),figname%(args.loop_length,args.tpulse,args.alpha,args.species)+'.lvl1_em.pickle')
 if os.path.isfile(lvl1_file):
@@ -64,7 +65,7 @@ else:
 
 #Statistics and diagnostics
 processor.calc_stats()
-processor.diagnose_em(cool_limits=cool_limits)
+processor.diagnose_em(cool_limits=cool_limits,t_ratio_cool=t_ratio_cool,t_ratio_hot=t_ratio_hot)
 processor.calc_diagnostic_stats()
 
 #Pickle results for building histograms later
@@ -74,6 +75,7 @@ with open(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha), fig
 #Instantiate Plotter class
 plotter = ebpe.DEMPlotter(processor.em, processor.em_stats, processor.diagnostics, processor.diagnostics_stats, fformat=format, fontsize=fontsize, alfs=0.65)
 plotter.plot_em_curves(print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.em_all'))
+plotter.plot_em_ratios(print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.ratios'))
 #Shorten figure size for next two plots
 plotter.figsize=(plotter.figsize[0],plotter.figsize[1]/2.0)
 #Build remaining plots
