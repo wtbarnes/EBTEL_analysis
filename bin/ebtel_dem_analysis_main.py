@@ -54,7 +54,7 @@ if not os.path.exists(os.path.join(args.root_dir_figs, figdir%(args.species,args
 fn_temp = os.path.join(figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species))
 
 #Instantiate Process class
-processor = ebd.DEMProcess(args.root_dir, args.root_dir_figs, figname%(args.loop_length,args.tpulse,args.alpha,args.species), t_wait, args.species, args.alpha, args.loop_length, args.tpulse, args.solver, scaling_suffix=args.t_wait_q_scaling, aspect_ratio_factor=10.0, em_peak_falloff=0.7,em_cutoff=1e+24)
+processor = ebd.DEMProcess(args.root_dir, args.root_dir_figs, figname%(args.loop_length,args.tpulse,args.alpha,args.species), args.species, args.alpha, args.loop_length, args.tpulse, args.solver, scaling_suffix=args.t_wait_q_scaling, aspect_ratio_factor=10.0, em_peak_falloff=0.7,em_cutoff=1e+24, Tn=t_wait)
 #Import the data
 if not os.path.exists(processor.em_res_top_dir):
     logging.info("Calculating level 1 EM results and saving to %s. This may take a while..."%(processor.em_res_top_dir))
