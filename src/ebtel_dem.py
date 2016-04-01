@@ -38,10 +38,20 @@ class DEMProcess(object):
         self.em_peak_falloff = em_peak_falloff
         #instantiate binner class
         self.binner = emb.EM_Binner(2.*loop_length*1.e+8)
+        
+        
+    def _build_em_dirs(self):
+        """Set up directory structure for saving unbinned em histograms"""
+        for tn in self.Tn:
+            if not os.path.exists(os.path.join(self.em_res_top_dir,'tn%d'%tn)):
+                os.makedirs(os.path.exists(os.path.join(self.em_res_top_dir,'tn%d'%tn)))
 
 
     def import_raw(self,read_teff=False,**kwargs):
         """Import all runs for given Tn waiting time values; calculate EM distributions from t,T,n."""
+        
+        #build dirs
+        self._build_em_dirs()
 
         for tn in self.Tn:
             #initialize counter and flag
