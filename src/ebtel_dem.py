@@ -44,7 +44,7 @@ class DEMProcess(object):
         """Set up directory structure for saving unbinned em histograms"""
         for tn in self.Tn:
             if not os.path.exists(os.path.join(self.em_res_top_dir,'tn%d'%tn)):
-                os.makedirs(os.path.exists(os.path.join(self.em_res_top_dir,'tn%d'%tn)))
+                os.makedirs(os.path.join(self.em_res_top_dir,'tn%d'%tn))
 
 
     def import_raw(self,read_teff=False,**kwargs):
@@ -77,7 +77,7 @@ class DEMProcess(object):
                     self.binner.set_data(t,T,n)
                     self.binner.build_em_dist()
                     #save data
-                    with open(os.path.join(em_res_tn_dir,os.path.splitext(pfile)[0]+'.pickle')) as f:
+                    with open(os.path.join(em_res_tn_dir,os.path.splitext(pfile)[0]+'.pickle'),'wb') as f:
                         pickle.dump({'T':self.binner.T_em_flat, 'em':self.binner.em_flat/self.aspect_ratio_factor, 'bins':self.binner.T_em_histo_bins},f)
                     #increment counter
                     counter += 1
