@@ -19,11 +19,11 @@ from scipy.optimize import curve_fit
 
 class DEMPlotter(object):
 
-    def __init__(self,em,em_stats,diagnostics,diagnostics_stats,Tn = np.arange(250,5250,250),dpi=1000,fontsize=18.,figsize=(8,8),alfs=0.75,fformat='eps',**kwargs):
+    def __init__(self,em_res_top_dir,em_stats,diagnostics,diagnostics_stats,Tn = np.arange(250,5250,250),dpi=1000,fontsize=18.,figsize=(8,8),alfs=0.75,fformat='eps',**kwargs):
         #set up logger
         self.logger = logging.getLogger(type(self).__name__)
         #arguments
-        self.em = em
+        self.em_res_top_dir = em_res_top_dir
         self.em_stats = em_stats
         self.diagnostics = diagnostics
         self.diagnostics_stats = diagnostics_stats
@@ -122,16 +122,15 @@ class DEMPlotter(object):
     def _make_em_axes(self,ax,tn_val):
         """Plot single em curve"""
         
-        tn_index = np.where(self.Tn==tn_val)[0]
-        if len(tn_index) != 1:
+        if tn_val not in self.Tn:
             raise ValueError("Invalid wait time %f. Use a valid value from self.Tn"%(tn_val))
-        else:
-            tn_index = tn_index[0]
             
         #standard deviation
         ax.fill_between(self.em_stats[tn_index]['T_mean'], self.em_stats[tn_index]['em_mean']-self.em_stats[tn_index]['em_std'], self.em_stats[tn_index]['em_mean']+self.em_stats[tn_index]['em_std'], facecolor=sns.color_palette('deep')[2], edgecolor=sns.color_palette('deep')[2], alpha=0.75)
         #MC histograms
-        for h in self.em[tn_index]:
+        for pfile in os.listdir(os.path.join(self.em_res_top_dir,'tn%d'%tn_val)):
+            with open(os.path.join(self.em_res_top_dir,'tn%d'%tn_val,pfile),'rb') as f:
+                h=pickle.load(f)
             ax.hist(h['T'],bins=h['bins'],weights=h['em'],histtype='step',color=sns.color_palette('deep')[0],linestyle=self.linestyles[-1],alpha=0.1)
         #mean
         ax.plot(self.em_stats[tn_index]['T_mean'],self.em_stats[tn_index]['em_mean'],color='black',linestyle=self.linestyles[-1],linewidth=2)

@@ -10,20 +10,28 @@ import numpy as np
 import logging
 import em_binner as emb
 from scipy.optimize import curve_fit
-
+try:
+    import __builtin__
+except ImportError:
+    import builtins as __builtin__
+    
+#Resolve Python 2/3 exception problem
+exc = getattr(__builtin__,"IOError","FileNotFoundError")
 
 class DEMProcess(object):
     """Class for processing and importing  EBTEL data"""
 
-    def __init__(self, root_dir, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, em_cutoff=1e+25, em_peak_falloff=0.99, **kwargs):
+    def __init__(self, root_dir, figs_dir, fig_name, Tn, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, em_cutoff=1e+25, em_peak_falloff=0.99, **kwargs):
         """Constructor for process class"""
         #set up paths
         child_path = os.path.join(root_dir, species+'_heating_runs', 'alpha'+str(alpha), 'data')
         self.file_path = 'ebtel_L'+str(loop_length)+'_tn%d'+scaling_suffix+'_tpulse'+str(tpulse)+'_'+solver
         self.root_path = os.path.join(child_path, self.file_path)
+        self.em_res_top_dir = os.path.join(os.path.split(child_path)[0].replace(root_dir.strip('/'),figs_dir.strip('/')),fig_name+'.lvl1_em')
         #configure logger
         self.logger = logging.getLogger(type(self).__name__)
         #configure keyword arguments
+        self.Tn=Tn
         self.tpulse = tpulse
         self.aspect_ratio_factor = aspect_ratio_factor
         self.em_cutoff = em_cutoff
@@ -32,18 +40,18 @@ class DEMProcess(object):
         self.binner = emb.EM_Binner(2.*loop_length*1.e+8)
 
 
-    def import_raw(self,Tn,save_to_file=None,read_teff=False,**kwargs):
+    def import_raw(self,read_teff=False,**kwargs):
         """Import all runs for given Tn waiting time values; calculate EM distributions from t,T,n."""
 
-        self.em = []
-
-        for i in range(len(Tn)):
-            #initialize lists
-            tmp = []
+        for tn in self.Tn:
             #initialize counter and flag
             counter=0
             #build wait-time specific path
-            tn_path = self.root_path%Tn[i]
+            tn_path = self.root_path%tn
+            #create em results dir if needed
+            em_res_tn_dir=os.path.join(self.em_res_top_dir,'tn%d'%tn)
+            if not os.path.exists(em_res_tn_dir):
+                os.makedirs(em_res_tn_dir)
             for pfile in os.listdir(tn_path):
                 if 'heat_amp' not in pfile and 'dem' not in pfile:
                     self.logger.debug("Reading %s"%pfile)
@@ -59,51 +67,41 @@ class DEMProcess(object):
                     self.binner.set_data(t,T,n)
                     self.binner.build_em_dist()
                     #save data
-                    tmp.append({'T':self.binner.T_em_flat, 'em':self.binner.em_flat/self.aspect_ratio_factor, 'bins':self.binner.T_em_histo_bins})
+                    with open(os.path.join(em_res_tn_dir,os.path.splitext(pfile)[0]+'.pickle')) as f:
+                        pickle.dump({'T':self.binner.T_em_flat, 'em':self.binner.em_flat/self.aspect_ratio_factor, 'bins':self.binner.T_em_histo_bins},f)
                     #increment counter
                     counter += 1
                 else:
                     continue
 
             #Estimate percentage of files read
-            self.logger.info("Tn = %d s finished, Estimated total # of events simulated: %.2f %%"%(Tn[i], counter*int(np.ceil(t[-1]/(self.tpulse+Tn[i])))))
-
-            #append to top level list
-            self.em.append(tmp)
-
-        if save_to_file is not None:
-            with open(save_to_file,'wb') as f:
-                pickle.dump(self.em,f)
-
-
-    def import_from_file(self,pickled_file):
-        """Import level 1 pickled results"""
-        with open(pickled_file,'rb') as f:
-            self.em = pickle.load(f)
+            self.logger.info("Tn = %d s finished, Estimated total # of events simulated: %.2f %%"%(tn, counter*int(np.ceil(t[-1]/(self.tpulse+tn)))))
 
 
     def calc_stats(self,**kwargs):
         """Calculate mean, standard deviation and max for EM and T."""
 
-        if not hasattr(self,'em'):
-            raise AttributeError("Before computing EM statistics, run self.import_raw() to calculate EM data.")
-
         self.em_stats, self.em_binned = [],[]
 
-        for em in self.em:
-            #initialize list
-            tmp = []
-            #preallocate memory in matrix
-            tmp_mat = np.zeros([len(em),len(em[0]['bins'])-1])
-            #loop over all mc runs
-            i = 0
-            for i in range(len(em)):
-                h,b = np.histogram(em[i]['T'],bins=em[i]['bins'],weights=em[i]['em'])
-                tmp_mat[i,:] = h
+        for tn in self.Tn:
+            #check for existence of directory
+            em_res_tn_dir=os.path.join(self.em_res_top_dir,'tn%d'%tn)
+            if not os.path.exists(em_res_tn_dir):
+                raise exc("Cannot find %s. Before computing EM statistics, run self.import_raw() to calculate EM data."%rm_res_tn_dir)
+            #initialize lists
+            tmp,tmp_mat = [],[]
+            for pfile in os.listdir(em_res_tn_dir):
+                #load results
+                with open(os.path.join(em_res_tn_dir,pfile),'rb') as f:
+                    em=pickle.load(f)
+                #calc emission measure
+                h,b = np.histogram(em['T'],bins=em['bins'],weights=em['em'])
+                tmp_mat.append(h)
                 tmp.append({'hist':h,'bin_centers':np.diff(b)/2. + b[0:-1]})
             #NOTE:Assuming all temperature arrays are the same!
-            bin_centers = np.diff(em[0]['bins'])/2. + em[0]['bins'][0:-1]
+            bin_centers = np.diff(em['bins'])/2. + em['bins'][0:-1]
             #calculate and save stats
+            tmp_mat=np.array(tmp_mat)
             self.em_stats.append({'T_mean':bin_centers, 'em_mean':np.mean(tmp_mat,axis=0), 'em_std':np.std(tmp_mat,axis=0), 'em_max_mean':np.mean(np.max(tmp_mat,axis=1)), 'em_max_std':np.std(np.max(tmp_mat,axis=1)), 'T_max_mean':np.mean(bin_centers[np.argmax(tmp_mat,axis=1)]), 'T_max_std': np.std(bin_centers[np.argmax(tmp_mat,axis=1)]) })
             #save binned em
             self.em_binned.append(tmp)

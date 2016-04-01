@@ -54,14 +54,11 @@ if not os.path.exists(os.path.join(args.root_dir_figs, figdir%(args.species,args
 fn_temp = os.path.join(figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species))
 
 #Instantiate Process class
-processor = ebd.DEMProcess(args.root_dir, args.species, args.alpha, args.loop_length, args.tpulse, args.solver, scaling_suffix=args.t_wait_q_scaling, aspect_ratio_factor=10.0, em_peak_falloff=0.7,em_cutoff=1e+24)
+processor = ebd.DEMProcess(args.root_dir, args.root_dir_figs, figname%(args.loop_length,args.tpulse,args.alpha,args.species), t_wait, args.species, args.alpha, args.loop_length, args.tpulse, args.solver, scaling_suffix=args.t_wait_q_scaling, aspect_ratio_factor=10.0, em_peak_falloff=0.7,em_cutoff=1e+24)
 #Import the data
-lvl1_file=os.path.join(args.root_dir_figs,figdir%(args.species,args.alpha),figname%(args.loop_length,args.tpulse,args.alpha,args.species)+'.lvl1_em.pickle')
-if os.path.isfile(lvl1_file):
-    logging.info("Importing level 1 results from %s"%(lvl1_file))
-    processor.import_from_file(lvl1_file)
-else:
-    processor.import_raw(t_wait,save_to_file=lvl1_file,read_teff=args.read_teff)
+if not os.path.exists(processor.em_res_top_dir):
+    logging.info("Calculating level 1 EM results and saving to %s. This may take a while..."%(processor.em_res_top_dir))
+    processor.import_raw(read_teff=args.read_teff)    
 
 #Statistics and diagnostics
 processor.calc_stats()
@@ -73,7 +70,7 @@ with open(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha), fig
     pickle.dump(processor.diagnostics,f)
 
 #Instantiate Plotter class
-plotter = ebpe.DEMPlotter(processor.em, processor.em_stats, processor.diagnostics, processor.diagnostics_stats, fformat=format, fontsize=fontsize, alfs=0.65)
+plotter = ebpe.DEMPlotter(processor.em_res_top_dir, processor.em_stats, processor.diagnostics, processor.diagnostics_stats, fformat=format, fontsize=fontsize, alfs=0.65)
 plotter.plot_em_curves(print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.em_all'))
 plotter.plot_em_ratios(print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '.ratios'))
 #Shorten figure size for next two plots
