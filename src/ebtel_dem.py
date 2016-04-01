@@ -21,7 +21,7 @@ exc = getattr(__builtin__,"IOError","FileNotFoundError")
 class DEMProcess(object):
     """Class for processing and importing  EBTEL data"""
 
-    def __init__(self, root_dir, figs_dir, fig_name, Tn, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, em_cutoff=1e+25, em_peak_falloff=0.99, **kwargs):
+    def __init__(self, root_dir, figs_dir, fig_name, species, alpha, loop_length, tpulse, solver, scaling_suffix='', aspect_ratio_factor=1.0, em_cutoff=1e+25, em_peak_falloff=0.99, Tn=np.arange(250,5250,250), **kwargs):
         """Constructor for process class"""
         #set up paths
         child_path = os.path.join(root_dir, species+'_heating_runs', 'alpha'+str(alpha), 'data')
