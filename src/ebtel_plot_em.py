@@ -17,9 +17,24 @@ import seaborn.apionly as sns
 from matplotlib.ticker import MaxNLocator
 from scipy.optimize import curve_fit
 
+
+def tick_maker(old_ticks,n,**kwargs):
+    if n < 2:
+        raise ValueError('n must be greater than 1')
+    
+    n = n-1
+    delta = (old_ticks[-1] - old_ticks[0])/n
+    new_ticks = []
+    for i in range(n):
+        new_ticks.append(old_ticks[0] + i*delta)
+    
+    new_ticks.append(old_ticks[0] + n*delta)
+    return new_ticks
+    
+
 class DEMPlotter(object):
 
-    def __init__(self,em_res_top_dir,em_stats,diagnostics,diagnostics_stats,Tn = np.arange(250,5250,250),dpi=1000,fontsize=18.,figsize=(8,8),alfs=0.75,fformat='eps',**kwargs):
+    def __init__(self, em_res_top_dir, em_stats, diagnostics, diagnostics_stats, Tn = np.arange(250,5250,250), dpi=1000, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', **kwargs):
         #set up logger
         self.logger = logging.getLogger(type(self).__name__)
         #arguments
@@ -77,7 +92,7 @@ class DEMPlotter(object):
             plt.show()
             
             
-    def plot_em_curves_grid(self,y_limits=[10**26.,10**32.],num_cols=4,print_fig_filename=None,**kwargs):
+    def plot_em_curves_grid(self, y_limits=[10**26.,10**32.], num_cols=4, print_fig_filename=None, **kwargs):
             """Make subplot grid of EM curves"""
             
             num_rows=int(np.ceil(len(self.Tn)/num_cols))
@@ -125,18 +140,20 @@ class DEMPlotter(object):
         if tn_val not in self.Tn:
             raise ValueError("Invalid wait time %f. Use a valid value from self.Tn"%(tn_val))
             
+        tn_index = np.where(self.Tn==tn_val)[0][0]
+            
         #standard deviation
         ax.fill_between(self.em_stats[tn_index]['T_mean'], self.em_stats[tn_index]['em_mean']-self.em_stats[tn_index]['em_std'], self.em_stats[tn_index]['em_mean']+self.em_stats[tn_index]['em_std'], facecolor=sns.color_palette('deep')[2], edgecolor=sns.color_palette('deep')[2], alpha=0.75)
         #MC histograms
         for pfile in os.listdir(os.path.join(self.em_res_top_dir,'tn%d'%tn_val)):
             with open(os.path.join(self.em_res_top_dir,'tn%d'%tn_val,pfile),'rb') as f:
                 h=pickle.load(f)
-            ax.hist(h['T'],bins=h['bins'],weights=h['em'],histtype='step',color=sns.color_palette('deep')[0],linestyle=self.linestyles[-1],alpha=0.1)
+            ax.hist(h['T'], bins=h['bins'], weights=h['em'], histtype='step', color=sns.color_palette('deep')[0], linestyle=self.linestyles[-1], alpha=0.1)
         #mean
-        ax.plot(self.em_stats[tn_index]['T_mean'],self.em_stats[tn_index]['em_mean'],color='black',linestyle=self.linestyles[-1],linewidth=2)
+        ax.plot(self.em_stats[tn_index]['T_mean'], self.em_stats[tn_index]['em_mean'], color='black', linestyle=self.linestyles[-1], linewidth=2)
 
 
-    def plot_em_curve(self,tn_val,y_limits=[10**25.,10**28.],print_fig_filename=None,**kwargs):
+    def plot_em_curve(self, tn_val, y_limits=[10**25.,10**28.], print_fig_filename=None, **kwargs):
         """Plot MC and mean EM curves for single value of Tn"""
         
         #set up figure
@@ -164,7 +181,7 @@ class DEMPlotter(object):
             plt.show()
 
 
-    def plot_em_max(self,t_ref_line=4e+6,y_limits_em=[10**26.,10**28.],y_limits_t=[10**6.,10**7.],print_fig_filename=None,**kwargs):
+    def plot_em_max(self, t_ref_line=4e+6, y_limits_em=[10**26.,10**28.], y_limits_t=[10**6.,10**7.], print_fig_filename=None, **kwargs):
         """Plot max(EM) and corresponding temperature with error bars"""
         
         #set up figure
@@ -201,7 +218,7 @@ class DEMPlotter(object):
             plt.show()
 
 
-    def plot_em_slopes(self,y_limits=[0,8],print_fig_filename=None,**kwargs):
+    def plot_em_slopes(self, y_limits=[0,8], print_fig_filename=None, **kwargs):
         """Plot cool and hot slopes versus heating frequency with error bars"""
         
         #set up figure
@@ -224,7 +241,7 @@ class DEMPlotter(object):
         ax.axhline(y=5.5,color='k',linestyle=':')
         ax.set_ylim(y_limits)
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
-        ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
+        ax.set_yticks(tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         
         #legend
@@ -242,7 +259,7 @@ class DEMPlotter(object):
             plt.show()
             
             
-    def plot_em_ratios(self,y_limits=[0,2],print_fig_filename=None,legend_labels=None,**kwargs):
+    def plot_em_ratios(self, y_limits=[0,2], print_fig_filename=None, legend_labels=None, **kwargs):
         """Plot EM(T_hot)/EM(T_cool) ratio as a function of Tn"""
         
         #set up figure
@@ -259,7 +276,7 @@ class DEMPlotter(object):
         ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{ratio}$',fontsize=self.fontsize)
         ax.set_ylim(y_limits)
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
-        ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
+        ax.set_yticks(tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         
         #legend
@@ -282,7 +299,7 @@ class DEMPlotter(object):
             plt.show()
             
             
-    def plot_em_derivs(self,em_cutoff=1e+23,y_limits=[-10,6],print_fig_filename=None,**kwargs):
+    def plot_em_derivs(self, em_cutoff=1e+23, y_limits=[-10,6], print_fig_filename=None, **kwargs):
         """Plot d(log(EM))/d(log(T)) as a function of T for all values of Tn"""
         
         #set up figure
@@ -310,7 +327,7 @@ class DEMPlotter(object):
         ax.axhline(y=-5.5,color='k',linestyle=':')
         ax.set_ylim(y_limits)
         ax.set_xlim([5.5,7.5])
-        ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
+        ax.set_yticks(tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         #avoid cutting off labels
         plt.tight_layout()
@@ -321,20 +338,6 @@ class DEMPlotter(object):
             plt.close('all')
         else:
             plt.show()
-            
-            
-    def tick_maker(self,old_ticks,n,**kwargs):
-        if n < 2:
-            raise ValueError('n must be greater than 1')
-        
-        n = n-1
-        delta = (old_ticks[-1] - old_ticks[0])/n
-        new_ticks = []
-        for i in range(n):
-            new_ticks.append(old_ticks[0] + i*delta)
-        
-        new_ticks.append(old_ticks[0] + n*delta)
-        return new_ticks
         
         
         
@@ -363,7 +366,7 @@ class EMHistoBuilder(object):
         self.histo_dict['cool'],self.histo_dict['hot'] = {},{}
         
             
-    def load_fits(self,t_wait_interval=0,t_wait_length=20,**kwargs):
+    def load_fits(self, t_wait_interval=0, t_wait_length=20, **kwargs):
         """Load in data and create dictionaries with slope values grouped according to 'group' option"""
         
         #Loop over (alpha,b) values 
@@ -388,7 +391,7 @@ class EMHistoBuilder(object):
                 raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
             
                 
-    def make_fit_histogram(self,temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None,**kwargs):
+    def make_fit_histogram(self, temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None, **kwargs):
         """Build histograms from hot and cool dictionaries built up by self.loader()"""
 
         #Set up figure
@@ -419,7 +422,7 @@ class EMHistoBuilder(object):
             ax.set_ylim(ylims_final)
         else:
             ax.set_ylim(y_limits)
-        ax.set_yticks(self.tick_maker(ax.get_yticks(),5))
+        ax.set_yticks(tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         if x_limits is not None:
             ax.set_xlim(x_limits)
@@ -469,17 +472,4 @@ class EMHistoBuilder(object):
             
         return bins
         
-    
-    def tick_maker(self,old_ticks,n,**kwargs):
-        if n < 2:
-            raise ValueError('n must be greater than 1')
-        
-        n = n-1
-        delta = (old_ticks[-1] - old_ticks[0])/n
-        new_ticks = []
-        for i in range(n):
-            new_ticks.append(old_ticks[0] + i*delta)
-        
-        new_ticks.append(old_ticks[0] + n*delta)
-        return new_ticks
                     
