@@ -65,7 +65,9 @@ processor.calc_stats()
 processor.diagnose_em(cool_limits=cool_limits,t_ratio_cool=t_ratio_cool,t_ratio_hot=t_ratio_hot)
 processor.calc_diagnostic_stats()
 
-#Pickle results for building histograms later
+#Pickle results for building plots/histograms later
+with open(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '.lvl2_em_statistics.pickle'),'wb') as f:
+    pickle.dump([processor.em_stats,processor.em_binned],f)
 with open(os.path.join(args.root_dir_figs, figdir%(args.species,args.alpha), figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '.lvl2_diagnostics.pickle'),'wb') as f:
     pickle.dump(processor.diagnostics,f)
 
