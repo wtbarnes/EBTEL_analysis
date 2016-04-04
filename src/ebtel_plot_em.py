@@ -473,3 +473,54 @@ class EMHistoBuilder(object):
         return bins
         
                     
+
+def make_top_em_grid(self,files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000,xlims=[10**5.5,10**7.5],ylims=[10**26.,10**29.],print_fig_filename=None):
+    """Plot a grid of EM curves for a select number of waiting times"""
+    
+    #input check
+    if len(files) != len(labels):
+        raise ValueError('Length of label list and length of file list must be equal.')
+    
+    #get needed indices (NOTE: assuming wait times are from this selection)
+    waiting_times = np.arange(250,5250,250)
+    try:
+        i_tws = [np.where(waiting_times==tws)[0][0] for tws in tw_select]
+    except IndexError:
+        logging.exception('Invalid wait time selection.')
+        
+    #prep dictionaries
+    em_dict = {}
+    for tws in tw_select:
+        em_dict[str(tws)] = {}
+
+    #load the data
+    for df,l in zip(files,labels):
+        with open(df,'rb') as f:
+            ems,emb = pickle.load(f)
+        for i,tws in zip(i_tws,tw_select):
+            em_dict[str(tw)][l] = ems[i]
+            
+    #plotting
+    fig,axes = plt.subplots(nrows,ncols,figsize=figsize,sharex=True,sharey=True)
+    for ax,tws in zip(axes.flatten(),tw_select):
+        for l,i in zip(labels,range(len(labels))):
+            ax.plot(em_dict[str(tws)][l]['T_mean'],em_dict[str(tws)][l]['em_mean'],color=sns.color_palette('deep')[i],label=l)
+        #plot options
+        ax.set_yscale('log')
+        ax.set_xscale('log')
+        ax.set_xlims(xlims)
+        ax.set_ylims(ylims)
+        ax.tick_params(axis='both',pad=8,labelsize=alfs*fontsize)
+        
+    #axes labels
+    fig.text(0.5, 0.005, r'$T$ $\mathrm{(K)}$', ha='center', va='center',fontsize=fontsize) #xlabel
+    fig.text(0.005, 0.5, r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$', ha='center', va='center', rotation='vertical',fontsize=fontsize) #ylabel
+    
+    plt.tight_layout()
+    
+    #save or show figure
+    if print_fig_filename is not None:
+        plt.savefig(print_fig_filename+'.'+fformat,format=fformat,dpi=dpi)
+        plt.close('all')
+    else:
+        plt.show()
