@@ -344,14 +344,17 @@ class DEMPlotter(object):
 class EMHistoBuilder(object):
     """Class to build histograms of slope values to compare across heating functions and heating frequencies"""
     
-    def __init__(self,species, loop_length, tpulse, alpha, group='by_alpha', root_dir = '/data/datadrive2/EBTEL_figs', fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, **kwargs):
+    def __init__(self,files=[],labels=[], group='by_alpha', fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, **kwargs):
         
         #configure logger
         self.logger = logging.getLogger(type(self).__name__)
         #Load in heating function values and set needed variables
-        self.alpha = alpha
-        if len(self.alpha) == 1:
-            self.logger.warning("Only one heating function specified.")
+        self.files = files
+        self.labels = labels
+        if len(files) != len(labels):
+            raise ValueError("File list and label list must be of equal length.")
+        elif len(files) == 1:
+            self.logger.warning("Only one data set specified.")
         #keyword options
         self.group = group
         self.dpi = dpi
@@ -359,34 +362,35 @@ class EMHistoBuilder(object):
         self.fontsize = fontsize
         self.alfs = alfs
         self.figsize = figsize
-        #Assemble temp file name
-        self.fn_temp = os.path.join(root_dir, species + '_heating_runs','alpha%s','ebtel_L' +str(loop_length) + '_tpulse' + str(tpulse) + '_alpha%s%s_' + species + '_heating.lvl2_fits.pickle')
         #Initialize dictionary to store separate histograms
         self.histo_dict = {}
-        self.histo_dict['cool'],self.histo_dict['hot'] = {},{}
+        self.histo_dict['cool'],self.histo_dict['hot'],self.histo_dict['ratio'] = {},{},{}
         
             
-    def load_fits(self, t_wait_interval=0, t_wait_length=20, **kwargs):
+    def load_diagnostics(self, t_wait_interval=0, t_wait_length=20, ratio_index=0, **kwargs):
         """Load in data and create dictionaries with slope values grouped according to 'group' option"""
         
         #Loop over (alpha,b) values 
-        for ab in self.alpha:
+        for fn,lab in zip(self.files,self.labels):
             #Unpickle the file
-            with open(self.fn_temp%(ab[0],ab[0],ab[1]),'rb') as f: 
+            with open(fn,'rb') as f: 
                 fits_dict = pickle.load(f)
             #Group by alpha method
             if self.group is 'by_alpha':
-                self.histo_dict['cool'][''.join(ab)] = [np.fabs(d['cool']['a']) for d in list(itertools.chain(*fits_dict)) if d['cool'] is not None]
-                self.histo_dict['hot'][''.join(ab)] = [np.fabs(d['hot']['a']) for d in list(itertools.chain(*fits_dict)) if d['hot'] is not None]
+                self.histo_dict['cool'][lab] = [np.fabs(d['cool']['a']) for d in list(itertools.chain(*fits_dict)) if d['cool'] is not None]
+                self.histo_dict['hot'][lab] = [np.fabs(d['hot']['a']) for d in list(itertools.chain(*fits_dict)) if d['hot'] is not None]
+                self.histo_dict['ratio'][lab] = [d['ratio'][ratio_index] for d in list(itertools.chain(*fits_dict)) if d['ratio'][ratio_index] is not None]
             #Group by Tn method
             elif self.group is 'by_t_wait':
                 for i in np.arange(0 + t_wait_interval,t_wait_length+t_wait_interval,1+t_wait_interval):
                     try:
                         self.histo_dict['cool'][str(i)].extend([np.fabs(d['cool']['a']) for d in fits_dict[i] if d['cool'] is not None])
                         self.histo_dict['hot'][str(i)].extend([np.fabs(d['hot']['a']) for d in fits_dict[i] if d['hot'] is not None])
+                        self.histo_dict['ratio'][str(i)].extend([d['ratio'][ratio_index] for d in fits_dict[i] if d['ratio'][ratio_index] is not None])
                     except KeyError:
                         self.histo_dict['cool'][str(i)] = [np.fabs(d['cool']['a']) for d in fits_dict[i] if d['cool'] is not None]
                         self.histo_dict['hot'][str(i)] = [np.fabs(d['hot']['a']) for d in fits_dict[i] if d['hot'] is not None]
+                        self.histo_dict['ratio'][str(i)] = [d['ratio'][ratio_index] for d in fits_dict[i] if d['ratio'][ratio_index] is not None]
             else:
                 raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
             
@@ -426,15 +430,6 @@ class EMHistoBuilder(object):
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         if x_limits is not None:
             ax.set_xlim(x_limits)
-        if temp_choice == 'cool':
-            ax.set_xlabel(r'$a$',fontsize=self.fontsize)
-            ax.axvline(x=2,color='k',linestyle=':',linewidth=2)
-            ax.axvline(x=5,color='k',linestyle=':',linewidth=2)
-        else:
-            ax.set_xlabel(r'$b$',fontsize=self.fontsize)
-            ax.axvline(x=5.5,color='k',linestyle='-.',linewidth=2)
-            ax.axvline(x=5.5,color='k',linestyle='-.',linewidth=2)
-            
         if leg:
             if leg_loc is None:
                 leg_loc = 'best'
