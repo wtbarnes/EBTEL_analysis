@@ -438,9 +438,8 @@ class EMHistoBuilder(object):
             else:
                 leg_title = r'$t_N$ $\mathrm{(s)}$'
             hand,lab = ax.get_legend_handles_labels()
-            #sort legend entries in t_wait case
-            if self.group == 'by_t_wait':
-                lab,hand = zip(*sorted(zip(lab,hand), key=lambda t: t[0]))
+            #sort legend entries
+            lab,hand = zip(*sorted(zip(lab,hand), key=lambda t: t[0]))
             leg = ax.legend(hand,lab,fontsize=self.alfs*self.fontsize,loc=leg_loc,ncol=1,title=leg_title)
             plt.setp(leg.get_title(),fontsize=self.alfs*self.fontsize)
         
