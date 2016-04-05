@@ -474,7 +474,7 @@ class EMHistoBuilder(object):
         
                     
 
-def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], print_fig_filename=None):
+def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], show_sigma=False, print_fig_filename=None):
     """Plot a grid of EM curves for a select number of waiting times"""
     
     #input check
@@ -505,7 +505,8 @@ def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=
     for ax,tws in zip(axes.flatten(),tw_select):
         for l,i in zip(labels,range(len(labels))):
             ax.plot(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean'], color=sns.color_palette('deep')[i], label=l)
-            ax.fill_between(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean']-em_dict[str(tws)][l]['em_std'], em_dict[str(tws)][l]['em_mean']+em_dict[str(tws)][l]['em_std'], facecolor=sns.color_palette('deep')[i], edgecolor=sns.color_palette('deep')[i], alpha=0.25)
+            if show_sigma:
+                ax.fill_between(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean']-em_dict[str(tws)][l]['em_std'], em_dict[str(tws)][l]['em_mean']+em_dict[str(tws)][l]['em_std'], facecolor=sns.color_palette('deep')[i], edgecolor=sns.color_palette('deep')[i], alpha=0.25)
         #plot options
         ax.text(0.7, 0.85, r'$t_N=%d$ $\mathrm{s}$'%tws, fontsize=alfs*fontsize, transform = ax.transAxes)
         ax.set_yscale('log')
