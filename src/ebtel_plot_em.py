@@ -395,7 +395,7 @@ class EMHistoBuilder(object):
                 raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
             
                 
-    def make_fit_histogram(self, temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None, **kwargs):
+    def make_fit_histogram(self, temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None, ncols_leg=1,**kwargs):
         """Build histograms from hot and cool dictionaries built up by self.loader()"""
 
         #Set up figure
@@ -446,7 +446,7 @@ class EMHistoBuilder(object):
             hand,lab = ax.get_legend_handles_labels()
             #sort legend entries
             lab,hand = zip(*sorted(zip(lab,hand), key=lambda t: t[0]))
-            leg = ax.legend(hand,lab,fontsize=self.alfs*self.fontsize,loc=leg_loc,ncol=1,title=leg_title)
+            leg = ax.legend(hand,lab,fontsize=self.alfs*self.fontsize,loc=leg_loc,ncol=ncols_leg,title=leg_title)
             plt.setp(leg.get_title(),fontsize=self.alfs*self.fontsize)
         
         #Print or show figure
