@@ -474,7 +474,7 @@ class EMHistoBuilder(object):
         
                     
 
-def make_top_em_grid(self,files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000,xlims=[10**5.5,10**7.5],ylims=[10**26.,10**29.],print_fig_filename=None):
+def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], print_fig_filename=None):
     """Plot a grid of EM curves for a select number of waiting times"""
     
     #input check
@@ -498,7 +498,7 @@ def make_top_em_grid(self,files=[],labels=[],tw_select=np.arange(250,5250,250),n
         with open(df,'rb') as f:
             ems,emb = pickle.load(f)
         for i,tws in zip(i_tws,tw_select):
-            em_dict[str(tw)][l] = ems[i]
+            em_dict[str(tws)][l] = ems[i]
             
     #plotting
     fig,axes = plt.subplots(nrows,ncols,figsize=figsize,sharex=True,sharey=True)
@@ -506,17 +506,22 @@ def make_top_em_grid(self,files=[],labels=[],tw_select=np.arange(250,5250,250),n
         for l,i in zip(labels,range(len(labels))):
             ax.plot(em_dict[str(tws)][l]['T_mean'],em_dict[str(tws)][l]['em_mean'],color=sns.color_palette('deep')[i],label=l)
         #plot options
+        ax.text(0.7, 0.85, r'$t_N=%d$ $\mathrm{s}$'%tws, fontsize=alfs*fontsize, transform = ax.transAxes)
         ax.set_yscale('log')
         ax.set_xscale('log')
-        ax.set_xlims(xlims)
-        ax.set_ylims(ylims)
+        ax.set_xlim(xlims)
+        ax.set_ylim(ylims)
         ax.tick_params(axis='both',pad=8,labelsize=alfs*fontsize)
         
     #axes labels
-    fig.text(0.5, 0.005, r'$T$ $\mathrm{(K)}$', ha='center', va='center',fontsize=fontsize) #xlabel
-    fig.text(0.005, 0.5, r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$', ha='center', va='center', rotation='vertical',fontsize=fontsize) #ylabel
+    fig.text(xlab_pos[0], xlab_pos[1], r'$T$ $\mathrm{(K)}$', ha='center', va='center',fontsize=fontsize) #xlabel
+    fig.text(ylab_pos[0], ylab_pos[1], r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$', ha='center', va='center', rotation='vertical',fontsize=fontsize) #ylabel
+    #legend
+    axes.flatten()[0].legend(loc='best',fontsize=alfs*fontsize)
     
     plt.tight_layout()
+    plt.subplots_adjust(hspace=0.0,wspace=0.0)
+    
     
     #save or show figure
     if print_fig_filename is not None:
