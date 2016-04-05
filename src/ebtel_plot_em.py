@@ -504,7 +504,8 @@ def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=
     fig,axes = plt.subplots(nrows,ncols,figsize=figsize,sharex=True,sharey=True)
     for ax,tws in zip(axes.flatten(),tw_select):
         for l,i in zip(labels,range(len(labels))):
-            ax.plot(em_dict[str(tws)][l]['T_mean'],em_dict[str(tws)][l]['em_mean'],color=sns.color_palette('deep')[i],label=l)
+            ax.plot(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean'], color=sns.color_palette('deep')[i], label=l)
+            ax.fill_between(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean']-em_dict[str(tws)][l]['em_std'], em_dict[str(tws)][l]['em_mean']+em_dict[str(tws)][l]['em_std'], facecolor=sns.color_palette('deep')[i], edgecolor=sns.color_palette('deep')[i], alpha=0.25)
         #plot options
         ax.text(0.7, 0.85, r'$t_N=%d$ $\mathrm{s}$'%tws, fontsize=alfs*fontsize, transform = ax.transAxes)
         ax.set_yscale('log')
