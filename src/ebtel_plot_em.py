@@ -417,6 +417,12 @@ class EMHistoBuilder(object):
                     ylims_final[0] = ylims[0]
             
         #Labels and styling
+        if temp_choice == 'hot':
+            ax.set_xlabel(r'$a$',fontsize=self.fontsize)
+        elif temp_choice == 'cool':
+            ax.set_xlabel(r'$b$',fontsize=self.fontsize)
+        else:
+            ax.set_xlabel(r'$\mathrm{EM}\,\,\mathrm{ratio}$',fontsize=self.fontsize)
         #Check for normalization in just one set; assumed all or none are normed
         if 'normed' in list(histo_opts.values())[0] and list(histo_opts.values())[0]['normed'] is True:
             ax.set_ylabel(r'$\mathrm{Normalized}$ $\mathrm{Frequency}$',fontsize=self.fontsize)            
@@ -468,7 +474,7 @@ class EMHistoBuilder(object):
         
                     
 
-def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], show_sigma=False, print_fig_filename=None):
+def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], show_sigma=False, ncols_leg=1, print_fig_filename=None):
     """Plot a grid of EM curves for a select number of waiting times"""
     
     #input check
@@ -496,7 +502,7 @@ def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=
             
     #plotting
     fig,axes = plt.subplots(nrows,ncols,figsize=figsize,sharex=True,sharey=True)
-    for ax,tws in zip(axes.flatten(),tw_select):
+    for ax,i_ax,tws in zip(axes.flatten(),len(axes.flatten()),tw_select):
         for l,i in zip(labels,range(len(labels))):
             ax.plot(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean'], color=sns.color_palette('deep')[i], label=l)
             if show_sigma:
@@ -508,12 +514,16 @@ def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=
         ax.set_xlim(xlims)
         ax.set_ylim(ylims)
         ax.tick_params(axis='both',pad=8,labelsize=alfs*fontsize)
+        if i_ax < ncols*(nrows-1):
+            ax.yaxis.set_major_locator(MaxNLocator(prune='lower'))
+        if i_ax >= ncols:
+            ax.yaxis.set_major_locator(MaxNLocator(prune='upper'))
         
     #axes labels
     fig.text(xlab_pos[0], xlab_pos[1], r'$T$ $\mathrm{(K)}$', ha='center', va='center',fontsize=fontsize) #xlabel
     fig.text(ylab_pos[0], ylab_pos[1], r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$', ha='center', va='center', rotation='vertical',fontsize=fontsize) #ylabel
     #legend
-    axes.flatten()[0].legend(loc='best',fontsize=alfs*fontsize)
+    axes.flatten()[0].legend(loc='best',fontsize=alfs*fontsize,ncol=ncols_leg)
     
     plt.tight_layout()
     plt.subplots_adjust(hspace=0.0,wspace=0.0)
