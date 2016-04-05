@@ -502,7 +502,7 @@ def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=
             
     #plotting
     fig,axes = plt.subplots(nrows,ncols,figsize=figsize,sharex=True,sharey=True)
-    for ax,i_ax,tws in zip(axes.flatten(),len(axes.flatten()),tw_select):
+    for ax,i_ax,tws in zip(axes.flatten(),range(len(axes.flatten())),tw_select):
         for l,i in zip(labels,range(len(labels))):
             ax.plot(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean'], color=sns.color_palette('deep')[i], label=l)
             if show_sigma:
