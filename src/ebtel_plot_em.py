@@ -402,11 +402,15 @@ class EMHistoBuilder(object):
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         
+        #set minimum number of statistics to show result
+        min_stats = 10
+        if self.group is not 'by_alpha':
+            min_stats=20*len(self.files)
         #Initialize y-limits values to find max values
         ylims_final = [0.0,0.0]
         #Loop over histograms
         for key in self.histo_dict[temp_choice]:
-            if len(self.histo_dict[temp_choice][key]) < 10:
+            if len(self.histo_dict[temp_choice][key]) < min_stats:
                 pass
             else:
                 ax.hist(self.histo_dict[temp_choice][key], bins=self._size_bins(self.histo_dict[temp_choice][key],bin_tool), histtype='step',**histo_opts[key])
