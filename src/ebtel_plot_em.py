@@ -530,7 +530,7 @@ def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linesty
     #legend
     handles,labels = axes.flatten()[0].get_legend_handles_labels()
     short_handles,short_labels = [],[]
-    for hand,lab,lb in zip(hand,lab,show_leg):
+    for hand,lab,lb in zip(handles,labels,show_leg):
         if lb:
             short_handles.append(hand)
             short_labels.append(lab.replace(', $\mathrm{IEQ}$',''))
