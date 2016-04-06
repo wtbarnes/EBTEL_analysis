@@ -474,12 +474,17 @@ class EMHistoBuilder(object):
         
                     
 
-def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], show_sigma=False, ncols_leg=1, print_fig_filename=None):
+def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linestyles=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], show_sigma=False, show_leg=[], print_fig_filename=None):
     """Plot a grid of EM curves for a select number of waiting times"""
     
     #input check
     if len(files) != len(labels):
         raise ValueError('Length of label list and length of file list must be equal.')
+        
+    if not linestyles:
+        linestyles = len(labels)*['solid']
+    if not show_leg:
+        show_leg = len(labels)*[True]
     
     #get needed indices (NOTE: assuming wait times are from this selection)
     waiting_times = np.arange(250,5250,250)
@@ -504,7 +509,7 @@ def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=
     fig,axes = plt.subplots(nrows,ncols,figsize=figsize,sharex=True,sharey=True)
     for ax,i_ax,tws in zip(axes.flatten(),range(len(axes.flatten())),tw_select):
         for l,i in zip(labels,range(len(labels))):
-            ax.plot(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean'], color=sns.color_palette('deep')[i], label=l)
+            ax.plot(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean'], color=colors[i], linestyle=linestyles[i], label=l)
             if show_sigma:
                 ax.fill_between(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean']-em_dict[str(tws)][l]['em_std'], em_dict[str(tws)][l]['em_mean']+em_dict[str(tws)][l]['em_std'], facecolor=sns.color_palette('deep')[i], edgecolor=sns.color_palette('deep')[i], alpha=0.25)
         #plot options
@@ -514,20 +519,24 @@ def make_top_em_grid(files=[],labels=[],tw_select=np.arange(250,5250,250),nrows=
         ax.set_xlim(xlims)
         ax.set_ylim(ylims)
         ax.tick_params(axis='both',pad=8,labelsize=alfs*fontsize)
-        if i_ax < ncols*(nrows-1):
-            ax.yaxis.set_major_locator(MaxNLocator(prune='lower'))
-        if i_ax >= ncols:
-            ax.yaxis.set_major_locator(MaxNLocator(prune='upper'))
+        #if i_ax < ncols*(nrows-1):
+        #    ax.yaxis.set_major_locator(MaxNLocator(prune='lower'))
+        #if i_ax >= ncols:
+        #    ax.yaxis.set_major_locator(MaxNLocator(prune='upper'))
         
     #axes labels
     fig.text(xlab_pos[0], xlab_pos[1], r'$T$ $\mathrm{(K)}$', ha='center', va='center',fontsize=fontsize) #xlabel
     fig.text(ylab_pos[0], ylab_pos[1], r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$', ha='center', va='center', rotation='vertical',fontsize=fontsize) #ylabel
     #legend
-    axes.flatten()[0].legend(loc='best',fontsize=alfs*fontsize,ncol=ncols_leg)
+    handles,labels = axes.flatten()[0].get_legend_handles_labels()
+    short_handles,short_labels = [],[]
+    for hand,lab,lb in zip(hand,lab,show_leg):
+        if lb:
+            short_handles.append(hand)
+            short_labels.append(lab.replace(', $\mathrm{IEQ}$',''))
+    axes.flatten()[0].legend(short_handles, short_labels, loc='best', fontsize=alfs*fontsize)
     
-    plt.tight_layout()
     plt.subplots_adjust(hspace=0.0,wspace=0.0)
-    
     
     #save or show figure
     if print_fig_filename is not None:
