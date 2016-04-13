@@ -25,7 +25,7 @@ class Runner(object):
         else:
             quiet_option = ''
             
-        output = subprocess.check_output([self.exec_directory+'ebtel-2fl', self.config_directory + config_file + quiet_option])
+        output = subprocess.check_output([os.path.join(self.exec_directory,'ebtel'), os.path.join(self.config_directory,config_file) + quiet_option])
                 
         if 'verbose' in kwargs and kwargs['verbose'] is True:
             print(output.decode(sys.stdout.encoding))
