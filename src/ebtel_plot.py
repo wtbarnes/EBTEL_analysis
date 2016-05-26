@@ -4,6 +4,11 @@
 #7 May 2015
 
 #Import necessary modules
+try:
+    import __builtin__
+except ImportError:
+    import builtins as __builtin__
+    
 import logging
 import matplotlib
 matplotlib.use('Agg')
@@ -12,6 +17,9 @@ import numpy as np
 import seaborn.apionly as sns
 from matplotlib.ticker import MaxNLocator
 from scipy.optimize import curve_fit
+
+#Resolve Python 2/3 exception problem
+exc = getattr(__builtin__,"IOError","FileNotFoundError")
 
 class Plotter(object):
 
@@ -48,7 +56,7 @@ class Plotter(object):
             self.temp_apex_e = data[:,5+2*index_offset]
             self.dens_apex = data[:,6+3*index_offset]
             self.heat = data[:,10+5*index_offset]
-        except:
+        except exc:
             self.logger.warning("Unable to load plasma parameters from %s."%(lvl0_filename+'.txt'))
             pass
 
@@ -60,14 +68,14 @@ class Plotter(object):
             self.dem_cor = data[:,2]
             self.dem_tot = data[:,3]
             self.em_cor = data[:,4]
-        except:
+        except exc:
             self.logger.warning("Unable to load DEM parameters from %s."%(lvl0_filename+'_dem.txt'))
             pass
             
         #load heat parameters
         try:
             self.events = np.loadtxt(lvl0_filename+'_heat_amp.txt')
-        except:
+        except exc:
             self.logger.warning("Unable to load heating event amplitudes from %s."%(lvl0_filename+'_heat_amp.txt'))
             pass
 
