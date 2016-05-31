@@ -74,6 +74,6 @@ else:
     logging.basicConfig(stream=sys.stdout,level=logging.DEBUG)
 
 #instantiate configuration class and print configuration files as well as job configuration file
-config = Configurer(config_dict, root_dir, Hn=Hn, delta_q=delta_q, mc=mc, build_paths=True, t_wait_q_scaling=args.t_wait_scaling, constraint_tol=1e-3)
+config = Configurer(config_dict, args.root_dir, Hn=Hn, delta_q=delta_q, mc=mc, build_paths=True, t_wait_q_scaling=args.t_wait_scaling, constraint_tol=1e-3)
 config.vary_wait_time(250,5000,250)
 config.print_job_array_config()
