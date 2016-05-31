@@ -26,10 +26,10 @@ parser.add_argument("--quiet_logger",help="Optional parameter to set logging lev
 args = parser.parse_args()
 
 #Set heating parameters--configure power-law bounds such that loop is maintained at an equilibrium temperature of T_peak
-tpeak = 4.0e+6 #peak temperature for time-averaged heating rate
-Hn = 4.5e-3 #1.0e-6*tpeak**(3.5)/(args.loop_length*1.0e+8)**2 #time-averaged heating rate needed to maintain peak temperature of 4 MK
+#tpeak = 4.0e+6 #peak temperature for time-averaged heating rate
+Hn = 3.6e-3 #1.0e-6*tpeak**(3.5)/(args.loop_length*1.0e+8)**2 #time-averaged heating rate needed to maintain peak temperature of 4 MK
 if args.species == 'single': #reduce energy input for single-fluid case
-    Hn *= 7.8e-7/1.0e-6
+    Hn *= (7.8e-7)/(8.12e-7)
 delta_q = 10.0 #range over which power-law distribution is constructed (typically one decade)
 
 #Configure all static dictionary options
@@ -38,7 +38,7 @@ config_dict['total_time'] = 80000
 config_dict['tau'] = 1.0
 config_dict['rka_error'] = 1.0e-6
 config_dict['index_dem'] = 451
-config_dict['sat_limit'] = 1.0/6.0
+config_dict['sat_limit'] = 1.0
 config_dict['h_back'] = 3.5e-5
 config_dict['heating_shape'] = 'triangle'
 config_dict['t_start_switch'] = 'file'
@@ -50,6 +50,10 @@ config_dict['t_pulse_half'] = 0.5*args.t_pulse
 config_dict['mean_t_start'] = 1000
 config_dict['std_t_start'] = 1000
 config_dict['sample_rate'] = 10
+config_dict['r3_grav_correction'] = 'True'
+config_dict['r3_loss_correction'] = 'True'
+config_dict['r3_cond_0'] = 6.0
+config_dict['r3_rad_0'] = 0.6
 
 #Configure directory-level parameters
 config_dict['heat_species'] = args.species

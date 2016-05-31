@@ -12,7 +12,7 @@ sys.path.append('../src/')
 from ebtel_configure import Configurer
 
 #Declare parser object
-parser = argparse.ArgumentParser(description='Script that prints configuration files for EBTEL-2fluid runs.')
+parser = argparse.ArgumentParser(description='Script that prints configuration files for IonPopSolver runs.')
 #Add arguments to parser
 parser.add_argument("-s","--species",help="Species to which the heating was applied for particular run.")
 parser.add_argument("-as","--amp_switch",help="Switch to decide between power-law and uniform heating.")
