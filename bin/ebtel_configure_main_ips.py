@@ -41,6 +41,6 @@ if args.quiet_logger:
 else:
     logging.basicConfig(stream=sys.stdout,level=logging.DEBUG)
 
-config = Configurer(config_dict,root_dir,build_paths=True,t_wait_q_scaling=args.t_wait_scaling)
-config.print_ips_input(root_dir_ebtel)
+config = Configurer(config_dict,args.root_dir,build_paths=True,t_wait_q_scaling=args.t_wait_scaling)
+config.print_ips_input(args.root_dir_ebtel)
 config.print_ips_config()
