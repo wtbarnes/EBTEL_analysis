@@ -168,7 +168,7 @@ class Plotter(object):
             plt.show()
 
 
-    def plot_event_distribution(self,print_fig_filename=None,noise_thresh=0.01,return_params=True,**kwargs):
+    def plot_event_distribution(self,print_fig_filename=None,noise_thresh=0.01,return_params=True,show_plot=True**kwargs):
         """Fit event energy distribution with a power-law and plot it."""
         
         #set up figure
@@ -219,7 +219,7 @@ class Plotter(object):
         if print_fig_filename is not None:
             plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
             plt.close('all')
-        else:
+        elif show_plot:
             plt.show()
             
         if return_params:
