@@ -188,7 +188,7 @@ class Plotter(object):
             bin_centers = bin_centers[0:noise[0][0]]
 
         #calculate fit
-        pars,covar = curve_fit(_power_law_curve,bin_centers,np.log10(n),sigma=np.sqrt(np.log10(n)))
+        pars,covar = curve_fit(self._power_law_curve,bin_centers,np.log10(n),sigma=np.sqrt(np.log10(n)))
         pl_fit = self._power_law_curve(bin_centers,*pars)
 
         #exception for when uncertainty calculation fails
