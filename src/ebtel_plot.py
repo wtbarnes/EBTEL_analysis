@@ -189,7 +189,7 @@ class Plotter(object):
 
         #calculate fit
         pars,covar = curve_fit(_power_law_curve,bin_centers,np.log10(n),sigma=np.sqrt(np.log10(n)))
-        pl_fit = _power_law_curve(bin_centers,*pars)
+        pl_fit = self._power_law_curve(bin_centers,*pars)
 
         #exception for when uncertainty calculation fails
         try:
@@ -226,7 +226,7 @@ class Plotter(object):
             return {'graphical':{'alpha':pars[1],'sigma':sigma[1]},'mle':{'alpha':alpha_mle,'sigma':sigma_mle}}
 
 
-    def _power_law_curve(x,a,b):
+    def _power_law_curve(self,x,a,b):
         return a + b*x
     
     def _freedman_diaconis(self,**kwargs):
