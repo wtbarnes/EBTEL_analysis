@@ -168,7 +168,7 @@ class Plotter(object):
             plt.show()
 
 
-    def plot_event_distribution(self,print_fig_filename=None,noise_thresh=0.01,return_params=True,show_plot=True**kwargs):
+    def plot_event_distribution(self,print_fig_filename=None,noise_thresh=0.01,return_params=True,show_plot=True,**kwargs):
         """Fit event energy distribution with a power-law and plot it."""
         
         #set up figure
