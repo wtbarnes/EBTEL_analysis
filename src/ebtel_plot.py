@@ -221,6 +221,8 @@ class Plotter(object):
             plt.close('all')
         elif show_plot:
             plt.show()
+        else:
+            plt.close('all')
             
         if return_params:
             return {'graphical':{'alpha':pars[1],'sigma':sigma[1]},'mle':{'alpha':alpha_mle,'sigma':sigma_mle}}
