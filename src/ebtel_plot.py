@@ -168,7 +168,9 @@ class Plotter(object):
             plt.show()
 
 
-    def plot_event_distribution(self,print_fig_filename=None,noise_thresh=0.01,**kwargs):
+    def plot_event_distribution(self,print_fig_filename=None,noise_thresh=0.01,return_params=True**kwargs):
+        """Fit event energy distribution with a power-law and plot it."""
+        
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
@@ -177,7 +179,8 @@ class Plotter(object):
         num_bins = self._freedman_diaconis()
         n,bins,patches = ax.hist(self.events,num_bins,histtype='stepfilled',facecolor='blue',alpha=0.25,label=r'Events')
         bin_centers = np.log10(np.diff(bins)/2.0+bins[0:-1])
-
+        
+        #Fit with "graphical method"
         #check for bins with no entries in them; below these entries (if they exist), don't calculate fit
         noise = np.where(n <= int(np.max(n)*noise_thresh))
         if len(noise[0]) > 0:
@@ -195,12 +198,17 @@ class Plotter(object):
             sigma = [0.0,0.0]
             print("Uncertainty calculation failed. Resulting value is a placeholder.")
             pass
+            
+        #estimate power-law fit using maximum likelihood estimation (see D'Huys et al., 2016, Sol. Phys.)
+        xmin = np.min(self.events)
+        alpha_mle = 1. + len(self.events)*1.0/(np.sum(np.log(self.events/xmin)))
+        sigma_mle = (alpha_mle - 1.)/np.sqrt(len(self.events))
 
         #plot fit
         ax.plot(10**bin_centers,10**pl_fit,'--r',label=r'Fit',linewidth=2.0)
         ax.set_xlabel(r'$E_H$ (erg cm$^{-3}$ s$^{-1}$)',fontsize=self.fontsize)
         ax.set_ylabel(r'Number of Events',fontsize=self.fontsize)
-        ax.set_title(r'$P(x)=Cx^{\alpha}$, C = %.2e, $\alpha$ = %.2f $\pm$ %.2e' % (pars[0],pars[1],sigma[1]),fontsize=self.fontsize)
+        ax.set_title(r'Graphical: $\alpha$ = %.2f $\pm$ %.2e, MLE: $\alpha$= %.2f $\pm$ %.2e' % (pars[1], sigma[1], alpha_mle, sigma_mle),fontsize=self.fontsize)
         ax.set_yscale('log',nonposy='clip')
         ax.set_xscale('log')
         ax.set_xlim([np.min(self.events),np.max(self.events)])
@@ -213,6 +221,9 @@ class Plotter(object):
             plt.close('all')
         else:
             plt.show()
+            
+        if return_params:
+            return {'graphical':{'alpha':pars[1],'sigma':sigma[1]},'mle':{'alpha':alpha_mle,'sigma':sigma_mle}}
 
 
     def _power_law_curve(x,a,b):
