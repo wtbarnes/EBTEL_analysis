@@ -168,7 +168,7 @@ class Plotter(object):
             plt.show()
 
 
-    def plot_event_distribution(self,print_fig_filename=None,noise_thresh=0.01,return_params=True,show_plot=True,**kwargs):
+    def plot_event_distribution(self,print_fig_filename=None,noise_thresh=0.01,return_params=True,show_plot=True,xmin=None,**kwargs):
         """Fit event energy distribution with a power-law and plot it."""
         
         #set up figure
@@ -200,8 +200,9 @@ class Plotter(object):
             pass
             
         #estimate power-law fit using maximum likelihood estimation (see D'Huys et al., 2016, Sol. Phys.)
-        xmin = np.min(self.events)
-        alpha_mle = 1. + len(self.events)*1.0/(np.sum(np.log(self.events/xmin)))
+        if xmin is None:
+            xmin = np.min(self.events)
+        alpha_mle = 1. + len(self.events)*1.0/(np.sum(np.log([e/xmin for e in self.events])))
         sigma_mle = (alpha_mle - 1.)/np.sqrt(len(self.events))
 
         #plot fit
