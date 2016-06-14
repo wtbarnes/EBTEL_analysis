@@ -1,15 +1,16 @@
-#ebtel_dem.py
+"""
+Calculation EM for many EBTEL runs and fit slopes
+"""
 
-#Will Barnes
-#13 May 2015
-
-#Import needed modules
 import os
 import pickle
-import numpy as np
 import logging
-import em_binner as emb
+
+import numpy as np
 from scipy.optimize import curve_fit
+
+import em_binner as emb
+
 try:
     import __builtin__
 except ImportError:

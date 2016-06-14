@@ -1,13 +1,12 @@
-#ebtel_plot_em.py
+"""
+Plot EM and EM slope for many EBTEL runs.
+"""
 
-#Will Barnes
-#14 May 2015
-
-#Import needed modules
 import os
 import logging
 import pickle
 import itertools
+
 import numpy as np
 from astroML import density_estimation
 import matplotlib
