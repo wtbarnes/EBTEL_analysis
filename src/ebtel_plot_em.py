@@ -366,7 +366,7 @@ class EMHistoBuilder(object):
         self.histo_dict['cool'],self.histo_dict['hot'],self.histo_dict['ratio'] = {},{},{}
         
             
-    def load_diagnostics(self, t_wait_interval=0, t_wait_length=20, ratio_index=0, **kwargs):
+    def load_diagnostics(self, t_wait_interval=0, t_wait_length=20, ratio_index=0, include_nei=False **kwargs):
         """Load in data and create dictionaries with slope values grouped according to 'group' option"""
         
         #Loop over (alpha,b) values 
@@ -383,13 +383,23 @@ class EMHistoBuilder(object):
             elif self.group is 'by_t_wait':
                 for i in np.arange(0 + t_wait_interval,t_wait_length+t_wait_interval,1+t_wait_interval):
                     try:
-                        self.histo_dict['cool'][str(i)].extend([np.fabs(d['cool']['a']) for d in fits_dict[i] if d['cool'] is not None])
-                        self.histo_dict['hot'][str(i)].extend([np.fabs(d['hot']['a']) for d in fits_dict[i] if d['hot'] is not None])
-                        self.histo_dict['ratio'][str(i)].extend([d['ratio'][ratio_index] for d in fits_dict[i] if d['ratio'][ratio_index] is not None])
+                        if include_nei and lab.lower() == 'nei':
+                            self.histo_dict['cool'][str(i)+'-nei'].extend([np.fabs(d['cool']['a']) for d in fits_dict[i] if d['cool'] is not None])
+                            self.histo_dict['hot'][str(i)+'-nei'].extend([np.fabs(d['hot']['a']) for d in fits_dict[i] if d['hot'] is not None])
+                            self.histo_dict['ratio'][str(i)+'-nei'].extend([d['ratio'][ratio_index] for d in fits_dict[i] if d['ratio'][ratio_index] is not None])
+                        else:
+                            self.histo_dict['cool'][str(i)].extend([np.fabs(d['cool']['a']) for d in fits_dict[i] if d['cool'] is not None])
+                            self.histo_dict['hot'][str(i)].extend([np.fabs(d['hot']['a']) for d in fits_dict[i] if d['hot'] is not None])
+                            self.histo_dict['ratio'][str(i)].extend([d['ratio'][ratio_index] for d in fits_dict[i] if d['ratio'][ratio_index] is not None])
                     except KeyError:
-                        self.histo_dict['cool'][str(i)] = [np.fabs(d['cool']['a']) for d in fits_dict[i] if d['cool'] is not None]
-                        self.histo_dict['hot'][str(i)] = [np.fabs(d['hot']['a']) for d in fits_dict[i] if d['hot'] is not None]
-                        self.histo_dict['ratio'][str(i)] = [d['ratio'][ratio_index] for d in fits_dict[i] if d['ratio'][ratio_index] is not None]
+                        if include_nei and lab.lower() == 'nei':
+                            self.histo_dict['cool'][str(i)+'-nei'] = [np.fabs(d['cool']['a']) for d in fits_dict[i] if d['cool'] is not None]
+                            self.histo_dict['hot'][str(i)+'-nei'] = [np.fabs(d['hot']['a']) for d in fits_dict[i] if d['hot'] is not None]
+                            self.histo_dict['ratio'][str(i)+'-nei'] = [d['ratio'][ratio_index] for d in fits_dict[i] if d['ratio'][ratio_index] is not None]
+                        else:
+                            self.histo_dict['cool'][str(i)] = [np.fabs(d['cool']['a']) for d in fits_dict[i] if d['cool'] is not None]
+                            self.histo_dict['hot'][str(i)] = [np.fabs(d['hot']['a']) for d in fits_dict[i] if d['hot'] is not None]
+                            self.histo_dict['ratio'][str(i)] = [d['ratio'][ratio_index] for d in fits_dict[i] if d['ratio'][ratio_index] is not None]
             else:
                 raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
             
@@ -446,10 +456,15 @@ class EMHistoBuilder(object):
                 leg_title = r'$\alpha$'
             else:
                 leg_title = r'$t_N$ $\mathrm{(s)}$'
-            hand,lab = ax.get_legend_handles_labels()
+            handles,labels = ax.get_legend_handles_labels()
+            short_hand,short_lab = [],[]
+            for hand,lab in zip(handles,labels):
+                if lab.lower() != 'nei':
+                    short_hand.append(hand)
+                    short_lab.append(lab) 
             #sort legend entries
-            lab,hand = zip(*sorted(zip(lab,hand), key=lambda t: t[0]))
-            leg = ax.legend(hand,lab,fontsize=self.alfs*self.fontsize,loc=leg_loc,ncol=ncols_leg,title=leg_title)
+            short_lab,short_hand = zip(*sorted(zip(short_lab,short_hand), key=lambda t: t[0]))
+            leg = ax.legend(short_hand,short_lab,fontsize=self.alfs*self.fontsize,loc=leg_loc,ncol=ncols_leg,title=leg_title)
             plt.setp(leg.get_title(),fontsize=self.alfs*self.fontsize)
         
         #Print or show figure
