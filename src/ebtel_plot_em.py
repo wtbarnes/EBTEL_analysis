@@ -366,7 +366,7 @@ class EMHistoBuilder(object):
         self.histo_dict['cool'],self.histo_dict['hot'],self.histo_dict['ratio'] = {},{},{}
         
             
-    def load_diagnostics(self, t_wait_interval=0, t_wait_length=20, ratio_index=0, include_nei=False **kwargs):
+    def load_diagnostics(self, t_wait_interval=0, t_wait_length=20, ratio_index=0, include_nei=False, **kwargs):
         """Load in data and create dictionaries with slope values grouped according to 'group' option"""
         
         #Loop over (alpha,b) values 
