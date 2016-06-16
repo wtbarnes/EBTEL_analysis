@@ -404,7 +404,7 @@ class EMHistoBuilder(object):
                 raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
             
                 
-    def make_fit_histogram(self, temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None, ncols_leg=1,**kwargs):
+    def make_fit_histogram(self, temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None, ncols_leg=1,min_stats = 10,**kwargs):
         """Build histograms from hot and cool dictionaries built up by self.loader()"""
 
         #Set up figure
@@ -412,7 +412,6 @@ class EMHistoBuilder(object):
         ax = fig.gca()
         
         #set minimum number of statistics to show result
-        min_stats = 10
         if self.group is not 'by_alpha':
             min_stats=20*len(self.files)
         #Initialize y-limits values to find max values
