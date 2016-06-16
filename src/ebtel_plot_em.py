@@ -430,9 +430,9 @@ class EMHistoBuilder(object):
                     ylims_final[0] = ylims[0]
             
         #Labels and styling
-        if temp_choice == 'hot':
+        if temp_choice == 'cool':
             ax.set_xlabel(r'$a$',fontsize=self.fontsize)
-        elif temp_choice == 'cool':
+        elif temp_choice == 'hot':
             ax.set_xlabel(r'$b$',fontsize=self.fontsize)
         else:
             ax.set_xlabel(r'$\mathrm{EM}\,\,\mathrm{ratio}$',fontsize=self.fontsize)
