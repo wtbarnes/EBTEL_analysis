@@ -478,14 +478,14 @@ class EMHistoBuilder(object):
         """Use astroML routines to choose bin edges"""
         
         if bin_tool == 'freedman':
-            dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True)
+            dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True, disp=False)
         elif bin_tool == 'scotts':
-            dx,bins = density_estimation.scotts_bin_width(hist,return_bins=True)
+            dx,bins = density_estimation.scotts_bin_width(hist,return_bins=True, disp=False)
         elif bin_tool == 'knuth':
-            dx,bins = density_estimation.knuth_bin_width(hist,return_bins=True)
+            dx,bins = density_estimation.knuth_bin_width(hist,return_bins=True, disp=False)
         else:
             self.logger.warning("Unrecognized bin_tool option. Using Freedman-Diaconis rule.")
-            dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True)
+            dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True, disp=False)
             
         return bins
         
