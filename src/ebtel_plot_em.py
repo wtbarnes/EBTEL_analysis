@@ -502,6 +502,8 @@ def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linesty
         linestyles = len(labels)*['solid']
     if not show_leg:
         show_leg = len(labels)*[True]
+    if not show_sigma:
+        show_sigma = len(labels)*[False]
     
     #get needed indices (NOTE: assuming wait times are from this selection)
     waiting_times = np.arange(250,5250,250)
@@ -527,8 +529,8 @@ def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linesty
     for ax,i_ax,tws in zip(axes.flatten(),range(len(axes.flatten())),tw_select):
         for l,i in zip(labels,range(len(labels))):
             ax.plot(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean'], color=colors[i], linestyle=linestyles[i], label=l)
-            if show_sigma:
-                ax.fill_between(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean']-em_dict[str(tws)][l]['em_std'], em_dict[str(tws)][l]['em_mean']+em_dict[str(tws)][l]['em_std'], facecolor=sns.color_palette('deep')[i], edgecolor=sns.color_palette('deep')[i], alpha=0.25)
+            if show_sigma[i]:
+                ax.fill_between(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean']-em_dict[str(tws)][l]['em_std'], em_dict[str(tws)][l]['em_mean']+em_dict[str(tws)][l]['em_std'], facecolor=colors[i], edgecolor=colors[i], alpha=0.25)
         #plot options
         ax.text(0.7, 0.85, r'$t_N=%d$ $\mathrm{s}$'%tws, fontsize=alfs*fontsize, transform = ax.transAxes)
         ax.set_yscale('log')
