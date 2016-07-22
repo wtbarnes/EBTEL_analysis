@@ -411,9 +411,6 @@ class EMHistoBuilder(object):
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
 
-        #set minimum number of statistics to show result
-        if self.group is not 'by_alpha':
-            min_stats=20*len(self.files)
         #Initialize y-limits values to find max values
         ylims_final = [0.0,0.0]
         #Loop over histograms
