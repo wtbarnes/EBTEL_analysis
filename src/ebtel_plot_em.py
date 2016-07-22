@@ -491,7 +491,7 @@ class EMHistoBuilder(object):
 
 
 
-def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linestyles=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], show_sigma=False, show_leg=[], leg_pos='best', print_fig_filename=None):
+def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linestyles=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], show_sigma=False, show_leg=[], leg_pos='best', leg_ax=0, print_fig_filename=None):
     """Plot a grid of EM curves for a select number of waiting times"""
 
     #input check
@@ -553,7 +553,7 @@ def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linesty
         if lb:
             short_handles.append(hand)
             short_labels.append(lab.replace(', $\mathrm{IEQ}$',''))
-    axes.flatten()[0].legend(short_handles, short_labels, loc=leg_pos, fontsize=alfs*fontsize)
+    axes.flatten()[leg_ax].legend(short_handles, short_labels, loc=leg_pos, fontsize=alfs*fontsize)
 
     plt.subplots_adjust(hspace=0.0,wspace=0.0)
 
