@@ -472,19 +472,21 @@ class EMHistoBuilder(object):
 
 
     def _size_bins(self,hist,bin_tool,**kwargs):
-        """Use astroML routines to choose bin edges"""
+        """Wrapper for astroML routines to choose optimal bin widths."""
 
         if bin_tool == 'freedman':
-            dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True)
+            _,bins = density_estimation.freedman_bin_width(hist,return_bins=True)
         elif bin_tool == 'scotts':
-            dx,bins = density_estimation.scotts_bin_width(hist,return_bins=True)
+            _,bins = density_estimation.scotts_bin_width(hist,return_bins=True)
         elif bin_tool == 'knuth':
-            dx,bins = density_estimation.knuth_bin_width(hist,return_bins=True, disp=False)
+            _,bins = density_estimation.knuth_bin_width(hist,return_bins=True, disp=False)
+        elif bin_tool == 'blocks':
+            bins = density_estimation.bayesian_blocks(hist)
         elif type(bin_tool) == type(int()) or type(bin_tool) == type(np.int64()) or type(bin_tool) == type(np.int32()):
             bins=bin_tool
         else:
             self.logger.warning("Unrecognized bin_tool option. Using Freedman-Diaconis rule.")
-            dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True)
+            _,bins = density_estimation.freedman_bin_width(hist,return_bins=True)
 
         return bins
 
