@@ -20,16 +20,16 @@ from scipy.optimize import curve_fit
 def tick_maker(old_ticks,n,**kwargs):
     if n < 2:
         raise ValueError('n must be greater than 1')
-    
+
     n = n-1
     delta = (old_ticks[-1] - old_ticks[0])/n
     new_ticks = []
     for i in range(n):
         new_ticks.append(old_ticks[0] + i*delta)
-    
+
     new_ticks.append(old_ticks[0] + n*delta)
     return new_ticks
-    
+
 
 class DEMPlotter(object):
 
@@ -55,7 +55,7 @@ class DEMPlotter(object):
 
     def plot_em_curves(self,delta_em = 0.2,y_limits=[10**26.,10**32.],print_fig_filename=None,**kwargs):
         """Plot mean EM distributions for each Tn with superimposed fit lines"""
-        
+
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
 
@@ -89,15 +89,15 @@ class DEMPlotter(object):
             plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi,bbox_extra_artists=[leg],bbox_inches='tight')
         else:
             plt.show()
-            
-            
+
+
     def plot_em_curves_grid(self, y_limits=[10**26.,10**32.], num_cols=4, print_fig_filename=None, **kwargs):
             """Make subplot grid of EM curves"""
-            
+
             num_rows=int(np.ceil(len(self.Tn)/num_cols))
             fig,axes=plt.subplots(num_rows,num_cols,figsize=(1.5*self.figsize[0],1.5*self.figsize[1]),sharex=True,sharey=True)
             plt.subplots_adjust(hspace=0.0,wspace=0.0,left=0.05,bottom=0.05)
-            
+
             for ax,i in zip(axes.flatten(),range(len(self.Tn))):
                 #plot histograms and mean
                 self._make_em_axes(ax,self.Tn[i])
@@ -120,27 +120,27 @@ class DEMPlotter(object):
                 ax.set_xscale('log')
                 ax.set_yscale('log')
                 ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
-            
-            #labels    
+
+            #labels
             fig.text(0.5, 0.005, r'$T$ $\mathrm{(K)}$', ha='center', va='center',fontsize=self.fontsize) #xlabel
             fig.text(0.005, 0.5, r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$', ha='center', va='center', rotation='vertical',fontsize=self.fontsize) #ylabel
-                            
+
             #save or show figure
             if print_fig_filename is not None:
                 plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
                 plt.close('all')
             else:
                 plt.show()
-            
-            
+
+
     def _make_em_axes(self,ax,tn_val):
         """Plot single em curve"""
-        
+
         if tn_val not in self.Tn:
             raise ValueError("Invalid wait time %f. Use a valid value from self.Tn"%(tn_val))
-            
+
         tn_index = np.where(self.Tn==tn_val)[0][0]
-            
+
         #standard deviation
         ax.fill_between(self.em_stats[tn_index]['T_mean'], self.em_stats[tn_index]['em_mean']-self.em_stats[tn_index]['em_std'], self.em_stats[tn_index]['em_mean']+self.em_stats[tn_index]['em_std'], facecolor=sns.color_palette('deep')[2], edgecolor=sns.color_palette('deep')[2], alpha=0.75)
         #MC histograms
@@ -154,13 +154,13 @@ class DEMPlotter(object):
 
     def plot_em_curve(self, tn_val, y_limits=[10**25.,10**28.], print_fig_filename=None, **kwargs):
         """Plot MC and mean EM curves for single value of Tn"""
-        
+
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
 
         self._make_em_axes(ax,tn_val)
-        
+
         #set labels
         ax.set_xlabel(r'$T$ $\mathrm{(K)}$',fontsize=self.fontsize)
         ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$',fontsize=self.fontsize)
@@ -182,7 +182,7 @@ class DEMPlotter(object):
 
     def plot_em_max(self, t_ref_line=4e+6, y_limits_em=[10**26.,10**28.], y_limits_t=[10**6.,10**7.], print_fig_filename=None, **kwargs):
         """Plot max(EM) and corresponding temperature with error bars"""
-        
+
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
@@ -219,11 +219,11 @@ class DEMPlotter(object):
 
     def plot_em_slopes(self, y_limits=[0,8], print_fig_filename=None, **kwargs):
         """Plot cool and hot slopes versus heating frequency with error bars"""
-        
+
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
-        
+
         marker_cool,marker_hot = [],[]
         for tw,fs in zip(self.Tn,self.diagnostics_stats):
             if fs['cool'] is not None:
@@ -236,17 +236,17 @@ class DEMPlotter(object):
         ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{slope}$',fontsize=self.fontsize)
         ax.axhline(y=2,color='k',linestyle=':')
         ax.axhline(y=2.5,color='k',linestyle=':')
-        ax.axhline(y=3,color='k',linestyle=':')        
+        ax.axhline(y=3,color='k',linestyle=':')
         ax.axhline(y=5.5,color='k',linestyle=':')
         ax.set_ylim(y_limits)
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
         ax.set_yticks(tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
-        
+
         #legend
         if marker_cool and marker_hot:
             ax.legend([marker_cool,marker_hot],[r'$a$, $\mathrm{cool}$',r'$b$, $\mathrm{hot}$'],loc=1,fontsize=self.alfs*self.fontsize,numpoints=1)
-            
+
         #avoid cutting off labels
         plt.tight_layout()
 
@@ -256,20 +256,20 @@ class DEMPlotter(object):
             plt.close('all')
         else:
             plt.show()
-            
-            
+
+
     def plot_em_ratios(self, y_limits=[0,2], print_fig_filename=None, legend_labels=None, **kwargs):
         """Plot EM(T_hot)/EM(T_cool) ratio as a function of Tn"""
-        
+
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
-        
+
         for tw,fs in zip(self.Tn,self.diagnostics_stats):
             for i in range(len(fs['ratio']['tpairs'])):
-                ax.errorbar(tw, fs['ratio']['mean'][i], yerr=fs['ratio']['sigma'][i], fmt='o', color=sns.color_palette('deep')[i], 
+                ax.errorbar(tw, fs['ratio']['mean'][i], yerr=fs['ratio']['sigma'][i], fmt='o', color=sns.color_palette('deep')[i],
                 label=r'$T_c=%.2f$ $\mathrm{MK}$, $T_h=%.2f$ $\mathrm{MK}$'%(fs['ratio']['tpairs'][i][0]/1e+6,fs['ratio']['tpairs'][i][1]/1e+6))
-            
+
         #set labels
         ax.set_xlabel(r'$t_N$ $\mathrm{(s)}$',fontsize=self.fontsize)
         ax.set_ylabel(r'$\mathrm{EM}$ $\mathrm{ratio}$',fontsize=self.fontsize)
@@ -277,7 +277,7 @@ class DEMPlotter(object):
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
         ax.set_yticks(tick_maker(ax.get_yticks(),5))
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
-        
+
         #legend
         handles,labels=ax.get_legend_handles_labels()
         leghand=handles[0:i+1]
@@ -286,7 +286,7 @@ class DEMPlotter(object):
         else:
             leglab=labels[0:i+1]
         ax.legend(leghand,leglab,fontsize=self.alfs*self.fontsize, numpoints=1, loc=2)
-        
+
         #avoid cutting off labels
         plt.tight_layout()
 
@@ -296,27 +296,27 @@ class DEMPlotter(object):
             plt.close('all')
         else:
             plt.show()
-            
-            
+
+
     def plot_em_derivs(self, em_cutoff=1e+23, y_limits=[-10,6], print_fig_filename=None, **kwargs):
         """Plot d(log(EM))/d(log(T)) as a function of T for all values of Tn"""
-        
+
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
-        
+
         i = 0
         #Iterate over t_wait values
         for ems in self.em_stats:
-            #filter and compute derivative 
-            em_tmp = np.log10(ems['em_mean'][ems['em_mean']>em_cutoff]) 
+            #filter and compute derivative
+            em_tmp = np.log10(ems['em_mean'][ems['em_mean']>em_cutoff])
             t_tmp = np.log10(ems['T_mean'][ems['em_mean']>em_cutoff])
             dem_dt = np.gradient(em_tmp,np.gradient(t_tmp))
             #plotting
             ax.plot(t_tmp, dem_dt, color=self.colors[i], linestyle=self.linestyles[i%len(self.linestyles)])
             #increment counter
             i += 1
-            
+
         #set labels
         ax.set_xlabel(r'$\log{T}$ $\mathrm{(K)}$',fontsize=self.fontsize)
         ax.set_ylabel(r'$d\log{\mathrm{EM}}/d\log{T}$',fontsize=self.fontsize)
@@ -330,21 +330,21 @@ class DEMPlotter(object):
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         #avoid cutting off labels
         plt.tight_layout()
-        
+
         #save or show figure
         if print_fig_filename is not None:
             plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
             plt.close('all')
         else:
             plt.show()
-        
-        
-        
+
+
+
 class EMHistoBuilder(object):
     """Class to build histograms of slope values to compare across heating functions and heating frequencies"""
-    
+
     def __init__(self,files=[],labels=[], group='by_alpha', fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, **kwargs):
-        
+
         #configure logger
         self.logger = logging.getLogger(type(self).__name__)
         #Load in heating function values and set needed variables
@@ -364,15 +364,15 @@ class EMHistoBuilder(object):
         #Initialize dictionary to store separate histograms
         self.histo_dict = {}
         self.histo_dict['cool'],self.histo_dict['hot'],self.histo_dict['ratio'] = {},{},{}
-        
-            
+
+
     def load_diagnostics(self, t_wait_interval=0, t_wait_length=20, ratio_index=0, include_nei=False, **kwargs):
         """Load in data and create dictionaries with slope values grouped according to 'group' option"""
-        
-        #Loop over (alpha,b) values 
+
+        #Loop over (alpha,b) values
         for fn,lab in zip(self.files,self.labels):
             #Unpickle the file
-            with open(fn,'rb') as f: 
+            with open(fn,'rb') as f:
                 fits_dict = pickle.load(f)
             #Group by alpha method
             if self.group is 'by_alpha':
@@ -402,15 +402,15 @@ class EMHistoBuilder(object):
                             self.histo_dict['ratio'][str(i)] = [d['ratio'][ratio_index] for d in fits_dict[i] if d['ratio'][ratio_index] is not None]
             else:
                 raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
-            
-                
+
+
     def make_fit_histogram(self, temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None, ncols_leg=1,min_stats = 10,**kwargs):
         """Build histograms from hot and cool dictionaries built up by self.loader()"""
 
         #Set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
-        
+
         #set minimum number of statistics to show result
         if self.group is not 'by_alpha':
             min_stats=20*len(self.files)
@@ -427,7 +427,7 @@ class EMHistoBuilder(object):
                     ylims_final[1] = ylims[1]
                 if ylims[0] < ylims_final[0]:
                     ylims_final[0] = ylims[0]
-            
+
         #Labels and styling
         if temp_choice == 'cool':
             ax.set_xlabel(r'$a$',fontsize=self.fontsize)
@@ -437,7 +437,7 @@ class EMHistoBuilder(object):
             ax.set_xlabel(r'$\mathrm{EM}\,\,\mathrm{ratio}$',fontsize=self.fontsize)
         #Check for normalization in just one set; assumed all or none are normed
         if 'normed' in list(histo_opts.values())[0] and list(histo_opts.values())[0]['normed'] is True:
-            ax.set_ylabel(r'$\mathrm{Normalized}$ $\mathrm{Frequency}$',fontsize=self.fontsize)            
+            ax.set_ylabel(r'$\mathrm{Normalized}$ $\mathrm{Frequency}$',fontsize=self.fontsize)
         else:
             ax.set_ylabel(r'$\mathrm{Frequency}$',fontsize=self.fontsize)
         if y_limits is None:
@@ -460,23 +460,23 @@ class EMHistoBuilder(object):
             for hand,lab in zip(handles,labels):
                 if lab.lower() != 'nei':
                     short_hand.append(hand)
-                    short_lab.append(lab) 
+                    short_lab.append(lab)
             #sort legend entries
             short_lab,short_hand = zip(*sorted(zip(short_lab,short_hand), key=lambda t: t[0]))
             leg = ax.legend(short_hand,short_lab,fontsize=self.alfs*self.fontsize,loc=leg_loc,ncol=ncols_leg,title=leg_title)
             plt.setp(leg.get_title(),fontsize=self.alfs*self.fontsize)
-        
+
         #Print or show figure
         if print_fig_filename is not None:
             plt.savefig(print_fig_filename+'.'+self.fformat,format=self.fformat,dpi=self.dpi)
             plt.close('all')
         else:
             plt.show()
-        
-        
+
+
     def _size_bins(self,hist,bin_tool,**kwargs):
         """Use astroML routines to choose bin edges"""
-        
+
         if bin_tool == 'freedman':
             dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True)
         elif bin_tool == 'scotts':
@@ -486,32 +486,32 @@ class EMHistoBuilder(object):
         else:
             self.logger.warning("Unrecognized bin_tool option. Using Freedman-Diaconis rule.")
             dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True, disp=False)
-            
-        return bins
-        
-                    
 
-def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linestyles=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], show_sigma=False, show_leg=[], print_fig_filename=None):
+        return bins
+
+
+
+def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linestyles=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], show_sigma=False, show_leg=[], leg_pos='best', print_fig_filename=None):
     """Plot a grid of EM curves for a select number of waiting times"""
-    
+
     #input check
     if len(files) != len(labels):
         raise ValueError('Length of label list and length of file list must be equal.')
-        
+
     if not linestyles:
         linestyles = len(labels)*['solid']
     if not show_leg:
         show_leg = len(labels)*[True]
     if not show_sigma:
         show_sigma = len(labels)*[False]
-    
+
     #get needed indices (NOTE: assuming wait times are from this selection)
     waiting_times = np.arange(250,5250,250)
     try:
         i_tws = [np.where(waiting_times==tws)[0][0] for tws in tw_select]
     except IndexError:
         logging.exception('Invalid wait time selection.')
-        
+
     #prep dictionaries
     em_dict = {}
     for tws in tw_select:
@@ -523,7 +523,7 @@ def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linesty
             ems,emb = pickle.load(f)
         for i,tws in zip(i_tws,tw_select):
             em_dict[str(tws)][l] = ems[i]
-            
+
     #plotting
     fig,axes = plt.subplots(nrows,ncols,figsize=figsize,sharex=True,sharey=True)
     for ax,i_ax,tws in zip(axes.flatten(),range(len(axes.flatten())),tw_select):
@@ -542,7 +542,7 @@ def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linesty
         #    ax.yaxis.set_major_locator(MaxNLocator(prune='lower'))
         #if i_ax >= ncols:
         #    ax.yaxis.set_major_locator(MaxNLocator(prune='upper'))
-        
+
     #axes labels
     fig.text(xlab_pos[0], xlab_pos[1], r'$T$ $\mathrm{(K)}$', ha='center', va='center',fontsize=fontsize) #xlabel
     fig.text(ylab_pos[0], ylab_pos[1], r'$\mathrm{EM}$ $\mathrm{(cm}^{-5}\mathrm{)}$', ha='center', va='center', rotation='vertical',fontsize=fontsize) #ylabel
@@ -553,10 +553,10 @@ def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linesty
         if lb:
             short_handles.append(hand)
             short_labels.append(lab.replace(', $\mathrm{IEQ}$',''))
-    axes.flatten()[0].legend(short_handles, short_labels, loc='best', fontsize=alfs*fontsize)
-    
+    axes.flatten()[0].legend(short_handles, short_labels, loc=leg_pos, fontsize=alfs*fontsize)
+
     plt.subplots_adjust(hspace=0.0,wspace=0.0)
-    
+
     #save or show figure
     if print_fig_filename is not None:
         plt.savefig(print_fig_filename+'.'+fformat,format=fformat,dpi=dpi)
