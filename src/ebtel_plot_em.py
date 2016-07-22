@@ -411,6 +411,12 @@ class EMHistoBuilder(object):
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
 
+        #bin tool options
+        if kwargs.get('bin_tool_opts') is not None:
+            bin_tool_opts = kwargs.get('bin_tool_opts')
+        else:
+            bin_tool_opts = {}
+
         #Initialize y-limits values to find max values
         ylims_final = [0.0,0.0]
         #Loop over histograms
@@ -418,7 +424,7 @@ class EMHistoBuilder(object):
             if len(self.histo_dict[temp_choice][key]) < min_stats:
                 pass
             else:
-                ax.hist(self.histo_dict[temp_choice][key], bins=self._size_bins(self.histo_dict[temp_choice][key],bin_tool), histtype='step',**histo_opts[key])
+                ax.hist(self.histo_dict[temp_choice][key], bins=self._size_bins(self.histo_dict[temp_choice][key],bin_tool,**bin_tool_opts), histtype='step',**histo_opts[key])
                 ylims = ax.get_ylim()
                 if ylims[1] > ylims_final[1]:
                     ylims_final[1] = ylims[1]
@@ -481,7 +487,7 @@ class EMHistoBuilder(object):
         elif bin_tool == 'knuth':
             _,bins = density_estimation.knuth_bin_width(hist,return_bins=True, disp=False)
         elif bin_tool == 'blocks':
-            bins = density_estimation.bayesian_blocks(hist)
+            bins = density_estimation.bayesian_blocks(hist,**kwargs)
         elif type(bin_tool) == type(int()) or type(bin_tool) == type(np.int64()) or type(bin_tool) == type(np.int32()):
             bins=bin_tool
         else:
