@@ -480,9 +480,11 @@ class EMHistoBuilder(object):
             dx,bins = density_estimation.scotts_bin_width(hist,return_bins=True)
         elif bin_tool == 'knuth':
             dx,bins = density_estimation.knuth_bin_width(hist,return_bins=True, disp=False)
+        elif type(bin_tool) == type(int()) or type(bin_tool) == type(np.int64()) or type(bin_tool) == type(np.int32()):
+            bins=bin_tool
         else:
             self.logger.warning("Unrecognized bin_tool option. Using Freedman-Diaconis rule.")
-            dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True, disp=False)
+            dx,bins = density_estimation.freedman_bin_width(hist,return_bins=True)
 
         return bins
 
