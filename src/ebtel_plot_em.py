@@ -412,10 +412,7 @@ class EMHistoBuilder(object):
         ax = fig.gca()
 
         #bin tool options
-        if kwargs.get('bin_tool_opts') is not None:
-            bin_tool_opts = kwargs.get('bin_tool_opts')
-        else:
-            bin_tool_opts = {}
+        bin_tool_opts = kwargs.get('bin_tool_opts',{})
 
         #Initialize y-limits values to find max values
         ylims_final = [0.0,0.0]
