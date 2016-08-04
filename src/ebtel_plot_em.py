@@ -404,7 +404,7 @@ class EMHistoBuilder(object):
                 raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
 
 
-    def make_fit_histogram(self, temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None, ncols_leg=1,min_stats = 10,**kwargs):
+    def make_fit_histogram(self, temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None, ncols_leg=1,min_stats = 10, show_low_N=False,**kwargs):
         """Build histograms from hot and cool dictionaries built up by self.loader()"""
 
         #Set up figure
@@ -422,7 +422,10 @@ class EMHistoBuilder(object):
         #Loop over histograms
         for key in self.histo_dict[temp_choice]:
             if len(self.histo_dict[temp_choice][key]) < min_stats:
-                pass
+                if show_low_N:
+                    ax.axvline(x=np.mean(self.histo_dict[temp_choice][key]), linestyle=histo_opts[key]['linestyle'], color=histo_opts[key]['color'], label=histo_opts[key]['label'], linewidth=histo_opts[key]['linewidth'])
+                else:
+                    pass
             else:
                 ax.hist(self.histo_dict[temp_choice][key], bins=self._size_bins(self.histo_dict[temp_choice][key],bin_tool,**bin_tool_opts), histtype='step',**histo_opts[key])
                 ylims = ax.get_ylim()
