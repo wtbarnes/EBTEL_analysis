@@ -420,7 +420,7 @@ class EMHistoBuilder(object):
         for key in self.histo_dict[temp_choice]:
             if len(self.histo_dict[temp_choice][key]) < min_stats:
                 if show_low_N:
-                    ax.axvline(x=np.mean(self.histo_dict[temp_choice][key]), linestyle=histo_opts[key]['linestyle'], color=histo_opts[key]['color'], label=histo_opts[key]['label'], linewidth=histo_opts[key]['linewidth'])
+                    ax.axvline(x=np.median(self.histo_dict[temp_choice][key]), linestyle=histo_opts[key]['linestyle'], color=histo_opts[key]['color'], label=histo_opts[key]['label'], linewidth=histo_opts[key]['linewidth'])
                 else:
                     pass
             else:
