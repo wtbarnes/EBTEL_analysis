@@ -1,19 +1,18 @@
-#em_binner.py
-#Will Barnes
-#14 October 2015
 
-#Class to construct emission measure (EM) distributions from temperature and density profiles. Incorporate effective temperature profiles due to non-equilibrium ionization.
+"""
+Class to construct emission measure (EM) distributions from temperature and density profiles. Incorporate effective temperature profiles due to non-equilibrium ionization.
+"""
 
-#Import needed modules
 import logging
 import numpy as np
 
 
 class EM_Binner(object):
 
-    def __init__(self,loop_length,time=None,temp=None,density=None,read_abundances=False,**kwargs):
-        #set loop length as member variable
+    def __init__(self,loop_length,time=None,temp=None,density=None,read_abundances=False,dVolume=None,**kwargs):
+        #set loop length volume element as member variable
         self.loop_length = loop_length
+        self.dVolume = dVolume
         #set up logger
         self.logger = logging.getLogger(type(self).__name__)
         #Get abundances
@@ -25,7 +24,7 @@ class EM_Binner(object):
             self.set_data(time,temp,density)
         else:
             self.logger.warning("Parameters not yet set. Run self.set_data(t,T,n)")
-            
+
     def set_data(self,time,temp,density):
         """Add parameters as class attributes"""
         self.time = time
@@ -41,13 +40,16 @@ class EM_Binner(object):
         self.T_em_histo_bins = np.append(self.T_em,self.T_em[-1]*10.**self.delta_logT)
 
     def _emission_measure_calc(self,n):
-        """Calculate emission measure distribution"""
+        """Calculate either column or volumetric emission measure distribution"""
 
-        return self.loop_length*n**2
-        
+        if self.dVolume is not None:
+            return self.dVolume*n**2
+        else:
+            return self.loop_length*n**2
+
     def _differential_emission_measure_calc(self,n,tmin,tmax):
         """Calculate differential emission measure distribution"""
-        
+
         em = self._emission_measure_calc(n)
         #EBTEL method for calculating coronal DEM
         tmax = np.log10(tmax)
@@ -74,7 +76,7 @@ class EM_Binner(object):
         except AttributeError:
             self.logger.info("Temperature bins not yet created. Building now with default values.")
             self.make_T_bins()
-            
+
         #allocate space for DEM, EM matrices
         if build_mat:
             self.em_mat = np.zeros([len(self.time),len(self.T_em)])
@@ -102,7 +104,7 @@ class EM_Binner(object):
                 self.T_em_flat.extend(self.T_em[iC[0]])
                 #append emission measure weighted by timestep to emission measure list
                 self.em_flat.extend(len(iC[0])*[w_tau[i]*self._emission_measure_calc(self.density[i])])
-                
+
         #cast as numpy arrays for convenience
         self.T_em_flat = np.array(self.T_em_flat)
         self.em_flat = np.array(self.em_flat)
