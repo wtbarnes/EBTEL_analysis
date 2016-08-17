@@ -530,14 +530,18 @@ def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linesty
             ems,emb = pickle.load(f)
         for i,tws in zip(i_tws,tw_select):
             em_dict[str(tws)][l] = ems[i]
+            
+    set_raster_inline = lambda option,axis: axis.get_rasterization_zorder()-1 if option else 1
 
     #plotting
     fig,axes = plt.subplots(nrows,ncols,figsize=figsize,sharex=True,sharey=True)
     for ax,i_ax,tws in zip(axes.flatten(),range(len(axes.flatten())),tw_select):
+        if rasterized_fig_option:
+            ax.set_rasterization_zorder(1)
         for l,i in zip(labels,range(len(labels))):
-            ax.plot(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean'], color=colors[i], linestyle=linestyles[i], label=l)
+            ax.plot(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean'], color=colors[i], linestyle=linestyles[i], label=l, zorder=set_raster_inline(rasterized_fig_option,ax))
             if show_sigma[i]:
-                ax.fill_between(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean']-em_dict[str(tws)][l]['em_std'], em_dict[str(tws)][l]['em_mean']+em_dict[str(tws)][l]['em_std'], facecolor=colors[i], edgecolor=colors[i], alpha=0.25)
+                ax.fill_between(em_dict[str(tws)][l]['T_mean'], em_dict[str(tws)][l]['em_mean']-em_dict[str(tws)][l]['em_std'], em_dict[str(tws)][l]['em_mean']+em_dict[str(tws)][l]['em_std'], facecolor=colors[i], edgecolor=colors[i], alpha=0.25, zorder=set_raster_inline(rasterized_fig_option,ax))
         #plot options
         ax.text(0.7, 0.85, r'$t_N=%d$ $\mathrm{s}$'%tws, fontsize=alfs*fontsize, transform = ax.transAxes)
         ax.set_yscale('log')
