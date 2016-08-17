@@ -498,7 +498,7 @@ class EMHistoBuilder(object):
 
 
 
-def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linestyles=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], show_sigma=False, show_leg=[], leg_pos='best', leg_ax=0, print_fig_filename=None):
+def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linestyles=[],tw_select=np.arange(250,5250,250),nrows=5,ncols=4, fontsize=18., figsize=(8,8), alfs=0.75, fformat='eps', dpi = 1000, xlims=[10**5.5,10**7.5], ylims=[10**26.,10**29.], xlab_pos=[0.5, 0.005], ylab_pos=[0.005, 0.5], show_sigma=False, show_leg=[], leg_pos='best', leg_ax=0, print_fig_filename=None, rasterized_fig_option=False):
     """Plot a grid of EM curves for a select number of waiting times"""
 
     #input check
@@ -566,7 +566,7 @@ def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linesty
 
     #save or show figure
     if print_fig_filename is not None:
-        plt.savefig(print_fig_filename+'.'+fformat,format=fformat,dpi=dpi)
+        plt.savefig(print_fig_filename+'.'+fformat,format=fformat,dpi=dpi, rasterized=rasterized_fig_option)
         plt.close('all')
     else:
         plt.show()
