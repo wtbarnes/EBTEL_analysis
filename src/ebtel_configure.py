@@ -269,11 +269,10 @@ class Configurer(object):
             self._constrain_distribution(ti)
 
 
-    def _constrain_distribution(self,ti,**kwargs):
+    def _constrain_distribution(self,ti,max_tries = 2000,**kwargs):
         """Choose events from power-law distribution such that total desired energy input is conserved."""
 
-        #set parameters
-        max_tries = 2000
+        #initialize parameters
         tries = 0
         err = 1.e+300
         #initial guess of bounds
@@ -299,13 +298,10 @@ class Configurer(object):
 
         if tries >= max_tries:
             self.logger.warning("Power-law constrainer reached max # of tries, using best guess with error = %f"%best_err)
-            
-        #randomize event list
-        random.shuffle(best[2])
 
         self.config_dictionary['amp0'] = best[0]
         self.config_dictionary['amp1'] = best[1]
-        self.config_dictionary['amp_array'] = best[2]
+        self.config_dictionary['amp_array'] = random.sample(best[2],len(best[2]))
 
 
     def _power_law_dist(self,x,a0,a1,alpha):
