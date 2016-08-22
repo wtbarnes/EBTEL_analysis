@@ -4,16 +4,18 @@
 #7 May 2015
 
 #Import needed modules
-import numpy as np
 import os
+import logging
+import itertools
+import random
+import xml.etree.ElementTree as ET
+import xml.dom.minidom as xdm
 try:
     import __builtin__
 except ImportError:
     import builtins as __builtin__
-import logging
-import itertools
-import xml.etree.ElementTree as ET
-import xml.dom.minidom as xdm
+
+import numpy as np
 
 #Resolve Python 2/3 exception problem
 exc = getattr(__builtin__,"IOError","FileNotFoundError")
@@ -297,6 +299,9 @@ class Configurer(object):
 
         if tries >= max_tries:
             self.logger.warning("Power-law constrainer reached max # of tries, using best guess with error = %f"%best_err)
+            
+        #randomize event list
+        random.shuffle(best[2])
 
         self.config_dictionary['amp0'] = best[0]
         self.config_dictionary['amp1'] = best[1]
