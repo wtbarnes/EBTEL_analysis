@@ -301,7 +301,7 @@ class Configurer(object):
 
         self.config_dictionary['amp0'] = best[0]
         self.config_dictionary['amp1'] = best[1]
-        self.config_dictionary['amp_array'] = random.sample(best[2],len(best[2]))
+        self.config_dictionary['amp_array'] = np.array(random.sample(list(best[2]),len(best[2])))
 
 
     def _power_law_dist(self,x,a0,a1,alpha):
