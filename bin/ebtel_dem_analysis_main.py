@@ -40,8 +40,8 @@ format = 'pdf'
 #static parameters
 t_wait = np.arange(250,5250,250)
 cool_limits = [10**6.0,10**6.5]
-t_ratio_cool=[10**6.3,1.6e+6,10**6.3]
-t_ratio_hot=[10**7.1,8.9e+6,8.9e+6] #Fe XV EIS line, Fe XX-XXII MaGIXS lines
+t_ratio_cool=[10**6.187,10**6.348,10**6.187,10**6.348]
+t_ratio_hot=2*[10**6.934]+2*[10**7.035]
 
 #set directories and filenames
 figdir = '%s_heating_runs/alpha%s'
@@ -60,7 +60,7 @@ processor = ebd.DEMProcess(args.root_dir, args.root_dir_figs, figname%(args.loop
 #Import the data
 if not os.path.exists(processor.em_res_top_dir):
     logging.info("Calculating level 1 EM results and saving to %s. This may take a while..."%(processor.em_res_top_dir))
-    processor.import_raw(read_teff=args.read_teff)    
+    processor.import_raw(read_teff=args.read_teff)
 
 #Statistics and diagnostics
 processor.calc_stats()
@@ -90,4 +90,3 @@ if args.alpha != 'uniform':
     #Build MC plots for each Tn value
     for tw in t_wait:
         plotter.plot_em_curve(tw, print_fig_filename=os.path.join(args.root_dir_figs, fn_temp + '_em_mc/', figname%(args.loop_length,args.tpulse,args.alpha,args.species) + '_tn%d_em'%(tw)))
-        
