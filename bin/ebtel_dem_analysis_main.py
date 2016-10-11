@@ -40,8 +40,8 @@ format = 'pdf'
 #static parameters
 t_wait = np.arange(250,5250,250)
 cool_limits = [10**6.0,10**6.5]
-t_ratio_cool=[10**6.187,10**6.348,10**6.187,10**6.348]
-t_ratio_hot=2*[10**6.934]+2*[10**7.035]
+t_ratio_cool=[10**6.187,10**6.342,10**6.187,10**6.342]
+t_ratio_hot=2*[10**6.942]+2*[10**7.027]
 
 #set directories and filenames
 figdir = '%s_heating_runs/alpha%s'
