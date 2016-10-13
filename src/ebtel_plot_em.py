@@ -404,7 +404,7 @@ class EMHistoBuilder(object):
                 raise ValueError("Unknown grouping option. Use either 'by_alpha' or 'by_t_wait'.")
 
 
-    def make_fit_histogram(self, temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None, ncols_leg=1,min_stats = 10, show_low_N=False,**kwargs):
+    def make_fit_histogram(self, temp_choice, histo_opts={}, x_limits=None, y_limits=None, leg=False, leg_loc=None, bin_tool='freedman', print_fig_filename=None, ncols_leg=1,min_stats = 10, show_low_N=False,num_yticks=5,**kwargs):
         """Build histograms from hot and cool dictionaries built up by self.loader()"""
 
         #Set up figure
@@ -447,7 +447,7 @@ class EMHistoBuilder(object):
             ax.set_ylim(ylims_final)
         else:
             ax.set_ylim(y_limits)
-        ax.set_yticks(tick_maker(ax.get_yticks(),5))
+        ax.set_yticks(tick_maker(ax.get_yticks(),num_yticks))
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         if x_limits is not None:
             ax.set_xlim(x_limits)
@@ -455,7 +455,7 @@ class EMHistoBuilder(object):
             if leg_loc is None:
                 leg_loc = 'best'
             if self.group == 'by_alpha':
-                leg_title = r'$\alpha$'
+                leg_title = None
             else:
                 leg_title = r'$t_N$ $\mathrm{(s)}$'
             handles,labels = ax.get_legend_handles_labels()
@@ -467,7 +467,8 @@ class EMHistoBuilder(object):
             #sort legend entries
             short_lab,short_hand = zip(*sorted(zip(short_lab,short_hand), key=lambda t: t[0]))
             leg = ax.legend(short_hand,short_lab,fontsize=self.alfs*self.fontsize,loc=leg_loc,ncol=ncols_leg,title=leg_title)
-            plt.setp(leg.get_title(),fontsize=self.alfs*self.fontsize)
+            if leg.get_title() is not None:
+                plt.setp(leg.get_title(),fontsize=self.alfs*self.fontsize)
 
         #Print or show figure
         if print_fig_filename is not None:
@@ -530,7 +531,7 @@ def make_top_em_grid(files=[],labels=[],colors=sns.color_palette('deep'),linesty
             ems,emb = pickle.load(f)
         for i,tws in zip(i_tws,tw_select):
             em_dict[str(tws)][l] = ems[i]
-            
+
     set_raster_inline = lambda option,axis: axis.get_rasterization_zorder()-1 if option else 1
 
     #plotting
