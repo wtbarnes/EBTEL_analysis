@@ -440,9 +440,9 @@ class EMHistoBuilder(object):
             ax.set_xlabel(r'$\mathrm{EM}\,\,\mathrm{ratio}$',fontsize=self.fontsize)
         #Check for normalization in just one set; assumed all or none are normed
         if 'normed' in list(histo_opts.values())[0] and list(histo_opts.values())[0]['normed'] is True:
-            ax.set_ylabel(r'$\mathrm{Normalized}$ $\mathrm{Frequency}$',fontsize=self.fontsize)
+            ax.set_ylabel(r'$\mathrm{Normalized}$ $\mathrm{Counts}$',fontsize=self.fontsize)
         else:
-            ax.set_ylabel(r'$\mathrm{Frequency}$',fontsize=self.fontsize)
+            ax.set_ylabel(r'$\mathrm{Counts}$',fontsize=self.fontsize)
         if y_limits is None:
             ax.set_ylim(ylims_final)
         else:
