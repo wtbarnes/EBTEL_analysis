@@ -443,11 +443,10 @@ class EMHistoBuilder(object):
             ax.set_ylabel(r'$\mathrm{Normalized}$ $\mathrm{Counts}$',fontsize=self.fontsize)
         else:
             ax.set_ylabel(r'$\mathrm{Counts}$',fontsize=self.fontsize)
-        if y_limits is None:
-            ax.set_ylim(ylims_final)
-        else:
-            ax.set_ylim(y_limits)
+        ax.set_ylim(ylims_final)
         ax.set_yticks(tick_maker(ax.get_yticks(),num_yticks))
+        if y_limits is not None:
+            ax.set_ylim(y_limits)
         ax.tick_params(axis='both',pad=8,labelsize=self.alfs*self.fontsize)
         if x_limits is not None:
             ax.set_xlim(x_limits)
